@@ -57,13 +57,16 @@ body {
 nav {
     align-items: center;
 }
-
+.navbar2 ul a {
+    text-decoration: none;
+    border-right: white 1px solid;
+    border-left: white 1px solid;
+}
 .navbar2 ul li {
     /* margin: 0 50px 0 50px; */
     padding: 30px;
     color: white;
-    border-right: white 1px solid;
-    border-left: white 1px solid;
+    
 }
 
 .navbar2 ul li:hover {
