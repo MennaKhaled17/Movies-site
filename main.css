@@ -43,7 +43,7 @@ body {
 .ul1{
     display: flex;
     list-style: none;
-  background-color: orange;
+  background-color: rgb(176, 13, 13);
 height:100px;
 margin: auto 0;
 
@@ -142,4 +142,25 @@ footer a {
 
 footer a:hover {
     text-decoration: underline;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+    margin: 0;
+    padding: 20px;
+}
+.movie {
+    background-color: #fff;
+    padding: 20px;
+    margin: 20px 0;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.movie h2 {
+    margin-top: 0;
+    color: #333;
+}
+.movie p {
+    margin: 5px 0;
 }

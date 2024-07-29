@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Details</title>
+</head>
+<body>
+    <h1>Movie Details</h1>
+    <% movies.forEach(function(movie) { %>
+        <div class="movie">
+            <h2><%= movie.name %></h2>
+            <p><strong>Description:</strong> <%= movie.description %></p>
+            <p><strong>Genre:</strong> <%= movie.genre %></p>
+            <p><strong>Price:</strong> $<%= movie.price %></p>
+            <p><strong>Timing:</strong> <%= movie.timing %></p>
+        </div>
+    <% }); %>
+</body>
+</html>
