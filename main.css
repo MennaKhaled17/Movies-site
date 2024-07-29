@@ -1,6 +1,45 @@
-.navbar1{
-    height:30px;
-}
+body {
+    margin: 0;
+    font-family: 'Arial', sans-serif;
+  }
+  
+  .navbar1 {
+    display: flex;
+    justify-content: center; /* Center the search bar */
+    align-items: center; /* Center the items vertically */
+    position: relative; /* Allows absolute positioning of contact info */
+    height: 60px; /* Define a height for the navbar */
+    background-color:#f0f0f0; /* Light pink background color */
+    padding: 0 20px; /* Adds padding to the navbar */
+  }
+  
+  .navbar1 input[type="search"] {
+    border-radius: 25px; /* Adds border radius */
+    padding: 10px 20px; /* Adds padding inside the input */
+    border: 1px solid #fffefe; /* Adds a border */
+    outline: none; /* Removes the default outline */
+    font-size: 16px; /* Sets the font size */
+    width: 100%; /* Makes the input take up the full width of its container */
+    max-width: 400px; /* Optional: sets a maximum width for the input */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional: adds a subtle shadow */
+  }
+  
+  .contact-info {
+    position: absolute; /* Positions the contact info absolutely */
+    right: 20px; /* Aligns the contact info to the right */
+    font-size: 14px; /* Sets the font size */
+    color: #333; /* Sets the text color */
+    background-color: #fffefe; /* Very light pink background for the contact info */
+    padding: 5px 10px; /* Adds padding inside the contact info box */
+    border-radius: 10px; /* Adds border radius for a cute style */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional: adds a subtle shadow */
+  }
+  
+  .phone-number {
+    font-weight: bold; /* Makes the phone number bold */
+    color: #0d0d0d; /* Sets the color of the phone number to hot pink */
+  }
+
 .ul1{
     display: flex;
     list-style: none;
