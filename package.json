@@ -1,7 +1,17 @@
 {
+  "name": "my-app",
+  "version": "1.0.0",
+  "description": "A simple application",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
   "dependencies": {
     "ejs": "^3.1.10",
-    "express": "^4.19.2",
+    "express": "^4.19.2"
+  },
+  "devDependencies": {
     "nodemon": "^3.1.4"
   }
 }
