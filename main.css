@@ -1,80 +1,94 @@
-body {
+*{
     margin: 0;
-    font-family: 'Arial', sans-serif;
-  }
-  
-  .navbar1 {
-    display: flex;
-    justify-content: center; /* Center the search bar */
-    align-items: center; /* Center the items vertically */
-    position: relative; /* Allows absolute positioning of contact info */
-    height: 60px; /* Define a height for the navbar */
-    background-color:#f0f0f0; /* Light pink background color */
-    padding: 0 20px; /* Adds padding to the navbar */
-  }
-  
-  .navbar1 input[type="search"] {
-    border-radius: 25px; /* Adds border radius */
-    padding: 10px 20px; /* Adds padding inside the input */
-    border: 1px solid #fffefe; /* Adds a border */
-    outline: none; /* Removes the default outline */
-    font-size: 16px; /* Sets the font size */
-    width: 100%; /* Makes the input take up the full width of its container */
-    max-width: 400px; /* Optional: sets a maximum width for the input */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional: adds a subtle shadow */
-  }
-  
-  .contact-info {
-    position: absolute; /* Positions the contact info absolutely */
-    right: 20px; /* Aligns the contact info to the right */
-    font-size: 14px; /* Sets the font size */
-    color: #333; /* Sets the text color */
-    background-color: #fffefe; /* Very light pink background for the contact info */
-    padding: 5px 10px; /* Adds padding inside the contact info box */
-    border-radius: 10px; /* Adds border radius for a cute style */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional: adds a subtle shadow */
-  }
-  
-  .phone-number {
-    font-weight: bold; /* Makes the phone number bold */
-    color: #0d0d0d; /* Sets the color of the phone number to hot pink */
-  }
+    padding: 0;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-weight: 500;
+}
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+}
 
-.ul1{
+.navbar1 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    height: 60px;
+    background-color: #f0f0f0;
+    padding: 0 20px;
+}
+
+.navbar1 input[type="search"] {
+    border-radius: 25px;
+    padding: 10px 20px;
+    border: 1px solid #fffefe;
+    outline: none;
+    font-size: 16px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.contact-info {
+    position: absolute;
+    right: 20px;
+    font-size: 14px;
+    color: #333;
+    background-color: #fffefe;
+    padding: 5px 10px;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.phone-number {
+    font-weight: bold;
+    color: #0d0d0d;
+}
+
+.ul1 {
     display: flex;
     list-style: none;
-  background-color: rgb(176, 13, 13);
-height:100px;
-margin: auto 0;
-
+    background-color: rgb(176, 13, 13);
+    height: 80px;
+    justify-content: center;
 }
-nav{
+
+nav {
     align-items: center;
 }
-.navbar2 ul li:hover{
-background-color:black;
-height:30px;
-border-radius: 100px;
-width: 70px;
+
+.navbar2 ul li {
+    /* margin: 0 50px 0 50px; */
+    padding: 30px;
+    color: white;
+    border-right: white 1px solid;
+    border-left: white 1px solid;
 }
-.navbar2 ul li{
-    margin: 50px;
-    color:white;
-font-family:Georgia, 'Times New Roman', Times, serif
-      
+
+.navbar2 ul li:hover {
+    background-color: rgb(53, 49, 49);
+    /* border-radius: 100px; */
 }
-.image1{
-    width:100%;
-    height:80%;
+
+
+.image1 {
+    width: 100%;
+    height: 80%;
+}
+
+.image1 img{
+    width: 100%;
 }
 /* //chatgpt */
 .navbar3 {
-    background-color: #d3d3d3; /* Light grey background */
     overflow: hidden;
-    display: inline-block; /* Inline-block to not take the whole width */
-    padding: 10px;
-    border-radius: 8px; /* Rounded corners */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Slight shadow for a lifted effect */
+    background-color: #ff8c00;
+    padding: 10px 0;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    display: inline-block;
+    box-shadow: 0px 3px 10px rgba(0,0,0,0.1);
 }
 
 .navbar3 ul {
@@ -87,43 +101,80 @@ font-family:Georgia, 'Times New Roman', Times, serif
 
 .navbar3 ul li {
     display: inline-block;
-    padding: 14px 20px;
     cursor: pointer;
     font-size: 18px;
+    padding: 10px 20px;
 }
 
 .navbar3 ul li a {
-    color: #333;
+    color: white;
     text-decoration: none;
-    display: block;
+    font-weight: bold;
     transition: background-color 0.3s;
 }
 
 .navbar3 ul li:hover {
-    background-color: #58504d18; /* Slightly darker grey on hover */
+    background-color: #f60;
 }
+
 /* ///// */
+
+
+.movie-section {
+    text-align: center;
+    padding: 20px;
+    background-color: #f8f8f8;
+}
+
+.movie-section h1 {
+    color: #333;
+    margin-bottom: 20px;
+}
+
 
 .movie-gallery {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    margin: 20px;
+    gap: 20px;
+    padding: 20px 0;
 }
 
-.movie-gallery img {
+.movie-card {
+    background-color: #fff;
     width: 200px;
-    height: 300px;
-    margin: 10px;
-    border-radius: 8px;
+    border-radius: 10px;
+    overflow: hidden;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s, box-shadow 0.3s;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
 }
 
-.movie-gallery img:hover {
-    transform: scale(1.05);
+.movie-card:hover {
+    transform: translateY(-10px);
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 }
+
+.movie-card img {
+    width: 100%;
+    border-bottom: 2px solid #ff8c00;
+}
+
+.movie-info {
+    padding: 15px;
+    text-align: center;
+}
+
+.movie-info h2 {
+    font-size: 1.2em;
+    margin: 10px 0;
+}
+
+.movie-info p {
+    margin: 5px 0;
+    color: #777;
+}
+
 footer {
     background-color: #333;
     color: white;
@@ -144,12 +195,8 @@ footer a:hover {
     text-decoration: underline;
 }
 
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f0f0f0;
-    margin: 0;
-    padding: 20px;
-}
+
+
 .movie {
     background-color: #fff;
     padding: 20px;
@@ -157,10 +204,12 @@ body {
     border-radius: 10px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
+
 .movie h2 {
     margin-top: 0;
     color: #333;
 }
+
 .movie p {
     margin: 5px 0;
 }
