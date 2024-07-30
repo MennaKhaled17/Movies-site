@@ -17,6 +17,7 @@
           <form action="/search" method="GET">
             <input type="search" name="q" placeholder="Search" id="search-input" autocomplete="off"/>
             <ul id="autocomplete-list"></ul>
+            <button id="search-button">Go</button>
           </form>
           
           <!-- <div class="contact-info">
@@ -39,8 +40,7 @@
       <div class="movie-gallery">
         <% movies.forEach(movie => { %>
         <div class="movie-card">
-          <a href="/details"
-            ><img
+          <a href="/details/{%id%}"><img
               src="https://image.tmdb.org/t/p/w200<%= movie.poster_path %>"
               alt="<%= movie.title %> poster"
           /></a>

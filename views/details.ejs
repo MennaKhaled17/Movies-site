@@ -14,15 +14,19 @@
     </style>
 </head>
 <body>
-    <h1 class="m1">Movie Details</h1>
-    <div class="moviesss">
-        <h2 class="c1">Movie Title 1</h2>
-        <div class="p1">
-        <p ><strong>Description:</strong> This is a description of Movie Title 1.</p>
-        <p><strong>Genre:</strong> Action</p>
-        <p><strong>Price:</strong> $12.99</p>
-        <p><strong>Timing:</strong> 7:00 PM</p>
-    </div>
-    </div>
+    <h1><strong>Movie Details</strong></h1>
+  <div class="moviesss">
+    <% if (movie) { %>
+      <h2 class="c1"><%= movie.title %></h2>
+      <div class="p1">
+        <p><strong>Description:</strong> <%= movie.description || 'No description available.' %></p>
+        <p><strong>Genre:</strong> <%= movie.genre || 'Genre not specified' %></p>
+        <p><strong>Price:</strong> <%= movie.price || 'N/A' %></p>
+        <p><strong>Timing:</strong> <%= movie.timing || 'Not available' %></p>
+      </div>
+    <% } else { %>
+      <p>Movie not found or an error occurred.</p>
+    <% } %>
+  </div>
 </body>
 </html>

@@ -65,7 +65,7 @@ app.get('/autocomplete', async (req, res) => {
     const response = await axios.get(`${BASE_URL}/search/movie`, {
       params: {
         api_key: API_KEY,
-        query: query,
+        query: query, //akl haga al fe al search hya al btruh fe al query
       },
     });
     // Filter out movies without a valid poster_path and limit results
@@ -81,27 +81,38 @@ app.get('/autocomplete', async (req, res) => {
   }
 });
 
-app.get('/details', async (req, res) => {
-  const query = req.query.q;
-  if (!query) {
-    return res.redirect('/');
+app.get('/details/?id', async (req, res) => {
+  const { id } = req.query; // Extract the id from the query parameters
+
+  if (!id) {
+    return res.status(404).send("Page Not Found");
   }
 
   try {
-    const response = await axios.get(`${BASE_URL}/details/movie`, {
+    const response = await axios.get(`${BASE_URL}/movies`, {
       params: {
         api_key: API_KEY,
-        query: query,
       },
     });
-    // Filter out movies without a valid poster_path
-    const validMovies = response.data.results.filter(movie => movie.poster_path);
-    // Limit the movies to the first 10 results
-    const movies = validMovies.slice(0, 10);
-    res.render('index', { movies });
+
+    const movies = response.data.results; // Assuming the response contains a 'results' array
+
+    if (!movies || movies.length === 0) {
+      return res.status(404).send("Movie Not Found");
+    }
+
+    // Find the movie with the specific ID
+    const movie = movies.find((movie) => movie.id === parseInt(id));
+
+    if (!movie) {
+      return res.status(404).send("Movie Not Found");
+    }
+
+    res.render('details', { movie }); // Render the 'details' page with the specific movie data
+
   } catch (error) {
-    console.error('Error searching for movies:', error);
-    res.render('index', { movies: [] });
+    console.error('Error fetching movie details:', error);
+    res.status(500).render('details', { movie: null, error: "An error occurred while fetching movie details." });
   }
 });
 

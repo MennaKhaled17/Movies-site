@@ -46,6 +46,21 @@ body {
     margin-right: 20px;
     background-color:#cacaca;
 }
+#search-button {
+    padding: 10px 20px;
+    background-color: black; /* Black background color */
+    color: white;            /* White text color */
+    border: none;            /* No border */
+    border-radius: 0 5px 5px 0; /* Rounded corners on the right */
+    cursor: pointer;
+    font-size: 16px;
+    position: absolute;
+  }
+  
+  #search-button:hover {
+    background-color: #333; /* Darker shade on hover */
+  }
+  
 
 .contact-info {
     color: white;
@@ -217,7 +232,51 @@ footer a:hover {
     text-decoration: underline;
 }
 
-
+.moviesss {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 15px;
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Movie Title */
+  .c1 {
+    font-size: 1.8rem;
+    margin-bottom: 10px;
+    color: #222;
+  }
+  
+  /* Movie Details Container */
+  .p1 {
+    margin-top: 15px;
+  }
+  
+  /* Movie detail text */
+  .p1 p {
+    margin-bottom: 10px;
+  }
+  
+  /* Strong text styles */
+  .p1 strong {
+    color: #555;
+  }
+  
+  /* Responsive adjustments
+  @media (max-width: 600px) {
+    .moviesss {
+      padding: 10px;
+    }
+  
+    .c1 {
+      font-size: 1.5rem;
+    }
+  
+    .p1 {
+      font-size: 0.9rem;
+    }
+  //} */
 
 .movie {
     background-color: #fff;
