@@ -81,9 +81,30 @@ app.get('/autocomplete', async (req, res) => {
   }
 });
 
-app.get('/details', (req, res) => {
-  res.render('details');
+app.get('/details', async (req, res) => {
+  const query = req.query.q;
+  if (!query) {
+    return res.redirect('/');
+  }
+
+  try {
+    const response = await axios.get(`${BASE_URL}/details/movie`, {
+      params: {
+        api_key: API_KEY,
+        query: query,
+      },
+    });
+    // Filter out movies without a valid poster_path
+    const validMovies = response.data.results.filter(movie => movie.poster_path);
+    // Limit the movies to the first 10 results
+    const movies = validMovies.slice(0, 10);
+    res.render('index', { movies });
+  } catch (error) {
+    console.error('Error searching for movies:', error);
+    res.render('index', { movies: [] });
+  }
 });
+
 
 app.use((req, res) => {
   res.status(404).send('Page not found');

@@ -235,3 +235,70 @@ footer a:hover {
 .movie p {
     margin: 5px 0;
 }
+
+.m1 {
+    font-size: 2.5rem;
+    color: #333;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+/* Movie Container */
+.moviesss {
+    max-width: 600px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Style for the autocomplete list */
+#autocomplete-list {
+    position: absolute;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    max-height: 200px;
+    overflow-y: auto;
+    width: 300px; /* Set a specific width for the dropdown */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    margin-top: 5px;
+    list-style-type: none;
+    padding: 0;
+    font-family: 'Arial', sans-serif; /* Set the desired font family */
+  }
+  
+  /* Style for each item in the list */
+  #autocomplete-list li {
+    padding: 8px; /* Adjusted padding for a more compact list */
+    cursor: pointer;
+    display: block;
+    color: #333;
+    font-size: 14px; /* Adjust font size if needed */
+    transition: background-color 0.3s; /* Smooth hover effect */
+  }
+  
+  /* Hover effect for list items */
+  #autocomplete-list li:hover {
+    background-color: #f0f0f0;
+  }
+  
+  /* Style for the input search bar */
+  #search-input {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    width: calc(100% - 22px); /* Adjust as necessary for container width */
+    font-size: 16px;
+    font-family: 'Arial', sans-serif; /* Match font with the dropdown */
+  }
+  
+  /* Additional styling for search input */
+  #search-input:focus {
+    border-color: #aaa;
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+  }
+  
