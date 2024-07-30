@@ -1,67 +1,119 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/css/main.css">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/css/main.css" />
+    <link rel="icon" href="/imgs/Untitled_design-removebg-preview.png">
     <title>Movies</title>
-</head>
+  </head>
 
-<body>
-    <nav class="navbar1">
-        <input type="search" placeholder="Search">
-        <div class="contact-info">For more info, call: <span class="phone-number">123-456-7890</span></div>
-    </nav>
-    <nav class="navbar2">
-        <ul class="ul1">
-            <a href="#"><li>Home</li></a>
-            <a href="#"><li>Genres</li></a>
-            <a href="#"><li>TV Series</li></a>
-            <a href="#"><li>News</li></a>
-        </ul>
-    </nav>
-    <div class="image1">
-        <img src="./imgs/maxresdefault.jpg" width="100%" height="100%">
-    </div>
-
-    <div class="movie-section">
-        <h1>Featured Movies</h1>
-        <nav class="navbar3">
-            <ul class="ul2">
-                <li><a href="#">Featured</a></li>
-                <li><a href="#">Top Viewed</a></li>
-                <li><a href="#">Top Rated</a></li>
-                <li><a href="#">Recently Added</a></li>
-            </ul>
-        </nav>
-        <div class="movie-gallery">
-            <div class="movie-card">
-                <a href="/details"><img src="/imgs/3f2f72c0-6820-413f-a347-173d330d27ed.jpg" alt="Movie 1"></a>
-                <div class="movie-info">
-                    <h2>Movie Title</h2>
-                    <p>2016</p>
-                    <p>★★★★☆</p>
-                </div>
-            </div>
-            <!-- Add more movie cards as needed -->
+  <body>
+    <nav class="navbar">
+        <div class="navbar-top">
+          <div class="logo">
+            <img src="/imgs/Untitled_design-removebg-preview.png" alt="Logo" />
+          </div>
+          <form action="/search" method="GET">
+            <input type="search" name="q" placeholder="Search" id="search-input" autocomplete="off"/>
+            <ul id="autocomplete-list"></ul>
+          </form>
+          
+          <!-- <div class="contact-info">
+            <span class="phone-number">123-456-7890</span>
+          </div> -->
+          <button class="login-button">Login</button>
         </div>
+        <div class="navbar-bottom">
+          <ul class="navbar-links">
+            <li><a href="/">Home</a></li>
+            <li><a href="#">Genres</a></li>
+            <li><a href="#">TV Series</a></li>
+            <li><a href="#">News</a></li>
+          </ul>
+        </div>
+      </nav>
+
+
+      
+      <div class="movie-gallery">
+        <% movies.forEach(movie => { %>
+        <div class="movie-card">
+          <a href="/details"
+            ><img
+              src="https://image.tmdb.org/t/p/w200<%= movie.poster_path %>"
+              alt="<%= movie.title %> poster"
+          /></a>
+          <div class="movie-info">
+            <h2><%= movie.title %></h2>
+            <p>Release Date: <%= movie.release_date %></p>
+            <!-- <p>★★★★☆</p> -->
+          </div>
+        </div>
+
+        <% }) %>
+      </div>
+
+      <div class="movies-list">
+        <img src="" alt="" />
+      </div>
     </div>
 
     <footer>
-        <p>&copy; 2024 Movie Gallery. All rights reserved.</p>
-        <p>
-            Contact us: <a href="mailto:info@moviegallery.com">info@moviegallery.com</a> |
-            Phone: (123) 456-7890
-        </p>
-        <p>
-            Follow us on
-            <a href="#">Facebook</a>,
-            <a href="#">Twitter</a>,
-            <a href="#">Instagram</a>
-        </p>
+      <p>&copy; 2024 Movie Gallery. All rights reserved.</p>
+      <p>
+        Contact us:
+        <a href="mailto:info@moviegallery.com">info@moviegallery.com</a> |
+        Phone: (123) 456-7890
+      </p>
+      <p>
+        Follow us on
+        <a href="#">Facebook</a>, <a href="#">Twitter</a>,
+        <a href="#">Instagram</a>
+      </p>
     </footer>
 
-</body>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+          const searchInput = document.getElementById('search-input');
+          const autocompleteList = document.getElementById('autocomplete-list');
+    
+          searchInput.addEventListener('input', async () => {
+            const query = searchInput.value;
+            if (query.length < 3) {
+              autocompleteList.innerHTML = '';
+              return;
+            }
+    
+            try {
+              const response = await fetch(`/autocomplete?q=${query}`);
+              const movies = await response.json();
+    
+              autocompleteList.innerHTML = '';
+              movies.forEach(movie => {
+                const li = document.createElement('li');
+                li.textContent = movie.title;
+                li.addEventListener('click', () => {
+                  searchInput.value = movie.title;
+                  autocompleteList.innerHTML = '';
+                  document.querySelector('form').submit();
+                });
+                autocompleteList.appendChild(li);
+              });
+            } catch (error) {
+              console.error('Error fetching autocomplete suggestions:', error);
+            }
+          });
+    
+          // Hide the list when clicking outside
+          document.addEventListener('click', (e) => {
+            if (!autocompleteList.contains(e.target) && e.target !== searchInput) {
+              autocompleteList.innerHTML = '';
+            }
+          });
+        });
+      </script>
+    
+  </body>
 </html>
