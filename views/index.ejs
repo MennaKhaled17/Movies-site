@@ -40,7 +40,7 @@
       <div class="movie-gallery">
         <% movies.forEach(movie => { %>
         <div class="movie-card">
-          <a href="/details/{%id%}"><img
+          <a href="/details/<%=movie.id%>"><img
               src="https://image.tmdb.org/t/p/w200<%= movie.poster_path %>"
               alt="<%= movie.title %> poster"
           /></a>
@@ -50,8 +50,14 @@
             <!-- <p>★★★★☆</p> -->
           </div>
         </div>
+        <% }); %>
+      </div>
 
-        <% }) %>
+        <% if (totalMovies != 0) { %>
+          <h2>Movies Found: <%= totalMovies %></h2>
+        <% } else { %>
+          <h2>Movies Found: 0</h2>
+        <% } %>
       </div>
 
       <div class="movies-list">

@@ -46,9 +46,10 @@ app.get('/search', async (req, res) => {
     });
     // Filter out movies without a valid poster_path
     const validMovies = response.data.results.filter(movie => movie.poster_path);
+    const totalMovies = validMovies.length;
     // Limit the movies to the first 10 results
     const movies = validMovies.slice(0, 10);
-    res.render('index', { movies });
+    res.render('index', { movies ,totalMovies:10});
   } catch (error) {
     console.error('Error searching for movies:', error);
     res.render('index', { movies: [] });
@@ -81,12 +82,8 @@ app.get('/autocomplete', async (req, res) => {
   }
 });
 
-app.get('/details/?id', async (req, res) => {
-  const { id } = req.query; // Extract the id from the query parameters
-
-  if (!id) {
-    return res.status(404).send("Page Not Found");
-  }
+app.get('/details/:id', async (req, res) => {
+  const { id } = req.params; // Extract the id from the URL parameters
 
   try {
     const response = await axios.get(`${BASE_URL}/movies`, {
@@ -95,17 +92,17 @@ app.get('/details/?id', async (req, res) => {
       },
     });
 
-    const movies = response.data.results; // Assuming the response contains a 'results' array
-
+    const movies = response.data.results;
+    const totalResults = movies.length;
     if (!movies || movies.length === 0) {
       return res.status(404).send("Movie Not Found");
     }
 
     // Find the movie with the specific ID
-    const movie = movies.find((movie) => movie.id === parseInt(id));
+    const movie = movies.find((movie) => movie.id === id);
 
     if (!movie) {
-      return res.status(404).send("Movie Not Found");
+      console.log("a7a");
     }
 
     res.render('details', { movie }); // Render the 'details' page with the specific movie data
@@ -115,6 +112,7 @@ app.get('/details/?id', async (req, res) => {
     res.status(500).render('details', { movie: null, error: "An error occurred while fetching movie details." });
   }
 });
+
 
 
 app.use((req, res) => {
