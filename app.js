@@ -49,9 +49,10 @@ app.get('/search', async (req, res) => {
     const validMovies = response.data.results.filter(movie => movie.poster_path);
     // const totalMovies = validMovies.length;
     // Limit the movies to the first 10 results
-    const totalMovies = response.data.total_results; // Get the total number of movies
+    const totalMoviess = response.data.total_results; // Get the total number of movies
     const movies = validMovies.slice(0, 10);
     res.render('index', { movies, totalMovies });
+
   } catch (error) {
     console.error('Error searching for movies:', error);
     res.render('index', { movies: [], totalMovies: 0 });
@@ -100,6 +101,33 @@ app.get('/details/:id', async (req, res) => {
     res.render('details', { movies: [] }); //if there is an error open the index and give it an empty array
   }
 });
+
+
+
+//pagnation
+router.get('/', (req, res) => {
+  const pageSize = 10; // Number of items per page
+  const currentPage = parseInt(req.query.page) || 1; // Current page, default to 1
+  const offset = (currentPage - 1) * pageSize;
+
+  // Query to get the total number of items
+  db.query('SELECT COUNT(*) AS count FROM movies', (err, countResult) => {
+    if (err) throw err;
+
+    const totalItems = countResult[0].count;
+    const totalPages = Math.ceil(totalItems / pageSize);
+
+    // Query to get the movies for the current page
+    db.query('SELECT * FROM movies LIMIT ?, ?', [offset, pageSize], (err, movies) => {
+      if (err) throw err;
+
+      res.render('movies', { movies, totalPages, currentPage });
+    });
+  });
+});
+
+module.exports = router;
+
 
 app.use((req, res) => {
   res.status(404).send('Page not found');
