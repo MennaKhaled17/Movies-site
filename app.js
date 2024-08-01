@@ -52,9 +52,7 @@ app.get('/search', async (req, res) => {
     const totalMoviess = response.data.total_results; // Get the total number of movies
     const movies = validMovies.slice(0, 10);
 
-    res.render('index', { movies ,totalMovies:10
-      
-    });
+    res.render('index', { movies ,totalMovies:10});
 
     res.render('index', { movies, totalMovies });
 
@@ -134,28 +132,6 @@ app.get('/details/:id', async (req, res) => {
 
 
 //pagnation
-router.get('/', (req, res) => {
-  const pageSize = 10; // Number of items per page
-  const currentPage = parseInt(req.query.page) || 1; // Current page, default to 1
-  const offset = (currentPage - 1) * pageSize;
-
-  // Query to get the total number of items
-  db.query('SELECT COUNT(*) AS count FROM movies', (err, countResult) => {
-    if (err) throw err;
-
-    const totalItems = countResult[0].count;
-    const totalPages = Math.ceil(totalItems / pageSize);
-
-    // Query to get the movies for the current page
-    db.query('SELECT * FROM movies LIMIT ?, ?', [offset, pageSize], (err, movies) => {
-      if (err) throw err;
-
-      res.render('movies', { movies, totalPages, currentPage });
-    });
-  });
-});
-
-module.exports = router;
 
 
 app.use((req, res) => {
