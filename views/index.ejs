@@ -74,28 +74,6 @@
 
 
 
-    <ul>
-      <% movies.forEach(movie => { %>
-        <li><%= movie.title %></li>
-      <% }) %>
-    </ul>
-  
-    <div>
-      <% if (curre  ntPage > 1) { %>
-        <a href="/movies?page=<%= currentPage - 1 %>">Previous</a>
-      <% } %>
-      
-      <% for (let i = 1; i <= totalPages; i++) { %>
-        <a href="/movies?page=<%= i %>"><%= i %></a>
-      <% } %>
-      
-      <% if (currentPage < totalPages) { %>
-        <a href="/movies?page=<%= currentPage + 1 %>">Next</a>
-      <% } %>
-    </div>
-
-
-
     <footer>
       <p>&copy; 2024 Movie Gallery. All rights reserved.</p>
       <p>

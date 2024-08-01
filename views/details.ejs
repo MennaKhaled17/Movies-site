@@ -29,26 +29,23 @@
   </header>
   <main>
     <div class="details-container">
-      <div class="poster">
-        <img src="https://image.tmdb.org/t/p/w300<%= movie.poster_path %>" alt="<%= movie.title %> Poster">
-      </div>
-
-    <% } else { %>
-      <p><%= console.log(movie); %></p>
-    <% } %>
-  </div>
-=======
-      <div class="movie-info">
-        <h1><%= movie.title %></h1>
-        <p>Release Date: <%= movie.release_date %></p>
-        <p class="description"><%= movie.description %></p>
-        <!-- Add more details as needed -->
-      </div>
+      <% if (movie) { %>
+        <div class="poster">
+          <img src="https://image.tmdb.org/t/p/w300<%= movie.poster_path %>" alt="<%= movie.title %> Poster">
+        </div>
+        <div class="movie-info">
+          <h1><%= movie.title %></h1>
+          <p>Release Date: <%= movie.release_date %></p>
+          <p class="description"><%= movie.description %></p>
+          <!-- Add more details as needed -->
+        </div>
+      <% } else { %>
+        <p>No movie details available.</p>
+      <% } %>
     </div>
   </main>
   <footer>
     <p>&copy; 2024 MovieApp. All rights reserved.</p>
   </footer>
-
 </body>
 </html>

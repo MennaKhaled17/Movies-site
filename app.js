@@ -13,7 +13,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.set('view engine', 'ejs');
 app.set('views', 'views');
-
+ 
 
 app.get('/', async (req, res) => {
   try {
@@ -23,7 +23,7 @@ app.get('/', async (req, res) => {
       },
     });
     const movies = response.data.results; //i specified that i want the movies only
-    const totalMovies = 0;
+    const totalMovies = 17;
     res.render('index', { movies, totalMovies });
   } catch (error) {
     console.error('Error fetching popular movies:', error);
@@ -45,19 +45,22 @@ app.get('/search', async (req, res) => {
         query: query,
       },
     });
+
     // Filter out movies without a valid poster_path
     const validMovies = response.data.results.filter(movie => movie.poster_path);
-    // const totalMovies = validMovies.length;
     // Limit the movies to the first 10 results
-    const totalMoviess = response.data.total_results; // Get the total number of movies
     const movies = validMovies.slice(0, 10);
-    res.render('index', { movies, totalMovies });
+    // Get the total number of movies
+    const totalMovies = response.data.total_results;
+
+    res.render('index', { movies, totalMovies }); // Display only the first 10 movies
 
   } catch (error) {
     console.error('Error searching for movies:', error);
     res.render('index', { movies: [], totalMovies: 0 });
   }
 });
+
 
 app.get('/autocomplete', async (req, res) => {
   const query = req.query.q;
@@ -104,29 +107,7 @@ app.get('/details/:id', async (req, res) => {
 
 
 
-//pagnation
-router.get('/', (req, res) => {
-  const pageSize = 10; // Number of items per page
-  const currentPage = parseInt(req.query.page) || 1; // Current page, default to 1
-  const offset = (currentPage - 1) * pageSize;
 
-  // Query to get the total number of items
-  db.query('SELECT COUNT(*) AS count FROM movies', (err, countResult) => {
-    if (err) throw err;
-
-    const totalItems = countResult[0].count;
-    const totalPages = Math.ceil(totalItems / pageSize);
-
-    // Query to get the movies for the current page
-    db.query('SELECT * FROM movies LIMIT ?, ?', [offset, pageSize], (err, movies) => {
-      if (err) throw err;
-
-      res.render('movies', { movies, totalPages, currentPage });
-    });
-  });
-});
-
-module.exports = router;
 
 
 app.use((req, res) => {
