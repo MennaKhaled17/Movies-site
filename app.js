@@ -67,7 +67,7 @@ app.get('/autocomplete', async (req, res) => {
     const response = await axios.get(`${BASE_URL}/search/movie`, {
       params: {
         api_key: API_KEY,
-        query: query,
+        query: query, //akl haga al fe al search hya al btruh fe al query
       },
     });
     // Filter out movies without a valid poster_path and limit results
