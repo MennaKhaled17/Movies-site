@@ -49,13 +49,15 @@ app.get('/search', async (req, res) => {
     const validMovies = response.data.results.filter(movie => movie.poster_path);
     const totalMovies = validMovies.length;
     // Limit the movies to the first 10 results
-    const totalMovies = response.data.total_results; // Get the total number of movies
+    const totalMoviess = response.data.total_results; // Get the total number of movies
     const movies = validMovies.slice(0, 10);
-<<<<<<< HEAD
-    res.render('index', { movies ,totalMovies:10});
-=======
+
+    res.render('index', { movies ,totalMovies:10
+      
+    });
+
     res.render('index', { movies, totalMovies });
->>>>>>> cef82a1845c1b477428ec493d97fb8733b7b7ec3
+
   } catch (error) {
     console.error('Error searching for movies:', error);
     res.render('index', { movies: [], totalMovies: 0 });
@@ -89,19 +91,19 @@ app.get('/autocomplete', async (req, res) => {
 });
 
 app.get('/details/:id', async (req, res) => {
-<<<<<<< HEAD
-  const { id } = req.params; // Extract the id from the URL parameters
 
-=======
+  const { ids } = req.params; // Extract the id from the URL parameters
+
+
   const id = parseInt(req.params.id, 10); // Convert id to a number
->>>>>>> cef82a1845c1b477428ec493d97fb8733b7b7ec3
+
   try {
     const response = await axios.get(`${BASE_URL}/movie/popular`, {
       params: {
         api_key: API_KEY, //check that you have the api key
       },
     });
-<<<<<<< HEAD
+
 
     const movies = response.data.results;
     const totalResults = movies.length;
@@ -110,7 +112,7 @@ app.get('/details/:id', async (req, res) => {
     }
 
     // Find the movie with the specific ID
-    const movie = movies.find((movie) => movie.id === id);
+    const moviess = movies.find((movie) => movie.id === id);
 
     if (!movie) {
       console.log("a7a");
@@ -118,22 +120,44 @@ app.get('/details/:id', async (req, res) => {
 
     res.render('details', { movie }); // Render the 'details' page with the specific movie data
 
-=======
-    const movies = response.data.results; // i specified that i want the movies only
+
+    const moviesss = response.data.results; // i specified that i want the movies only
     const movie = movies.find(m => m.id === id);
     res.render('details', { movie });
->>>>>>> cef82a1845c1b477428ec493d97fb8733b7b7ec3
+
   } catch (error) {
     console.error('Error fetching popular movies:', error);
     res.render('details', { movies: [] }); //if there is an error open the index and give it an empty array
   }
 });
 
-<<<<<<< HEAD
 
 
-=======
->>>>>>> cef82a1845c1b477428ec493d97fb8733b7b7ec3
+//pagnation
+router.get('/', (req, res) => {
+  const pageSize = 10; // Number of items per page
+  const currentPage = parseInt(req.query.page) || 1; // Current page, default to 1
+  const offset = (currentPage - 1) * pageSize;
+
+  // Query to get the total number of items
+  db.query('SELECT COUNT(*) AS count FROM movies', (err, countResult) => {
+    if (err) throw err;
+
+    const totalItems = countResult[0].count;
+    const totalPages = Math.ceil(totalItems / pageSize);
+
+    // Query to get the movies for the current page
+    db.query('SELECT * FROM movies LIMIT ?, ?', [offset, pageSize], (err, movies) => {
+      if (err) throw err;
+
+      res.render('movies', { movies, totalPages, currentPage });
+    });
+  });
+});
+
+module.exports = router;
+
+
 app.use((req, res) => {
   res.status(404).send('Page not found');
 });
