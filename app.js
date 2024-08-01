@@ -51,12 +51,10 @@ app.get('/search', async (req, res) => {
     // Limit the movies to the first 10 results
     const totalMoviess = response.data.total_results; // Get the total number of movies
     const movies = validMovies.slice(0, 10);
-<<<<<<< HEAD
 
     res.render('index', { movies ,totalMovies:10});
 
-=======
->>>>>>> 0a0af3c358aa0a2f56435592642a623eebf12532
+
     res.render('index', { movies, totalMovies });
 
   } catch (error) {
