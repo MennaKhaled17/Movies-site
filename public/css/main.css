@@ -23,7 +23,7 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 10px;
-    background-color:#f3f3f3;
+    background-color: #f3f3f3;
     height: 60px;
 }
 
@@ -44,7 +44,7 @@ body {
     width: 100%;
     max-width: 400px;
     margin-right: 20px;
-    background-color:#cacaca;
+    background-color: #cacaca;
 }
 
 .contact-info {
@@ -195,6 +195,14 @@ body {
 .movie-info p {
     margin: 5px 0;
     color: #777;
+}
+
+
+.total-movies {
+    text-align: center;
+    margin: 20px 0;
+    font-size: 1.2em;
+    color: #333;
 }
 
 footer {

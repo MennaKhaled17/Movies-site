@@ -39,7 +39,7 @@
       <div class="movie-gallery">
         <% movies.forEach(movie => { %>
         <div class="movie-card">
-          <a href="/details"
+          <a href="/details/<%= movie.id %>"
             ><img
               src="https://image.tmdb.org/t/p/w200<%= movie.poster_path %>"
               alt="<%= movie.title %> poster"
@@ -58,6 +58,12 @@
         <img src="" alt="" />
       </div>
     </div>
+
+    <% if(totalMovies){%>
+    <div class="total-movies">
+      <p>Total Movies Found: <%= totalMovies %></p>
+    </div>
+    <%}%>
 
     <footer>
       <p>&copy; 2024 Movie Gallery. All rights reserved.</p>

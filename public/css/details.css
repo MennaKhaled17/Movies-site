@@ -1,0 +1,116 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  header {
+    background-color: #ff8000;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  header .logo img {
+    height: 50px;
+  }
+  
+  header nav ul {
+    list-style: none;
+    display: flex;
+    margin: 0;
+    padding: 0;
+  }
+  
+  header nav ul li {
+    margin: 0 15px;
+  }
+  
+  header nav ul li a {
+    text-decoration: none;
+    color: #fff;
+    font-weight: bold;
+  }
+  
+  header .search-bar {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+  }
+  
+  header .search-bar input {
+    width: 60%;
+    padding: 10px;
+    border: none;
+    border-radius: 20px;
+  }
+  
+  header .user-actions {
+    display: flex;
+    align-items: center;
+  }
+  
+  header .user-actions .login-btn {
+    padding: 10px 20px;
+    background-color: #fff;
+    border: none;
+    border-radius: 20px;
+    color: #ff8000;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  
+  main {
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+  }
+  
+  .details-container {
+    display: flex;
+    max-width: 1200px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+  
+  .poster img {
+    width: 300px;
+    border-radius: 10px 0 0 10px;
+  }
+  
+  .movie-info {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  
+  .movie-info h1 {
+    margin: 0;
+    font-size: 2em;
+  }
+  
+  .movie-info p {
+    margin: 10px 0;
+  }
+  
+  .movie-info .description {
+    font-size: 1em;
+    color: #333;
+  }
+  
+  footer {
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    padding: 20px;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+  }
+  

@@ -23,7 +23,8 @@ app.get('/', async (req, res) => {
       },
     });
     const movies = response.data.results; //i specified that i want the movies only
-    res.render('index', { movies });
+    const totalMovies = 0;
+    res.render('index', { movies, totalMovies });
   } catch (error) {
     console.error('Error fetching popular movies:', error);
     res.render('index', { movies: [] }); //if there is an error open the index and give it an empty array
@@ -47,11 +48,12 @@ app.get('/search', async (req, res) => {
     // Filter out movies without a valid poster_path
     const validMovies = response.data.results.filter(movie => movie.poster_path);
     // Limit the movies to the first 10 results
+    const totalMovies = response.data.total_results; // Get the total number of movies
     const movies = validMovies.slice(0, 10);
-    res.render('index', { movies });
+    res.render('index', { movies, totalMovies });
   } catch (error) {
     console.error('Error searching for movies:', error);
-    res.render('index', { movies: [] });
+    res.render('index', { movies: [], totalMovies: 0 });
   }
 });
 
@@ -81,8 +83,21 @@ app.get('/autocomplete', async (req, res) => {
   }
 });
 
-app.get('/details', (req, res) => {
-  res.render('details');
+app.get('/details/:id', async (req, res) => {
+  const id = parseInt(req.params.id, 10); // Convert id to a number
+  try {
+    const response = await axios.get(`${BASE_URL}/movie/popular`, {
+      params: {
+        api_key: API_KEY, //check that you have the api key
+      },
+    });
+    const movies = response.data.results; // i specified that i want the movies only
+    const movie = movies.find(m => m.id === id);
+    res.render('details', { movie });
+  } catch (error) {
+    console.error('Error fetching popular movies:', error);
+    res.render('details', { movies: [] }); //if there is an error open the index and give it an empty array
+  }
 });
 
 app.use((req, res) => {
