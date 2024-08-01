@@ -23,7 +23,8 @@ app.get('/', async (req, res) => {
       },
     });
     const movies = response.data.results; //i specified that i want the movies only
-    res.render('index', { movies });
+    const totalMovies = 0;
+    res.render('index', { movies, totalMovies });
   } catch (error) {
     console.error('Error fetching popular movies:', error);
     res.render('index', { movies: [] }); //if there is an error open the index and give it an empty array
@@ -48,11 +49,16 @@ app.get('/search', async (req, res) => {
     const validMovies = response.data.results.filter(movie => movie.poster_path);
     const totalMovies = validMovies.length;
     // Limit the movies to the first 10 results
+    const totalMovies = response.data.total_results; // Get the total number of movies
     const movies = validMovies.slice(0, 10);
+<<<<<<< HEAD
     res.render('index', { movies ,totalMovies:10});
+=======
+    res.render('index', { movies, totalMovies });
+>>>>>>> cef82a1845c1b477428ec493d97fb8733b7b7ec3
   } catch (error) {
     console.error('Error searching for movies:', error);
-    res.render('index', { movies: [] });
+    res.render('index', { movies: [], totalMovies: 0 });
   }
 });
 
@@ -83,14 +89,19 @@ app.get('/autocomplete', async (req, res) => {
 });
 
 app.get('/details/:id', async (req, res) => {
+<<<<<<< HEAD
   const { id } = req.params; // Extract the id from the URL parameters
 
+=======
+  const id = parseInt(req.params.id, 10); // Convert id to a number
+>>>>>>> cef82a1845c1b477428ec493d97fb8733b7b7ec3
   try {
-    const response = await axios.get(`${BASE_URL}/movies`, {
+    const response = await axios.get(`${BASE_URL}/movie/popular`, {
       params: {
-        api_key: API_KEY,
+        api_key: API_KEY, //check that you have the api key
       },
     });
+<<<<<<< HEAD
 
     const movies = response.data.results;
     const totalResults = movies.length;
@@ -107,14 +118,22 @@ app.get('/details/:id', async (req, res) => {
 
     res.render('details', { movie }); // Render the 'details' page with the specific movie data
 
+=======
+    const movies = response.data.results; // i specified that i want the movies only
+    const movie = movies.find(m => m.id === id);
+    res.render('details', { movie });
+>>>>>>> cef82a1845c1b477428ec493d97fb8733b7b7ec3
   } catch (error) {
-    console.error('Error fetching movie details:', error);
-    res.status(500).render('details', { movie: null, error: "An error occurred while fetching movie details." });
+    console.error('Error fetching popular movies:', error);
+    res.render('details', { movies: [] }); //if there is an error open the index and give it an empty array
   }
 });
 
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> cef82a1845c1b477428ec493d97fb8733b7b7ec3
 app.use((req, res) => {
   res.status(404).send('Page not found');
 });

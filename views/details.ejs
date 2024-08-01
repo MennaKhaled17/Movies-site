@@ -1,32 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Movie Details</title>
-    <style>
-        .movie {
-            margin-bottom: 20px;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/css/details.css" />
+  <link rel="icon" href="/imgs/Untitled_design-removebg-preview.png">
+  <title><%= movie.title %> | Movie Details</title>
 </head>
 <body>
-    <h1><strong>Movie Details</strong></h1>
-  <div class="moviesss">
-    <% if (movie) { %>
-      <h2 class="c1"><%= movie.title %></h2>
-      <div class="p1">
-        <p><strong>Description:</strong> <%= movie.description || 'No description available.' %></p>
-        <p><strong>Genre:</strong> <%= movie.genre || 'Genre not specified' %></p>
-        <p><strong>Price:</strong> <%= movie.price || 'N/A' %></p>
-        <p><strong>Timing:</strong> <%= movie.timing || 'Not available' %></p>
+  <header>
+    <div class="logo">
+      <img src="/path/to/logo.png" alt="Logo">
+    </div>
+    <nav>
+      <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/genres">Genres</a></li>
+        <li><a href="/tv-series">TV Series</a></li>
+        <li><a href="/news">News</a></li>
+      </ul>
+    </nav>
+    <div class="search-bar">
+      <input type="text" placeholder="Search">
+    </div>
+    <div class="user-actions">
+      <button class="login-btn">Login</button>
+    </div>
+  </header>
+  <main>
+    <div class="details-container">
+      <div class="poster">
+        <img src="https://image.tmdb.org/t/p/w300<%= movie.poster_path %>" alt="<%= movie.title %> Poster">
       </div>
+<<<<<<< HEAD
     <% } else { %>
       <p><%= console.log(movie); %></p>
     <% } %>
   </div>
+=======
+      <div class="movie-info">
+        <h1><%= movie.title %></h1>
+        <p>Release Date: <%= movie.release_date %></p>
+        <p class="description"><%= movie.description %></p>
+        <!-- Add more details as needed -->
+      </div>
+    </div>
+  </main>
+  <footer>
+    <p>&copy; 2024 MovieApp. All rights reserved.</p>
+  </footer>
+>>>>>>> cef82a1845c1b477428ec493d97fb8733b7b7ec3
 </body>
 </html>
