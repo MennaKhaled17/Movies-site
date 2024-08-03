@@ -18,51 +18,69 @@ app.set('view engine', 'ejs');
 app.set('views', 'views');
 
 // Routing
-app.get('/', async (req, res) => { // Rendering index page and sending it movies and total movies as parameters
+app.get('/', async (req, res) => {
   try {
-    const response = await axios.get(`${BASE_URL}/movie/popular`, { // Getting popular movies from API
+    const page = parseInt(req.query.page, 10) || 1; // Current page number
+    const limit = 10; // Number of items per page
+
+    const response = await axios.get(`${BASE_URL}/movie/popular`, {
       params: {
-        api_key: API_KEY, // Check that you have the API key
+        api_key: API_KEY,
+        page: page, // Include page number in the API request
       },
     });
-    const movies = response.data.results; // I specified that i want the movies only
-    const totalMovies = 17;
-    res.render('index', { movies, totalMovies });
+
+    const movies = response.data.results; // All movies from API
+    const totalMovies = response.data.total_results; // Total movies from API
+    const totalPages = Math.ceil(totalMovies / limit); // Calculate total pages
+
+    // Slice the array to get the movies for the current page
+    const paginatedMovies = movies.slice((page - 1) * limit, page * limit);
+
+    res.render('index', { movies: paginatedMovies, totalMovies, page, totalPages, query: null });
+
   } catch (error) {
     console.error('Error fetching popular movies:', error);
-    res.render('index', { movies: [] }); // If there is an error open the index and give it an empty array
+    res.render('index', { movies: [], totalMovies: 0, page: 1, totalPages: 0, query: null });
   }
 });
 
+
 // Route to search movies
-app.get('/search', async (req, res) => { // Searching for a specific movie
-  const query = req.query.q; // What's written in the search bar
-  if (!query) { // If there is nothing in the search bar, redirect
-    return res.redirect('/');
+app.get('/search', async (req, res) => {
+  const query = req.query.q; // Query from the search bar
+  if (!query) {
+    return res.redirect('/'); // Redirect if no query is provided
   }
 
   try {
-    const response = await axios.get(`${BASE_URL}/search/movie`, { // Searching in the API
+    const page = parseInt(req.query.page, 10) || 1; // Current page number
+    const limit = 10; // Number of items per page
+
+    const response = await axios.get(`${BASE_URL}/search/movie`, {
       params: {
-        api_key: API_KEY, // Check that you have the API key
-        query: query, // Sending what is written in the search bar
+        api_key: API_KEY,
+        query: query,
+        page: page,
       },
     });
 
-    // Filtering out movies without a valid poster
-    const validMovies = response.data.results.filter(movie => movie.poster_path);
-    // Limit the movies to the first 10 results
-    const movies = validMovies.slice(0, 10);
-    // Get the total number of movies
+    const validMovies = response.data.results.filter(movie => movie.poster_path); // Filter out movies without a poster
     const totalMovies = response.data.total_results;
+    const totalPages = Math.ceil(totalMovies / limit); // Calculate total pages
 
-    res.render('index', { movies, totalMovies }); // Display only the first 10 movies
+    // Slice the array to get the movies for the current page
+    const paginatedMovies = validMovies.slice((page - 1) * limit, page * limit);
+
+    res.render('index', { movies: paginatedMovies, totalMovies, page, totalPages, query: query });
 
   } catch (error) {
     console.error('Error searching for movies:', error);
-    res.render('index', { movies: [], totalMovies: 0 });
+    res.render('index', { movies: [], totalMovies: 0, page: 1, totalPages: 0, query: query });
   }
 });
+
+
 
 app.get('/autocomplete', async (req, res) => {
   const query = req.query.q; // What's written in the search bar (While typing in the search bar)
@@ -93,13 +111,13 @@ app.get('/autocomplete', async (req, res) => {
 app.get('/details/:id', async (req, res) => {
   const id = parseInt(req.params.id, 10); // Convert id to a number
   try {
-    const response = await axios.get(`${BASE_URL}/movie/popular`, {
+    const response = await axios.get(`${BASE_URL}/movie/${id}`, {
       params: {
         api_key: API_KEY, // Check that you have the api key
       },
     });
-    const movies = response.data.results; // I specified that i want the movies only
-    const movie = movies.find(m => m.id === id); // Finding movie that has same id
+    const movie = response; // I specified that i want the movies only
+    // const movie = movies.find(m => m.id === id); // Finding movie that has same id
     res.render('details', { movie });
   } catch (error) {
     console.error('Error fetching popular movies:', error);
