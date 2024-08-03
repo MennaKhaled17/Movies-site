@@ -66,8 +66,8 @@ app.get('/search', async (req, res) => {
     });
 
     const validMovies = response.data.results.filter(movie => movie.poster_path); // Filter out movies without a poster
-    const totalMovies = response.data.total_results;
-    const totalPages = Math.ceil(totalMovies / limit); // Calculate total pages
+    const totalMovies = response.data.total_results; // Calculate totalMovies
+    const totalPages = Math.ceil(totalMovies / limit); // Calculate totalPages
 
     // Slice the array to get the movies for the current page
     const paginatedMovies = validMovies.slice((page - 1) * limit, page * limit);
