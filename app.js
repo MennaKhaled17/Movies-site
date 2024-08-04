@@ -6,7 +6,7 @@ const path = require('path');
 const axios = require('axios');
 const app = express();
 
-// API Stuff
+// API Data
 const API_KEY = '2306111c328b44f1be3d16ba83e418a6';
 const BASE_URL = 'https://api.themoviedb.org/3';
 
@@ -54,23 +54,31 @@ app.get('/search', async (req, res) => {
   }
 
   try {
-    const page = parseInt(req.query.page, 10) || 1; // Current page number
-    const limit = 10; // Number of items per page
+    page = parseInt(req.query.page) || 1;
+    const pageSize = parseInt(req.query.pageSize) || 10;
+
+
+    if (page === 3) {
+      page = 2;
+    }
 
     const response = await axios.get(`${BASE_URL}/search/movie`, {
       params: {
         api_key: API_KEY,
         query: query,
-        page: page,
+        // page: page,
       },
     });
 
-    const validMovies = response.data.results.filter(movie => movie.poster_path); // Filter out movies without a poster
-    const totalMovies = response.data.total_results; // Calculate totalMovies
-    const totalPages = Math.ceil(totalMovies / limit); // Calculate totalPages
+    const movies = response.data.results;
+    // Use the total number of valid movies
+    const totalMovies = response.data.total_results;
+    const totalPages = Math.ceil(totalMovies / pageSize);
 
-    // Slice the array to get the movies for the current page
-    const paginatedMovies = validMovies.slice((page - 1) * limit, page * limit);
+    // Calculate pagination indices
+    const startIndex = (page - 1) * pageSize;
+    const endIndex = Math.min(startIndex + pageSize, totalMovies);
+    const paginatedMovies = movies.slice(startIndex, endIndex);
 
     res.render('index', { movies: paginatedMovies, totalMovies, page, totalPages, query: query });
 
@@ -79,6 +87,8 @@ app.get('/search', async (req, res) => {
     res.render('index', { movies: [], totalMovies: 0, page: 1, totalPages: 0, query: query });
   }
 });
+
+
 
 
 
@@ -116,7 +126,8 @@ app.get('/details/:id', async (req, res) => {
         api_key: API_KEY, // Check that you have the api key
       },
     });
-    const movie = response; // I specified that i want the movies only
+    // console.log(response);
+    const movie = response.data; // I specified that i want the movies only
     // const movie = movies.find(m => m.id === id); // Finding movie that has same id
     res.render('details', { movie });
   } catch (error) {

@@ -33,107 +33,83 @@
     </div>
   </nav>
 
-
-
   <div class="movie-gallery">
-    <% movies.forEach(movie=> { %>
-      <div class="movie-card">
-        <a href="/details/<%= movie.id %>"><img src="https://image.tmdb.org/t/p/w200<%= movie.poster_path %>"
-            alt="<%= movie.title %> poster" /></a>
-        <div class="movie-info">
-          <h2>
-            <%= movie.title %>
-          </h2>
-          <p>Release Date: <%= movie.release_date %>
-          </p>
-          <!-- <p>★★★★☆</p> -->
+    <% movies.forEach(movie => { %>
+    <div class="movie-item">
+        <div class="movie-poster">
+            <a href="/details/<%= movie.id %>">
+                <img src="<%= movie.poster_path ? 'https://image.tmdb.org/t/p/w200' + movie.poster_path : '/imgs/default.png' %>" alt="<%= movie.title %> poster" />
+            </a>
         </div>
-      </div>
-      <% }); %>
-  </div>
+        <div class="movie-details">
+            <h2><%= movie.title %></h2>
+            <p>Release Date: <%= movie.release_date %></p>
+            <p class="overview"><%= movie.overview %></p>
+        </div>
+    </div>
+    <% }); %>
+</div>
 
-  <!-- The URL changes according to the button clicked - Concatenates search query with pagination -->
-  <%if(query !=0){%>
+  <% if(query != 0) { %>
     <div class="pagination">
       <button class="page-button" id="first" onclick="location.href='/search?q=<%= query %>&page=1'">First</button>
-
-      <button class="page-button" id="previous"
-        onclick="location.href='/search?q=<%= query %>&page=<%= page - 1 > 0 ? page - 1 : 1 %>'">Previous</button>
-
-      <button class="page-button" id="next"
-        onclick="location.href='/search?q=<%= query %>&page=<%= page + 1 <= totalPages ? page + 1 : totalPages %>'">Next</button>
-
-      <button class="page-button" id="last"
-        onclick="location.href='/search?q=<%= query %>&page=<%= totalPages %>'">Last</button>
+      <button class="page-button" id="previous" onclick="location.href='/search?q=<%= query %>&page=<%= page - 1 > 0 ? page - 1 : 1 %>'">Previous</button>
+      <button class="page-button" id="next" onclick="location.href='/search?q=<%= query %>&page=<%= page + 1 <= totalPages ? page + 1 : totalPages %>'">Next</button>
+      <button class="page-button" id="last" onclick="location.href='/search?q=<%= query %>&page=<%= totalPages %>'">Last</button>
     </div>
-    <%}%>
+  <% } %>
 
-    <!-- Displays total movies -->
-      <% if(totalMovies){%>
-        <div class="total-movies">
-          <p>Total Movies Found: <%= totalMovies %>
-          </p>
-        </div>
-        <%}%>
+  <% if(totalMovies) { %>
+    <div class="total-movies">
+      <p>Total Movies Found: <%= totalMovies %></p>
+    </div>
+  <% } %>
 
+  <footer>
+    <p>&copy; 2024 Movie Gallery. All rights reserved.</p>
+    <p>Contact us: <a href="mailto:info@moviegallery.com">info@moviegallery.com</a> | Phone: (123) 456-7890</p>
+    <p>Follow us on <a href="#">Facebook</a>, <a href="#">Twitter</a>, <a href="#">Instagram</a></p>
+  </footer>
 
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const searchInput = document.getElementById('search-input');
+      const autocompleteList = document.getElementById('autocomplete-list');
 
-          <footer>
-            <p>&copy; 2024 Movie Gallery. All rights reserved.</p>
-            <p>
-              Contact us:
-              <a href="mailto:info@moviegallery.com">info@moviegallery.com</a> |
-              Phone: (123) 456-7890
-            </p>
-            <p>
-              Follow us on
-              <a href="#">Facebook</a>, <a href="#">Twitter</a>,
-              <a href="#">Instagram</a>
-            </p>
-          </footer>
+      searchInput.addEventListener('input', async () => {
+        const query = searchInput.value;
+        if (query.length < 3) {
+          autocompleteList.innerHTML = '';
+          return;
+        }
 
+        try {
+          const response = await fetch(`/autocomplete?q=${query}`);
+          const movies = await response.json();
 
-          <script>
-            document.addEventListener('DOMContentLoaded', () => {
-              const searchInput = document.getElementById('search-input');
-              const autocompleteList = document.getElementById('autocomplete-list');
-
-              searchInput.addEventListener('input', async () => {
-                const query = searchInput.value;
-                if (query.length < 3) {
-                  autocompleteList.innerHTML = '';
-                  return;
-                }
-
-                try {
-                  const response = await fetch(`/autocomplete?q=${query}`);
-                  const movies = await response.json();
-
-                  autocompleteList.innerHTML = '';
-                  movies.forEach(movie => {
-                    const li = document.createElement('li');
-                    li.textContent = movie.title;
-                    li.addEventListener('click', () => {
-                      searchInput.value = movie.title;
-                      autocompleteList.innerHTML = '';
-                      document.querySelector('form').submit();
-                    });
-                    autocompleteList.appendChild(li);
-                  });
-                } catch (error) {
-                  console.error('Error fetching autocomplete suggestions:', error);
-                }
-              });
-
-              // Hide the list when clicking outside
-              document.addEventListener('click', (e) => {
-                if (!autocompleteList.contains(e.target) && e.target !== searchInput) {
-                  autocompleteList.innerHTML = '';
-                }
-              });
+          autocompleteList.innerHTML = '';
+          movies.forEach(movie => {
+            const li = document.createElement('li');
+            li.textContent = movie.title;
+            li.addEventListener('click', () => {
+              searchInput.value = movie.title;
+              autocompleteList.innerHTML = '';
+              document.querySelector('form').submit();
             });
-          </script>
+            autocompleteList.appendChild(li);
+          });
+        } catch (error) {
+          console.error('Error fetching autocomplete suggestions:', error);
+        }
+      });
 
+      document.addEventListener('click', (e) => {
+        if (!autocompleteList.contains(e.target) && e.target !== searchInput) {
+          autocompleteList.innerHTML = '';
+        }
+      });
+    });
+  </script>
 </body>
 
 </html>

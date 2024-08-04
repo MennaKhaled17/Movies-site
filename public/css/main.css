@@ -171,46 +171,107 @@ body {
 
 .movie-gallery {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
     gap: 20px;
-    padding: 20px 0;
 }
 
-.movie-card {
+.movie-item {
+    display: flex;
+    align-items: flex-start;
     background-color: #fff;
-    width: 200px;
+    padding: 20px;
     border-radius: 10px;
-    overflow: hidden;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 800px;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-    cursor: pointer;
 }
 
-.movie-card:hover {
-    transform: translateY(-10px);
+.movie-item:hover {
+    transform: translateY(-5px);
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 }
 
-.movie-card img {
-    width: 100%;
-    border-bottom: 2px solid #ff8c00;
+.movie-poster img {
+    width: 150px;
+    border-radius: 10px;
+    margin-right: 20px;
 }
 
-.movie-info {
-    padding: 15px;
-    text-align: center;
+.movie-details {
+    flex: 1;
 }
 
-.movie-info h2 {
-    font-size: 1.2em;
-    margin: 10px 0;
+.movie-details h2 {
+    font-size: 1.5em;
+    margin: 0 0 10px;
+    color: #333;
 }
 
-.movie-info p {
+.movie-details p {
     margin: 5px 0;
     color: #777;
 }
+
+.overview {
+    margin-top: 10px;
+    font-size: 1rem;
+    color: #555;
+}
+
+
+
+/* Pagination Container */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+/* Page Button Styles */
+.page-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+/* Hover Effect for Buttons */
+.page-button:hover {
+    background-color: #0056b3;
+}
+
+/* Disabled State for Buttons */
+.page-button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+/* Individual Button Styles */
+#first, #last {
+    background-color: #28a745;
+}
+
+#first:hover, #last:hover {
+    background-color: #218838;
+}
+
+#previous, #next {
+    background-color: #ffc107;
+}
+
+#previous:hover, #next:hover {
+    background-color: #e0a800;
+}
+    
 
   
 .total-movies {

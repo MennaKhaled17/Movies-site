@@ -4,9 +4,10 @@
   <meta charset="UTF-8">
   <link rel="stylesheet" href="/css/details.css" />
   <link rel="icon" href="/imgs/Untitled_design-removebg-preview.png">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
   <title><%= movie.title %> | Movie Details</title>
 </head>
-<body>
+<body class="<%= movie.poster_path ? 'has-poster' : 'no-poster' %>">
   <header>
     <div class="logo">
       <img src="/imgs/Untitled_design-removebg-preview.png" alt="Logo">
@@ -20,23 +21,29 @@
       </ul>
     </nav>
     <div class="search-bar">
-      <input type="text" placeholder="Search">
+      <form action="/search" method="GET">
+        <input type="search" name="q" placeholder="Search" id="search-input" autocomplete="off" />
+        <ul id="autocomplete-list"></ul>
+        <!-- <button id="search-button">Go</button> -->
+      </form>
     </div>
     <div class="user-actions">
       <button class="login-btn">Login</button>
     </div>
   </header>
   <main>
-    <!-- Displays movie details according to movie passed from app.js -->
     <div class="details-container">
       <% if (movie) { %>
         <div class="poster">
-          <img src="https://image.tmdb.org/t/p/w300<%= movie.poster_path %>" alt="<%= movie.title %> Poster">
+          <img src="<%= movie.poster_path ? 'https://image.tmdb.org/t/p/w500' + movie.poster_path : '/imgs/default.png' %>" alt="<%= movie.title %> poster" />
         </div>
         <div class="movie-info">
           <h1><%= movie.title %></h1>
-          <p>Release Date: <%= movie.release_date %></p>
-          <p class="description"><%= movie.description %></p>
+          <p class="release-date">Release Date: <%= movie.release_date %></p>
+          <p class="user-score">User Score: <%= movie.vote_average %> / 10</p>
+          <p class="overview"><%= movie.overview %></p>
+          <p class="director">Director: <%= movie.director %></p>
+          <p class="genres">Genres: <%= movie.genres.map(genre => genre.name).join(', ') %></p>
         </div>
       <% } else { %>
         <p>No movie details available.</p>
@@ -46,5 +53,45 @@
   <footer>
     <p>&copy; 2024 MovieApp. All rights reserved.</p>
   </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const searchInput = document.getElementById('search-input');
+      const autocompleteList = document.getElementById('autocomplete-list');
+
+      searchInput.addEventListener('input', async () => {
+        const query = searchInput.value;
+        if (query.length < 3) {
+          autocompleteList.innerHTML = '';
+          return;
+        }
+
+        try {
+          const response = await fetch(`/autocomplete?q=${query}`);
+          const movies = await response.json();
+
+          autocompleteList.innerHTML = '';
+          movies.forEach(movie => {
+            const li = document.createElement('li');
+            li.textContent = movie.title;
+            li.addEventListener('click', () => {
+              searchInput.value = movie.title;
+              autocompleteList.innerHTML = '';
+              document.querySelector('form').submit();
+            });
+            autocompleteList.appendChild(li);
+          });
+        } catch (error) {
+          console.error('Error fetching autocomplete suggestions:', error);
+        }
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!autocompleteList.contains(e.target) && e.target !== searchInput) {
+          autocompleteList.innerHTML = '';
+        }
+      });
+    });
+  </script>
 </body>
 </html>
