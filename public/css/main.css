@@ -281,26 +281,6 @@ body {
     color: #333;
 }
 
-footer {
-    background-color: #333;
-    color: white;
-    text-align: center;
-    padding: 20px 0;
-    margin-top: 20px;
-    position: relative;
-    bottom: 0;
-    width: 100%;
-}
-
-footer a {
-    color: #d3d3d3;
-    text-decoration: none;
-}
-
-footer a:hover {
-    text-decoration: underline;
-}
-
 .moviesss {
     max-width: 600px;
     margin: 20px auto;

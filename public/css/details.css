@@ -148,16 +148,6 @@ main {
   line-height: 1.6;
 }
 
-footer {
-  background-color: #1c1c1c;
-  color: #fff;
-  text-align: center;
-  padding: 20px;
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-}
-
 #autocomplete-list {
   position: absolute;
   background-color: white;
