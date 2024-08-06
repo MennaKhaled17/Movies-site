@@ -4,6 +4,7 @@ const url = require('url');
 const express = require('express');
 const path = require('path');
 const axios = require('axios');
+const { render } = require('ejs');
 const app = express();
 
 // API Data
@@ -136,6 +137,9 @@ app.get('/details/:id', async (req, res) => {
   }
 });
 
+app.get("/login",async(req,res)=>{
+  res.render('login');
+})
 // Callback function when route is incorrect
 app.use((req, res) => {
   res.status(404).send('Page not found');
