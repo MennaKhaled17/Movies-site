@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register Page</title>
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="icon" href="/imgs/Untitled_design-removebg-preview.png">
+  <!-- <link rel="stylesheet" href="/css/footer.css"> -->
+  <style>
+    .error-message {
+      color: rgb(243, 19, 19);
+      font-size: 0.9em;
+      margin-top: 10px;
+    }
+    .errorDiv {
+      display: none; /* Hide error divs initially */
+    }
+  </style>
+</head>
+<body>
+  <script>
+    function validateForm(event) {
+      const form = document.getElementById('loginForm');
+      const errorDiv = document.getElementById('errorMessages');
+      errorDiv.innerHTML = ''; 
+      
+      // Get input values
+      
+
+      // Patterns for validation
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      const phonePattern = /^[0-9]{10}$/; 
+
+      let isValid = true;
+
+      // Check required fields
+      if (!firstName || !lastName || !email || !password || !country || !phone) {
+        errorDiv.innerHTML += '<p>Please fill out all required fields.</p>';
+        isValid = false;
+      }
+
+      // Validate email format
+      if (!emailPattern.test(email)) {
+        errorDiv.innerHTML += '<p>Please enter a valid email address.</p>';
+        isValid = false;
+      }
+
+      // Validate password length
+      if (password.length < 8) {
+        errorDiv.innerHTML += '<p>Password must be at least 8 characters long.</p>';
+        isValid = false;
+      }
+
+      // Validate phone number
+      if (!phonePattern.test(phone)) {
+        errorDiv.innerHTML += '<p>Please enter a valid phone number (10 digits).</p>';
+        isValid = false;
+      }
+
+      // If not valid, prevent form submission
+      if (!isValid) {
+        event.preventDefault(); // Prevent form submission
+      }
+
+      return isValid;
+    }
+  </script>
+
+  <%- include('partials/navbar.ejs') %> 
+  <div class="container">
+    <h1>Login</h1>
+    <form action="/submit" id="loginForm" method="post" onsubmit="return validateForm(event)">
+      <label for="firstName">First Name:</label>
+      <input type="text" id="firstName" name="firstName" required placeholder="Enter Your First Name"> <br>
+      
+      <label for="lastName">Last Name:</label>
+      <input type="text" id="lastName" name="lastName" required placeholder="Enter Your Last Name"> <br>
+      
+      <label for="email">Email:</label>
+      <input type="email" id="email" name="email" required placeholder="Enter your email address"> <br>
+      
+      <label for="password">Password:</label>
+      <input type="password" id="password" name="password" required placeholder="Enter your password"> <br>
+      
+      <label for="country">Country:</label>
+      <select id="country" name="country" required>
+        <option value="" disabled selected>Select your country</option>
+        <option value="US">United States</option>
+        <option value="CA">Canada</option>
+        <option value="GB">United Kingdom</option>
+        <option value="AU">Australia</option>
+        <option value="IN">India</option>
+        <option value="DE">Germany</option>
+        <option value="FR">France</option>
+        <!-- Add more countries as needed -->
+      </select><br>
+
+      <label for="phone">Phone Number:</label>
+      <input type="tel" id="phone" name="phone" required placeholder="Enter your phone number"><br>
+
+        <button type="submit" class="login-button" onsubmit="return validateForm(event)">Submit</button>
+      </form>
+    <div id="errorMessages" class="error-message"></div>
+  </div>
+  <%- include("./partials/footer.ejs") %>
+</body>
+</html>

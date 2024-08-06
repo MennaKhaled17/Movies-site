@@ -424,9 +424,10 @@ body {
     padding: 20px;
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
     text-align: center; /* Center-align text inside the container */
-    position: absolute;
+    position: relative;
     left:450px;
-  }
+    bottom:60px;
+   }
   
   /* Heading styling */
   h1 {
@@ -439,6 +440,7 @@ body {
   form {
     display: flex;
     flex-direction: column;
+
   }
   
   /* Label styling */
@@ -503,24 +505,3 @@ body {
   
   /* Responsive Design */
  
-
-footer {
-    background-color: #333;
-    color: white;
-    text-align: center;
-    padding: 20px 0;
-    margin-top: 20px;
-    position: relative;
-    bottom: 0;
-    width: 100%;
-}
-
-footer a {
-    color: #d3d3d3;
-    text-decoration: none;
-}
-
-footer a:hover {
-    text-decoration: underline;
-}
-  

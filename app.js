@@ -137,8 +137,8 @@ app.get('/details/:id', async (req, res) => {
   }
 });
 
-app.get("/login",async(req,res)=>{
-  res.render('login');
+app.get("/Register",async(req,res)=>{
+  res.render('Register');
 })
 // Callback function when route is incorrect
 app.use((req, res) => {
