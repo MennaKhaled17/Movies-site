@@ -58,9 +58,9 @@ app.get('/search', async (req, res) => {
     const pageSize = parseInt(req.query.pageSize) || 10;
 
 
-    if (page === 3) {
-      page = 2;
-    }
+    // if (page === 3) {
+    //   page = 2;
+    // }
 
     const response = await axios.get(`${BASE_URL}/search/movie`, {
       params: {
