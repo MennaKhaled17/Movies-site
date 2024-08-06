@@ -20,9 +20,10 @@
         <ul id="autocomplete-list"></ul>
         <button id="search-button">Go</button>
       </form>
+      <div class="buttonss">
       <button class="login-button" onclick="location.href='/Register';">Register</button>
       <button class="login-button" onclick="location.href='/Login';">Login</button>
-
+</div>
       
       </div> 
       
@@ -70,7 +71,7 @@
     </div>
   <% } %>
 
-  <%- include('./partials/footer.ejs') %>
+ 
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -111,6 +112,7 @@
       });
     });
   </script>
+   <%- include('./partials/footer.ejs') %>
 </body>
 
 </html>

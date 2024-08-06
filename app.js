@@ -5,6 +5,7 @@ const express = require('express');
 const path = require('path');
 const axios = require('axios');
 const { render } = require('ejs');
+const { getCountries } = require('country-state-picker');
 const app = express();
 
 // API Data
@@ -139,6 +140,14 @@ app.get('/details/:id', async (req, res) => {
 
 app.get("/Register",async(req,res)=>{
   res.render('Register');
+  let countries=getCountries();
+ 
+})
+app.get('/countries',(req,res)=>{
+  const countrylist=Object.values(countries).map(country=>{
+country.name});
+res.json(countrylist);
+  
 })
 app.get("/login",async(req,res)=>{
   res.render('login');

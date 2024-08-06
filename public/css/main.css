@@ -55,6 +55,7 @@ body {
     cursor: pointer;
     font-size: 16px;
     position: absolute;
+    left:190px;
   }
   
   #search-button:hover {
@@ -415,79 +416,93 @@ body {
   /* Basic reset */
 
   /* Container styling */
-  .container {
+ /* Global styling to center the container */
+/* Global styling to center the container */
+
+/* Container styling */
+.container {
     background: #ffffff;
     border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    max-width: 500px;  /* Maximum width of the form box */
-    width: 100%;
-    padding: 20px;
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-    text-align: center; /* Center-align text inside the container */
+    max-width: 500px; /* Maximum width of the form box */
+    width: 100%;
+    padding: 40px; /* Reduced padding for better organization */
+    text-align: left; /* Align text to the left for better readability */
     position: relative;
-    left:450px;
-    bottom:60px;
-   }
-  
-  /* Heading styling */
-  h1 {
+    left:500px; 
+}
+
+/* Heading styling */
+h1 {
     color: #333;
     margin-bottom: 20px;
     font-size: 2em;
-  }
-  
-  /* Form element styling */
-  form {
+    text-align: center; /* Center the heading text */
+}
+
+/* Form element styling */
+form {
     display: flex;
     flex-direction: column;
+        position: relative;
+        left: 150px;
+}
 
-  }
-  
-  /* Label styling */
-  label {
+/* Field styling */
+.field {
+    display: flex;
+    align-items: center; /* Align items vertically center */
+    justify-content: center; /* Center items horizontally */
+    margin-bottom: 15px; /* Spacing between fields */
+}
+
+/* Label styling */
+label {
     font-size: 0.9em;
     color: #555;
-    margin-bottom: 5px;
-  }
-  
-  /* Input and select styling */
-  input[type="text"],
-  input[type="email"],
-  input[type="password"],
-  input[type="tel"],
-  select {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 15px;
+    margin-right: 10px; /* Space between label and input */
+    white-space: nowrap; /* Prevent label wrapping */
+    width: 120px; /* Fixed width for labels */
+    text-align: left;
+}
+
+/* Input and select styling */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="tel"],
+select {
+    width: 200px; /* Fixed width for inputs */
+    padding: 8px; /* Standard padding for better height */
     border: 1px solid #ddd;
     border-radius: 5px;
-    font-size: 16px;
+    font-size: 14px; /* Font size for inputs */
     transition: all 0.3s ease;
-  }
-  
-  /* Input focus and hover effects */
-  input:focus,
-  select:focus {
+}
+
+/* Input focus and hover effects */
+input:focus,
+select:focus {
     border-color: #ff8c00;
     box-shadow: 0 0 5px rgba(255, 140, 0, 0.5);
     outline: none;
-  }
-  
-  /* Placeholder styling */
-  input::placeholder {
+}
+
+/* Placeholder styling */
+input::placeholder {
     color: #999;
     font-style: italic;
     font-weight: 300;
-  }
-  
-  /* Dropdown styling */
-  select {
+}
+
+/* Dropdown styling */
+select {
     background: #f9f9f9;
     color: #333;
-  }
-  
-  /* Button styling */
-  .login-button {
+}
+
+/* Button styling */
+.login-button {
     padding: 12px 20px;
     border: none;
     border-radius: 5px;
@@ -496,12 +511,14 @@ body {
     font-size: 16px;
     cursor: pointer;
     transition: background 0.3s ease, transform 0.3s ease;
-  }
-  
-  button:hover {
+    margin-top: 10px; /* Space above the button */
+    align-self: center; /* Center the button */
+    position: relative;
+    right:150px;    
+}
+
+/* Button hover effects */
+.login-button:hover {
     background: linear-gradient(135deg, #ff6f00, #ff8c00);
     transform: translateY(-2px);
-  }
-  
-  /* Responsive Design */
- 
+}
