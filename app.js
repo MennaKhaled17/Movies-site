@@ -140,6 +140,9 @@ app.get('/details/:id', async (req, res) => {
 app.get("/Register",async(req,res)=>{
   res.render('Register');
 })
+app.get("/login",async(req,res)=>{
+  res.render('login');
+})
 // Callback function when route is incorrect
 app.use((req, res) => {
   res.status(404).send('Page not found');
