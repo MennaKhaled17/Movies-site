@@ -4,32 +4,47 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login Page</title>
-  <link rel="stylesheet" href="/styles/style.css">
+  <link rel="stylesheet" href="/css/main.css">
+  <!-- <link rel="stylesheet" href="/css/footer.css"> -->
 </head>
 <body>
+
   <div class="container">
     <h1>Login</h1>
     <form action="/submit" method="post">
       <label for="firstName">First Name:</label>
-      <input type="text" id="firstName" name="firstName" required><br>
+      <input type="text" id="firstName" name="firstName" required placeholder=" Enter Your First Name"> <br>
 
       <label for="lastName">Last Name:</label>
-      <input type="text" id="lastName" name="lastName" required><br>
+      <input type="text" id="lastName" name="lastName" required placeholder=" Enter Your Last Name"> <br>
+     
 
       <label for="email">Email:</label>
-      <input type="email" id="email" name="email" required><br>
+      <input type="email" id="email" name="email" required placeholder="Enter your email address"> <br>
+      
 
       <label for="password">Password:</label>
-      <input type="password" id="password" name="password" required><br>
+      <input type="password" id="password" name="password" required  placeholder="Enter your password address"><br>
 
       <label for="country">Country:</label>
-      <input type="text" id="country" name="country" required><br>
+      <select id="country" name="country" required>
+        <option value="" disabled selected>Select your country</option>
+        <option value="US">United States</option>
+        <option value="CA">Canada</option>
+        <option value="GB">United Kingdom</option>
+        <option value="AU">Australia</option>
+        <option value="IN">India</option>
+        <option value="DE">Germany</option>
+        <option value="FR">France</option>
+        <!-- Add more countries as needed -->
+      </select><br>
 
       <label for="phone">Phone Number:</label>
-      <input type="tel" id="phone" name="phone" required><br>
+      <input type="tel" id="phone" name="phone" required placeholder="Enter your phone number "><br>
 
       <button type="submit" class="login-button">Submit</button>
     </form>
   </div>
+  <!-- <%-include("./partials/footer.ejs")%> -->
 </body>
 </html>
