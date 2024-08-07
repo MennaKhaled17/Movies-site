@@ -69,13 +69,13 @@
       return isValid;
     }
  
-        $(document).ready(function() {
-            $.getJSON('/countries', function(data) {
-                $('#country').autocomplete({
-                    source: data
-                });
-            });
-        });
+        // $(document).ready(function() {
+        //     $.getJSON('/countries', function(data) {
+        //         $('#country').autocomplete({
+        //             source: data
+        //         });
+        //     });
+        // });
    
   </script>
 
@@ -95,8 +95,9 @@
       <label for="password">Password:</label>
       <input type="password" id="password" name="password" required placeholder="Enter your password"> <br>
       
-      <input id ="country" name="country">Country:</label>
-     
+      <label for="country">Country:</label>
+      <input id="country" name="country" required placeholder="Type to search...">
+      <div id="country-list" class="suggestions"></div>
 
       <label for="phone">Phone Number:</label>
       <input type="tel" id="phone" name="phone" required placeholder="Enter your phone number"><br>
@@ -115,6 +116,7 @@
     <p>Follow us on <a href="#">Facebook</a>, <a href="#">Twitter</a>, <a href="#">Instagram</a></p>
 </footer>
   <style>
+   
     footer {
     background-color: #333;
     color: white;
@@ -137,43 +139,71 @@ footer a:hover {
 }
 </style>
 <script>
+  
   document.addEventListener('DOMContentLoaded', () => {
-    const searchInput = document.getElementById('search-input');
-    const autocompleteList = document.getElementById('autocomplete-list');
+    const searchInput = document.getElementById('country');
+    const autocompleteList = document.getElementById('country-list');
 
     searchInput.addEventListener('input', async () => {
-      const query = searchInput.value;
-      if (query.length < 3) {
-        autocompleteList.innerHTML = '';
-        return;
-      }
+        const query = searchInput.value.trim().toLowerCase();
+        autocompleteList.innerHTML = ''; // Clear previous suggestions
 
-      try {
-        const response = await fetch(`/autocomplete?q=${query}`);
-        const movies = await response.json();
+        if (query.length < 2) {
+            return; // No suggestions if query is less than 2 characters
+        }
 
-        autocompleteList.innerHTML = '';
-        movies.forEach(movie => {
-          const li = document.createElement('li');
-          li.textContent = movie.title;
-          li.addEventListener('click', () => {
-            searchInput.value = movie.title;
-            autocompleteList.innerHTML = '';
-            document.querySelector('form').submit();
-          });
-          autocompleteList.appendChild(li);
-        });
-      } catch (error) {
-        console.error('Error fetching autocomplete suggestions:', error);
-      }
+        try {
+            const response = await fetch('https://restcountries.com/v3.1/all');
+            const countries = await response.json();
+
+            const filteredCountries = countries.filter(country => 
+                country.name.common.toLowerCase().includes(query)
+            );
+
+            autocompleteList.innerHTML = ''; // Clear previous suggestions
+            filteredCountries.forEach(country => {
+                const li = document.createElement('li');
+                li.classList.add('suggestion-item');
+                li.textContent = country.name.common;
+                li.addEventListener('click', () => {
+                    searchInput.value = country.name.common;
+                    autocompleteList.innerHTML = '';
+                });
+                autocompleteList.appendChild(li);
+            });
+        } catch (error) {
+            console.error('Error fetching autocomplete suggestions:', error);
+        }
     });
+});
+
+      // //Filter countries based on the input
+      // const filteredCountries = countries.filter(country => 
+      //   country.toLowerCase().includes(query.toLowerCase())
+      // );
+
+      // // Create and display suggestion items
+      // filteredCountries.forEach(country => {
+      //   const li = document.createElement('div');
+      //   li.classList.add('suggestion-item');
+      //   li.textContent = country; // Set the country name
+
+      //   // Add click event to set input value and clear suggestions
+      //   li.addEventListener('click', () => {
+      //     searchInput.value = country; // Set the input value to the selected country
+      //     autocompleteList.innerHTML = ''; // Clear suggestions
+      //   });
+
+      //   autocompleteList.appendChild(li); // Append suggestion item to the list
+      // });
+    //});
 
     document.addEventListener('click', (e) => {
       if (!autocompleteList.contains(e.target) && e.target !== searchInput) {
-        autocompleteList.innerHTML = '';
+        autocompleteList.innerHTML = ''; // Clear suggestions if clicked outside
       }
     });
-  });
+ 
 </script>
 </body>
 </body>

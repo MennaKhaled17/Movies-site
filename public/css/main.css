@@ -441,11 +441,12 @@ h1 {
 }
 
 /* Form element styling */
+/* Form styling */
 form {
     display: flex;
     flex-direction: column;
-        position: relative;
-        left: 150px;
+    position: relative;
+    left: 150px;
 }
 
 /* Field styling */
@@ -464,6 +465,8 @@ label {
     white-space: nowrap; /* Prevent label wrapping */
     width: 120px; /* Fixed width for labels */
     text-align: left;
+    font-family: 'Arial', sans-serif; /* Font family */
+    font-weight: bold; /* Bold text */
 }
 
 /* Input and select styling */
@@ -478,6 +481,7 @@ select {
     border-radius: 5px;
     font-size: 14px; /* Font size for inputs */
     transition: all 0.3s ease;
+    font-family: 'Arial', sans-serif; /* Font family */
 }
 
 /* Input focus and hover effects */
@@ -514,11 +518,78 @@ select {
     margin-top: 10px; /* Space above the button */
     align-self: center; /* Center the button */
     position: relative;
-    right:150px;    
+    right: 150px;
+    font-family: 'Arial', sans-serif; /* Font family */
+    font-weight: bold; /* Bold text */
 }
 
 /* Button hover effects */
 .login-button:hover {
     background: linear-gradient(135deg, #ff6f00, #ff8c00);
     transform: translateY(-2px);
+}
+
+/* Styling for country label */
+label[for="country"] {
+    font-size: 0.9em; /* Font size for labels */
+    color: #555; /* Label text color */
+    margin-right: 10px; /* Space between label and input */
+    display: block; /* Block display for labels */
+    font-family: 'Arial', sans-serif; /* Font family */
+    font-weight: bold; /* Bold text */
+}
+
+/* Input styling for country */
+#country {
+    width: calc(45% - 22px); /* Full width minus padding */
+    padding: 10px; /* Padding for better height */
+    border: 1px solid #ddd; /* Border styling */
+    border-radius: 5px; /* Rounded corners */
+    font-size: 14px; /* Font size for inputs */
+    transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Smooth transitions */
+    box-sizing: border-box; /* Ensure padding doesn't affect width */
+    font-family: 'Arial', sans-serif; /* Font family */
+}
+
+/* Input focus effect */
+#country:focus {
+    border-color: #ff8c00; /* Border color on focus */
+    box-shadow: 0 0 5px rgba(255, 140, 0, 0.5); /* Shadow on focus */
+    outline: none; /* Remove outline */
+}
+
+/* Autocomplete suggestions container */
+#country-list {
+    position: absolute; /* Dropdown positioning */
+    background-color: white; /* Background color */
+    border: 1px solid #ddd; /* Border */
+    border-radius: 5px; /* Rounded corners */
+    max-height: 150px; /* Max height for dropdown */
+    overflow-y: auto; /* Scroll if too many items */
+    width: calc(45% - 22px); /* Match input width */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); /* Shadow for depth */
+    z-index: 1000; /* Ensure it appears above other content */
+    margin-top: 5px; /* Space between input and dropdown */
+    list-style-type: none; /* Remove default list styling */
+    padding: 0; /* No padding */
+    font-family: 'Arial', sans-serif; /* Font family */
+    position: relative;
+    
+}
+
+/* Style for each suggestion item */
+.suggestion-item {
+    padding: 10px; /* Space inside items */
+    cursor: pointer; /* Pointer cursor on hover */
+    color: #333; /* Text color */
+    font-size: 14px; /* Font size for suggestions */
+    transition: background-color 0.3s, color 0.3s; /* Smooth background color and text color change */
+    position: relative;
+    
+}
+
+/* Hover effect for suggestion items */
+.suggestion-item:hover {
+    background-color: #ff8c00; /* Highlight color on hover */
+    color: white; /* Change text color on hover */
 }

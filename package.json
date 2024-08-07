@@ -1,20 +1,21 @@
-{
-  "name": "my-app",
-  "version": "1.0.0",
-  "description": "A simple application",
-  "main": "app.js",
-  "scripts": {
-    "start": "node app.js",
-    "dev": "nodemon app.js"
-  },
-  "dependencies": {
-    "axios": "^1.7.2",
-    "countries-list": "^3.1.1",
-    "country-state-picker": "^1.1.5",
-    "ejs": "^3.1.10",
-    "express": "^4.19.2"
-  },
-  "devDependencies": {
-    "nodemon": "^3.1.4"
+  {
+    "name": "my-app",
+    "version": "1.0.0",
+    "description": "A simple application",
+    "main": "app.js",
+    "scripts": {
+      "start": "node app.js",
+      "dev": "nodemon app.js"
+    },
+    "dependencies": {
+      "axios": "^1.7.2",
+      "countries-list": "^3.1.1",
+      "country-state-picker": "^1.1.5",
+      "ejs": "^3.1.10",
+      "express": "^4.19.2",
+      "mongoose": "^8.5.2"
+    },
+    "devDependencies": {
+      "nodemon": "^3.1.4"
+    }
   }
-}

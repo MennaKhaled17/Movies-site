@@ -7,6 +7,7 @@ const axios = require('axios');
 const { render } = require('ejs');
 const { getCountries } = require('country-state-picker');
 const app = express();
+const mongoose=require("mongoose");
 
 // API Data
 const API_KEY = '2306111c328b44f1be3d16ba83e418a6';
@@ -152,6 +153,49 @@ res.json(countrylist);
 app.get("/login",async(req,res)=>{
   res.render('login');
 })
+const uri="mongodb+srv://menakhaled:menakhaled@cluster0.klteank.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+const connectDB = async () => { 
+  console.log('Attempting to connect to MongoDB...');
+  try {
+    await mongoose.connect(uri);
+    console.log('MongoDB connected...');
+  } catch (err) {
+    console.error('Error connecting to MongoDB:', err.message);
+    process.exit(1);
+  }
+};
+
+module.exports = connectDB();
+
+
+
+
+app.post('/Register', async (req, res) => {
+  const { firstname, lastname, email, password, country, phoneNumber } = req.body;
+
+  try {
+    // Create a new user instance
+    const user = new User({
+      firstname,
+      lastname,
+      email,
+      password,
+      country,
+      phoneNumber
+    });
+
+    // Save the user to the database
+    await user.save();
+    
+    // Send success response
+    res.status(201).send('User registered successfully');
+  } catch (error) {
+    console.error('Error registering user:', error);
+    res.status(500).send('Error registering user');
+  }
+});
+
+module.exports = router;
 // Callback function when route is incorrect
 app.use((req, res) => {
   res.status(404).send('Page not found');
