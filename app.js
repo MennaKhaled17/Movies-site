@@ -169,16 +169,21 @@ const connectDB = async () => {
 module.exports = connectDB();
 
 
-
+// app.use(express.json());
+// app.use(express.urlencoded({extended:true}));
 
 app.post('/Register', async (req, res) => {
-  const { firstName, lastName, email, password, country, phone } = req.body;
+  const { firstname, lastname, email, password, country, phone } = req.body;
+// console.log(req.body.firstname);
+// console.log(req.body);
+
+
 
   try {
     // Create a new user instance
     const user = new usermodel({
-      firstName,
-      lastName,
+      firstname,
+      lastname,
       email,
       password,
       country,
