@@ -78,7 +78,7 @@
   <%- include('partials/navbar.ejs') %> 
   <div class="container">
     <h1 style="color:#ff8c00;">Register Form </h1>
-    <form action="/submit" id="loginForm" method="post" onsubmit="return validateForm(event)">
+    <form action="/Register" id="loginForm" method="post" onsubmit="return validateForm(event)">
       <label for="firstName">First Name:</label>
       <input type="text" id="firstName" name="firstName" required placeholder="Enter Your First Name"> <br>
       
@@ -98,7 +98,7 @@
       <label for="phone">Phone Number:</label>
       <input type="tel" id="phone" name="phone" required placeholder="Enter your phone number"><br>
 
-        <button type="submit" class="login-button" onsubmit="return validateForm(event)" onclick="return app.save()">Submit</button>
+        <button type="submit" class="login-button">Submit</button>
       </form>
     <div id="errorMessages" class="error-message"></div>
   </div>

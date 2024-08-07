@@ -172,17 +172,17 @@ module.exports = connectDB();
 
 
 app.post('/Register', async (req, res) => {
-  const { firstname, lastname, email, password, country, phoneNumber } = req.body;
+  const { firstName, lastName, email, password, country, phone } = req.body;
 
   try {
     // Create a new user instance
     const user = new usermodel({
-      firstname,
-      lastname,
+      firstName,
+      lastName,
       email,
       password,
       country,
-      phoneNumber
+      phone
     });
 
     // Save the user to the database
