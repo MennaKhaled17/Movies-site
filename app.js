@@ -8,6 +8,7 @@ const { render } = require('ejs');
 const { getCountries } = require('country-state-picker');
 const app = express();
 const mongoose=require("mongoose");
+const usermodel=require('./models/Schema')
 
 // API Data
 const API_KEY = '2306111c328b44f1be3d16ba83e418a6';
@@ -175,7 +176,7 @@ app.post('/Register', async (req, res) => {
 
   try {
     // Create a new user instance
-    const user = new User({
+    const user = new usermodel({
       firstname,
       lastname,
       email,
@@ -195,7 +196,7 @@ app.post('/Register', async (req, res) => {
   }
 });
 
-module.exports = router;
+module.exports = app;
 // Callback function when route is incorrect
 app.use((req, res) => {
   res.status(404).send('Page not found');

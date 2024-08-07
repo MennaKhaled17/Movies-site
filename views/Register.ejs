@@ -24,59 +24,55 @@
 
   <script>
     function validateForm(event) {
-      const form = document.getElementById('loginForm');
-      const errorDiv = document.getElementById('errorMessages');
-      errorDiv.innerHTML = ''; 
-      
-      // Get input values
-      
+    const form = document.getElementById('loginForm');
+    const errorDiv = document.getElementById('errorMessages');
+    errorDiv.innerHTML = ''; 
 
-      // Patterns for validation
-      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      const phonePattern = /^[0-9]{10}$/; 
+    // Get input values
+    const firstName = form.querySelector('input[name="firstname"]').value.trim();
+    const lastName = form.querySelector('input[name="lastname"]').value.trim();
+    const email = form.querySelector('input[name="email"]').value.trim();
+    const password = form.querySelector('input[name="password"]').value.trim();
+    const country = form.querySelector('input[name="country"]').value.trim();
+    const phone = form.querySelector('input[name="phone"]').value.trim();
 
-      let isValid = true;
+    // Patterns for validation
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Validates standard email formats
+    const phonePattern = /^[0-9]{12}$/; // Validates exactly 12 digits for phone number
 
-      // Check required fields
-      if (!firstName || !lastName || !email || !password || !country || !phone) {
+    let isValid = true;
+
+    // Check required fields
+    if (!firstName || !lastName || !email || !password || !country || !phone) {
         errorDiv.innerHTML += '<p>Please fill out all required fields.</p>';
         isValid = false;
-      }
+    }
 
-      // Validate email format
-      if (!emailPattern.test(email)) {
+    // Validate email format
+    if (!emailPattern.test(email)) {
         errorDiv.innerHTML += '<p>Please enter a valid email address.</p>';
         isValid = false;
-      }
+    }
 
-      // Validate password length
-      if (password.length < 8) {
+    // Validate password length
+    if (password.length < 8) {
         errorDiv.innerHTML += '<p>Password must be at least 8 characters long.</p>';
         isValid = false;
-      }
-
-      // Validate phone number
-      if (!phonePattern.test(phone)) {
-        errorDiv.innerHTML += '<p>Please enter a valid phone number (10 digits).</p>';
-        isValid = false;
-      }
-
-      // If not valid, prevent form submission
-      if (!isValid) {
-        event.preventDefault(); // Prevent form submission
-      }
-
-      return isValid;
     }
- 
-        // $(document).ready(function() {
-        //     $.getJSON('/countries', function(data) {
-        //         $('#country').autocomplete({
-        //             source: data
-        //         });
-        //     });
-        // });
-   
+
+    // Validate phone number
+    if (!phonePattern.test(phone)) {
+        errorDiv.innerHTML += '<p>Please enter a valid phone number (12 digits).</p>';
+        isValid = false;
+    }
+
+    // If not valid, prevent form submission
+    if (!isValid) {
+        event.preventDefault(); // Prevent form submission
+    }
+
+    return isValid;
+  }
   </script>
 
   <%- include('partials/navbar.ejs') %> 
@@ -102,7 +98,7 @@
       <label for="phone">Phone Number:</label>
       <input type="tel" id="phone" name="phone" required placeholder="Enter your phone number"><br>
 
-        <button type="submit" class="login-button" onsubmit="return validateForm(event)">Submit</button>
+        <button type="submit" class="login-button" onsubmit="return validateForm(event)" onclick="return app.save()">Submit</button>
       </form>
     <div id="errorMessages" class="error-message"></div>
   </div>
