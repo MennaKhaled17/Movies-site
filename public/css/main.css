@@ -593,3 +593,27 @@ label[for="country"] {
     background-color: #ff8c00; /* Highlight color on hover */
     color: white; /* Change text color on hover */
 }
+
+/* Alert box styling */
+#alertBox {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px;
+    background-color: #4CAF50; /* Green */
+    color: white;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  #alertBox.error {
+    background-color: #f44336; /* Red */
+  }
+  
+  .hidden {
+    display: none;
+  }
+  

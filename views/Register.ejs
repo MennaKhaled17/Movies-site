@@ -99,6 +99,10 @@
       <input type="tel" id="phone" name="phone" required placeholder="Enter your phone number"><br>
 
         <button type="submit" class="login-button">Submit</button>
+        <div id="alertBox" class="hidden">
+  <span id="alertMessage"></span>
+  <button onclick="closeAlert()">Close</button>
+</div>
       </form>
     <div id="errorMessages" class="error-message"></div>
   </div>
@@ -171,6 +175,7 @@ footer a:hover {
             console.error('Error fetching autocomplete suggestions:', error);
         }
     });
+
 });
 
       // //Filter countries based on the input
@@ -193,6 +198,25 @@ footer a:hover {
       //   autocompleteList.appendChild(li); // Append suggestion item to the list
       // });
     //});
+function showAlert(message, type) {
+  const alertBox = document.getElementById('alertBox');
+  const alertMessage = document.getElementById('alertMessage');
+
+  alertMessage.textContent = message;
+
+  if (type === 'success') {
+    alertBox.classList.remove('error');
+  } else if (type === 'error') {
+    alertBox.classList.add('error');
+  }
+
+  alertBox.classList.remove('hidden');
+}
+
+function closeAlert() {
+  const alertBox = document.getElementById('alertBox');
+  alertBox.classList.add('hidden');
+}
 
     document.addEventListener('click', (e) => {
       if (!autocompleteList.contains(e.target) && e.target !== searchInput) {
