@@ -169,8 +169,8 @@ const connectDB = async () => {
 module.exports = connectDB();
 
 
-// app.use(express.json());
-// app.use(express.urlencoded({extended:true}));
+app.use(express.json());
+app.use(express.urlencoded({extended:true}));
 
 app.post('/Register', async (req, res) => {
   const { firstname, lastname, email, password, country, phone } = req.body;
@@ -194,11 +194,11 @@ app.post('/Register', async (req, res) => {
     await user.save();
     
     // Send success response
-    res.status(201).send('User registered successfully');
+    res.status(200).send('User registered successfully');
   } catch (error) {
     console.error('Error registering user:', error);
     res.status(500).send('Error registering user');
-  }
+  } 
 });
 
 module.exports = app;
@@ -208,6 +208,6 @@ app.use((req, res) => {
 });
 
 // Starting server using port 3000
-app.listen(3000, () => {
-  console.log('Server is running on http://localhost:3000');
+app.listen(3001, () => {
+  console.log('Server is running on http://localhost:3001');
 });
