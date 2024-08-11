@@ -192,7 +192,10 @@ app.post('/Register', async (req, res) => {
 
     // Save the user to the database
     await user.save();
-    
+    console.log('Saving user to the database...');
+    await user.save();
+    console.log('User saved successfully');
+
     // Send success response
     res.status(200).send('User registered successfully');
   } catch (error) {
