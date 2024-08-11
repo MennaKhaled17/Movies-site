@@ -154,7 +154,7 @@ res.json(countrylist);
 app.get("/login",async(req,res)=>{
   res.render('login');
 })
-const uri="mongodb+srv://menakhaled:menakhaled@cluster0.klteank.mongodb.net/?retryWri =true&w=majority&appName=Cluster0";
+const uri="mongodb+srv://menakhaled:menakhaled@cluster0.klteank.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 const connectDB = async () => { 
   console.log('Attempting to connect to MongoDB...');
   try {
