@@ -154,11 +154,11 @@ res.json(countrylist);
 app.get("/login",async(req,res)=>{
   res.render('login');
 })
-const uri="mongodb+srv://menakhaled:menakhaled@cluster0.klteank.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+const uri="mongodb+srv://menakhaled:menakhaled@cluster0.klteank.mongodb.net/?retryWri =true&w=majority&appName=Cluster0";
 const connectDB = async () => { 
   console.log('Attempting to connect to MongoDB...');
   try {
-    await mongoose.connect(uri);
+    await mongoose.connect(uri); 
     console.log('MongoDB connected...');
   } catch (err) {
     console.error('Error connecting to MongoDB:', err.message);
