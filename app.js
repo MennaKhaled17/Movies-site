@@ -23,7 +23,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.set('view engine', 'ejs');
 app.set('views', 'views');
 
-<<<<<<< HEAD
+
 // Middleware to parse request bodies
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -32,23 +32,24 @@ app.use(express.urlencoded({ extended: true }));
 const uri = "mongodb+srv://menakhaled:menakhaled@cluster0.klteank.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 const connectDB = async () => {
   console.log('Attempting to connect to MongoDB...');
-  try {
+  
     await mongoose.connect(uri);
-=======
+
 const uri="mongodb+srv://menakhaled:menakhaled@cluster0.klteank.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 const connectDB = async () => { 
   console.log('Attempting to connect to MongoDB...');
   try {
     await mongoose.connect(uri); 
->>>>>>> 5ab6cf13a25337086f808b711d09708d48ace99e
+
     console.log('MongoDB connected...');
   } catch (err) {
     console.error('Error connecting to MongoDB:', err.message);
     process.exit(1);
   }
 };
-<<<<<<< HEAD
+
 connectDB();
+  }
 
 // Authentication Middleware
 function authenticateToken(req, res, next) {
@@ -67,7 +68,6 @@ function authenticateToken(req, res, next) {
     next(); // Proceed to the next middleware or route handler
   });
 }
-=======
 
 module.exports = connectDB();
 
@@ -75,7 +75,7 @@ module.exports = connectDB();
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
 
->>>>>>> 5ab6cf13a25337086f808b711d09708d48ace99e
+
 
 // Routing
 app.get('/', async (req, res) => {
@@ -189,8 +189,7 @@ app.get('/Register', (req, res) => {
   res.render('Register', { message: message || '', messageType: messageType || 'success' });
 });
 
-<<<<<<< HEAD
-=======
+
 app.get('/countries',(req,res)=>{
   const countrylist=Object.values(countries).map(country=>{
 country.name});
@@ -202,7 +201,6 @@ app.get("/login",async(req,res)=>{
 })
 
 
->>>>>>> 5ab6cf13a25337086f808b711d09708d48ace99e
 app.post('/Register', async (req, res) => {
   const { firstname, lastname, email, password, country, phone } = req.body;
   // console.log(req.body);
@@ -242,11 +240,11 @@ app.post('/Login', async (req, res) => {
   const { email, password } = req.body;
 
   try {
-<<<<<<< HEAD
+
     const user = await usermodel.findOne({ email: email });
 
     if (!user) {
-=======
+
     // Check if the user with the provided email exists
     const user = await usermodel.findOne({ email: email, password:password });
 
@@ -262,7 +260,7 @@ app.post('/Login', async (req, res) => {
         res.redirect('/login?error=Invalid%20credentials');
       }
     } else {
->>>>>>> 5ab6cf13a25337086f808b711d09708d48ace99e
+
       console.log('User not found');
       return res.redirect('/Login?error=Invalid%20credentials');
     }
@@ -280,8 +278,9 @@ app.post('/Login', async (req, res) => {
     );
 
     console.log('Password matches');
+     
     res.redirect(`/index?message=Welcome%20back,%20${encodeURIComponent(user.firstname)}&token=${token}`);
-  } catch (err) {
+  }} catch (err) {
     console.error('Error during login:', err);
     res.status(500).send('Server error');
   }
