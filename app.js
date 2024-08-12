@@ -7,8 +7,10 @@ const axios = require('axios');
 const { render } = require('ejs');
 const { getCountries } = require('country-state-picker');
 const app = express();
-const mongoose=require("mongoose");
-const usermodel=require('./models/Schema')
+const mongoose = require("mongoose");
+const usermodel = require('./models/Schema');
+const bcrypt = require("bcrypt");
+const jwt = require('jsonwebtoken');
 
 // API Data
 const API_KEY = '2306111c328b44f1be3d16ba83e418a6';
@@ -20,6 +22,42 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Setting views folder
 app.set('view engine', 'ejs');
 app.set('views', 'views');
+
+// Middleware to parse request bodies
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Connecting to MongoDB
+const uri = "mongodb+srv://menakhaled:menakhaled@cluster0.klteank.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+const connectDB = async () => {
+  console.log('Attempting to connect to MongoDB...');
+  try {
+    await mongoose.connect(uri);
+    console.log('MongoDB connected...');
+  } catch (err) {
+    console.error('Error connecting to MongoDB:', err.message);
+    process.exit(1);
+  }
+};
+connectDB();
+
+// Authentication Middleware
+function authenticateToken(req, res, next) {
+  const token = req.query.token || req.headers['authorization'];
+
+  if (!token) {
+    return res.redirect('/login?error=Access%20denied.%20Please%20login%20first.');
+  }
+
+  jwt.verify(token, 'mena1234', (err, user) => {
+    if (err) {
+      console.error('Token verification failed:', err);
+      return res.redirect('/login?error=Invalid%20token.%20Please%20login%20again.');
+    }
+    req.user = user; // Attach the decoded user to the request
+    next(); // Proceed to the next middleware or route handler
+  });
+}
 
 // Routing
 app.get('/', async (req, res) => {
@@ -41,14 +79,13 @@ app.get('/', async (req, res) => {
     // Slice the array to get the movies for the current page
     const paginatedMovies = movies.slice((page - 1) * limit, page * limit);
 
-    res.render('index', { movies: paginatedMovies, totalMovies, page, totalPages, query: null });
+    res.render('index', { movies: paginatedMovies, totalMovies, page, totalPages, query: null, user: req.user });
 
   } catch (error) {
     console.error('Error fetching popular movies:', error);
-    res.render('index', { movies: [], totalMovies: 0, page: 1, totalPages: 0, query: null });
+    res.render('index', { movies: [], totalMovies: 0, page: 1, totalPages: 0, query: null, user: req.user });
   }
 });
-
 
 // Route to search movies
 app.get('/search', async (req, res) => {
@@ -58,62 +95,51 @@ app.get('/search', async (req, res) => {
   }
 
   try {
-    page = parseInt(req.query.page) || 1;
+    const page = parseInt(req.query.page) || 1;
     const pageSize = parseInt(req.query.pageSize) || 10;
-
-
-    // if (page === 3) {
-    //   page = 2;
-    // }
 
     const response = await axios.get(`${BASE_URL}/search/movie`, {
       params: {
         api_key: API_KEY,
         query: query,
-        // page: page,
       },
     });
 
     const movies = response.data.results;
-    // Use the total number of valid movies
     const totalMovies = response.data.total_results;
     const totalPages = Math.ceil(totalMovies / pageSize);
 
-    // Calculate pagination indices
     const startIndex = (page - 1) * pageSize;
     const endIndex = Math.min(startIndex + pageSize, totalMovies);
     const paginatedMovies = movies.slice(startIndex, endIndex);
 
-    res.render('index', { movies: paginatedMovies, totalMovies, page, totalPages, query: query });
+    res.render('index', { movies: paginatedMovies, totalMovies, page, totalPages, query: query, user: req.user });
 
   } catch (error) {
     console.error('Error searching for movies:', error);
-    res.render('index', { movies: [], totalMovies: 0, page: 1, totalPages: 0, query: query });
+    res.render('index', { movies: [], totalMovies: 0, page: 1, totalPages: 0, query: query, user: req.user });
   }
 });
 
-
-
-
-
+// Autocomplete route
 app.get('/autocomplete', async (req, res) => {
-  const query = req.query.q; // What's written in the search bar (While typing in the search bar)
+  const query = req.query.q; 
   if (!query) {
     return res.json([]);
   }
 
   try {
-    const response = await axios.get(`${BASE_URL}/search/movie`, { // Searching in the API
+    const response = await axios.get(`${BASE_URL}/search/movie`, { 
       params: {
-        api_key: API_KEY, // Check that you have the API key
-        query: query, // Sending what is written in the search bar
+        api_key: API_KEY, 
+        query: query,
       },
     });
-    // Filter out movies without a valid poster_path and limit results
+
     const movies = response.data.results
-      .filter(movie => movie.poster_path) // filtering movies that has only posters
-      .slice(0, 10) // Specify number of movies
-      .map(movie => ({ title: movie.title })); // Looping over movies with the movie title specified 
+      .filter(movie => movie.poster_path) 
+      .slice(0, 10) 
+      .map(movie => ({ title: movie.title })); 
 
     res.json(movies);
   } catch (error) {
@@ -122,65 +148,41 @@ app.get('/autocomplete', async (req, res) => {
   }
 });
 
+// Movie details route
 app.get('/details/:id', async (req, res) => {
-  const id = parseInt(req.params.id, 10); // Convert id to a number
+  const id = parseInt(req.params.id, 10);
   try {
     const response = await axios.get(`${BASE_URL}/movie/${id}`, {
       params: {
-        api_key: API_KEY, // Check that you have the api key
+        api_key: API_KEY,
       },
     });
-    // console.log(response);
-    const movie = response.data; // I specified that i want the movies only
-    // const movie = movies.find(m => m.id === id); // Finding movie that has same id
-    res.render('details', { movie });
+    const movie = response.data;
+    res.render('details', { movie, user: req.user });
   } catch (error) {
-    console.error('Error fetching popular movies:', error);
-    res.render('details', { movies: [] }); //if there is an error open the index and give it an empty array
+    console.error('Error fetching movie details:', error);
+    res.render('details', { movie: null, user: req.user });
   }
 });
 
+// Registration route
 app.get('/Register', (req, res) => {
-  const { message, messageType } = req.query; // Get message and messageType from query parameters
-  res.render('Register', { message: message || '', messageType: messageType || 'success' }); // Pass default values if not present
+  const { message, messageType } = req.query;
+  res.render('Register', { message: message || '', messageType: messageType || 'success' });
 });
-
-app.get('/countries',(req,res)=>{
-  const countrylist=Object.values(countries).map(country=>{
-country.name});
-res.json(countrylist);
-  
-})
-app.get("/login",async(req,res)=>{
-  res.render('login');
-})
-const uri="mongodb+srv://menakhaled:menakhaled@cluster0.klteank.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
-const connectDB = async () => { 
-  console.log('Attempting to connect to MongoDB...');
-  try {
-    await mongoose.connect(uri); 
-    console.log('MongoDB connected...');
-  } catch (err) {
-    console.error('Error connecting to MongoDB:', err.message);
-    process.exit(1);
-  }
-};
-
-module.exports = connectDB();
-
-
-app.use(express.json());
-app.use(express.urlencoded({extended:true}));
 
 app.post('/Register', async (req, res) => {
   const { firstname, lastname, email, password, country, phone } = req.body;
+  // console.log(req.body);
 
   try {
+    const hashedPassword = await bcrypt.hash(password, 6);
+
     const user = new usermodel({
       firstname,
       lastname,
       email,
-      password,
+      password: hashedPassword,
       country,
       phone
     });
@@ -190,50 +192,62 @@ app.post('/Register', async (req, res) => {
     
     // Redirect with success message
     res.redirect('/Register?message=User%20registered%20successfully&messageType=success');
-    } catch (error) {
+  } catch (error) {
     console.error('Error registering user:', error);
-    
-    // Redirect with error message
-res.redirect('/Register?message=Error%20registering%20user&messageType=error');
+    res.redirect('/Register?message=Error%20registering%20user&messageType=error');
   }
 });
-app.post('/submit', async (req, res) => {
+
+// Login route
+app.get("/Login", async (req, res) => {
+  const { error } = req.query;
+  res.render('Login', { error });
+
+});
+app.use(express.urlencoded({ extended: true })); // For parsing application/x-www-form-urlencoded
+app.use(express.json());
+app.post('/Login', async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    // Check if the user with the provided email exists
-    const user = await usermodel.findOne({ email: email,password:password });
+    const user = await usermodel.findOne({ email: email });
 
-    if (user) {
-      // Check if the password matches
-      if (password == res.password &&email == res.email ) {
-        console.log('Password matches');
-        // Redirect to home with a Toastr message
-        res.redirect(`/home?message=Welcome%20back,%20${encodeURIComponent(user.firstname)}!`);
-      } else {
-        console.log('Password does not match');
-        // Password doesn't match, return an error
-        res.redirect('/login?error=Invalid%20credentials');
-      }
-    } else {
+    if (!user) {
       console.log('User not found');
-      // Email doesn't exist in the database
-      res.redirect('/login?error=Invalid%20credentials');
+      return res.redirect('/Login?error=Invalid%20credentials');
     }
+
+    const isPasswordCorrect = await bcrypt.compare(password, user.password);
+    if (!isPasswordCorrect) {
+      console.log('Password does not match');
+      return res.redirect('/Login?error=Invalid%20credentials');
+    }
+
+    const token = jwt.sign(
+      { id: user._id, email: user.email },
+      'mena12',
+      { expiresIn: '1h' }
+    );
+
+    console.log('Password matches');
+    res.redirect(`/index?message=Welcome%20back,%20${encodeURIComponent(user.firstname)}&token=${token}`);
   } catch (err) {
-    console.error('Error during login:', err);  
+    console.error('Error during login:', err);
     res.status(500).send('Server error');
   }
 });
+// Countries API route
+app.get('/countries', (req, res) => {
+  const countrylist = Object.values(getCountries()).map(country => country.name);
+  res.json(countrylist);
+});
 
-
-module.exports = app;
-// Callback function when route is incorrect
+// Fallback route for undefined paths
 app.use((req, res) => {
   res.status(404).send('Page not found');
 });
 
-// Starting server using port 3000
+// Starting server using port 3001
 app.listen(3001, () => {
   console.log('Server is running on http://localhost:3001');
 });

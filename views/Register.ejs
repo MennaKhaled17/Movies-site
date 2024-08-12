@@ -37,7 +37,7 @@
 
   <div class="container">
     <h1 style="color:#ff8c00;">Register Form</h1>
-    <form action="/Register" id="loginForm" method="post" onsubmit="return validateForm(event)">
+    <form action="/Register" id="registrationForm" method="post" onsubmit="return validateForm(event)">
       <label for="firstname">First Name:</label>
       <input type="text" id="firstname" name="firstname" required placeholder="Enter Your First Name"autocomplete="off"> <br>
 
@@ -57,7 +57,7 @@
       <label for="phone">Phone Number:</label>
       <input type="tel" id="phone" name="phone" required placeholder="Enter your phone number"autocomplete="off"><br>
 
-      <button type="submit" class="login-button">Submit</button>
+      <button type="submit" class="reigration-button">Submit</button>
     </form>
     <div id="errorMessages" class="error-message"></div>
 <!--   
@@ -76,7 +76,7 @@
 
   <script>
    
-  document.getElementById('loginForm').addEventListener('submit', function() {
+  document.getElementById('registrationForm').addEventListener('submit', function() {
     setTimeout(() => {
       this.reset(); // Clear form fields after submission
     }, 1000); // Adjust the delay if needed
@@ -103,7 +103,7 @@
       // Your existing code for form validation and autocomplete
     });
     function validateForm(event) {
-      const form = document.getElementById('loginForm');
+      const form = document.getElementById('registrationForm');
       const errorDiv = document.getElementById('errorMessages');
       errorDiv.innerHTML = '';
 
