@@ -38,7 +38,7 @@
       <label for="password">Password:</label>
       <input type="password" id="password" name="password" required placeholder="Enter your password"> <br><br>
 
-      <button type="submit" class="login-button">Submit</button>
+      <button type="submit" class="login-button">Login</button>
     </form>
     <div id="errorMessages" class="error-message"></div>
   </div>
@@ -53,6 +53,18 @@
     <p>Follow us on <a href="#">Facebook</a>, <a href="#">Twitter</a>, <a href="#">Instagram</a></p>
 </footer>
 </body>
+<script>
+const submitButton = document.querySelector(".login-button");
+
+submitButton.addEventListener("click", function(event) {
+  event.preventDefault(); // Prevent the default form submission
+
+  // Assuming you want to do some validation or other logic here
+
+  window.location.href = "/"; // Redirect to the home page
+});
+
+</script>
 <style>
     footer {
     background-color: #333;

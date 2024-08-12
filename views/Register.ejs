@@ -6,225 +6,188 @@
   <title>Register Page</title>
   <link rel="stylesheet" href="/css/main.css">
   <link rel="icon" href="/imgs/Untitled_design-removebg-preview.png">
-  <!-- <link rel="stylesheet" href="/css/footer.css"> -->
+  <link rel="stylesheet" href="/css/footer.css">
   <style>
     .error-message {
       color: rgb(243, 19, 19);
       font-size: 0.9em;
       margin-top: 10px;
     }
-    .errorDiv {
-      display: none; /* Hide error divs initially */
+    
+    footer {
+      background-color: #333;
+      color: white;
+      text-align: center;
+      padding: 20px 0;
+      margin-top: 20px;
+      position: relative;
+      width: 100%;
+    }
+    footer a {
+      color: #d3d3d3;
+      text-decoration: none;
+    }
+    footer a:hover {
+      text-decoration: underline;
     }
   </style>
 </head>
 <body>
-  
+  <%- include('partials/navbar.ejs') %>
 
-
-  <script>
-    function validateForm(event) {
-    const form = document.getElementById('loginForm');
-    const errorDiv = document.getElementById('errorMessages');
-    errorDiv.innerHTML = ''; 
-
-    // Get input values
-    const firstName = form.querySelector('input[name="firstname"]').value.trim();
-    const lastName = form.querySelector('input[name="lastname"]').value.trim();
-    const email = form.querySelector('input[name="email"]').value.trim();
-    const password = form.querySelector('input[name="password"]').value.trim();
-    const country = form.querySelector('input[name="country"]').value.trim();
-    const phone = form.querySelector('input[name="phone"]').value.trim();
-
-    // Patterns for validation
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Validates standard email formats
-    const phonePattern = /^[0-9]{12}$/; // Validates exactly 12 digits for phone number
-
-    let isValid = true;
-
-    // Check required fields
-    if (!firstName || !lastName || !email || !password || !country || !phone) {
-        errorDiv.innerHTML += '<p>Please fill out all required fields.</p>';
-        isValid = false;
-    }
-
-    // Validate email format
-    if (!emailPattern.test(email)) {
-        errorDiv.innerHTML += '<p>Please enter a valid email address.</p>';
-        isValid = false;
-    }
-
-    // Validate password length
-    if (password.length < 8) {
-        errorDiv.innerHTML += '<p>Password must be at least 8 characters long.</p>';
-        isValid = false;
-    }
-
-    // Validate phone number
-    if (!phonePattern.test(phone)) {
-        errorDiv.innerHTML += '<p>Please enter a valid phone number (12 digits).</p>';
-        isValid = false;
-    }
-
-    // If not valid, prevent form submission
-    if (!isValid) {
-        event.preventDefault(); // Prevent form submission
-    }
-
-    return isValid;
-  }
-  </script>
-
-  <%- include('partials/navbar.ejs') %> 
   <div class="container">
-    <h1 style="color:#ff8c00;">Register Form </h1>
+    <h1 style="color:#ff8c00;">Register Form</h1>
     <form action="/Register" id="loginForm" method="post" onsubmit="return validateForm(event)">
-      <label for="firstName">First Name:</label>
-      <input type="text" id="firstname" name="firstname" required placeholder="Enter Your First Name"> <br>
-      
-      <label for="lastName">Last Name:</label>
-      <input type="text" id="lastname" name="lastname" required placeholder="Enter Your Last Name"> <br>
-      
+      <label for="firstname">First Name:</label>
+      <input type="text" id="firstname" name="firstname" required placeholder="Enter Your First Name"autocomplete="off"> <br>
+
+      <label for="lastname">Last Name:</label>
+      <input type="text" id="lastname" name="lastname" required placeholder="Enter Your Last Name"autocomplete="off"> <br>
+
       <label for="email">Email:</label>
-      <input type="email" id="email" name="email" required placeholder="Enter your email address"> <br>
-      
+      <input type="email" id="email" name="email" required placeholder="Enter your email address"autocomplete="off"> <br>
+
       <label for="password">Password:</label>
-      <input type="password" id="password" name="password" required placeholder="Enter your password"> <br>
-      
+      <input type="password" id="password" name="password" required placeholder="Enter your password" autocomplete="off"> <br>
+
       <label for="country">Country:</label>
-      <input id="country" name="country" required placeholder="Type to search...">
+      <input id="country" name="country" required placeholder="Type to search..." autocomplete="off">
       <div id="country-list" class="suggestions"></div>
 
       <label for="phone">Phone Number:</label>
-      <input type="tel" id="phone" name="phone" required placeholder="Enter your phone number"><br>
+      <input type="tel" id="phone" name="phone" required placeholder="Enter your phone number"autocomplete="off"><br>
 
-        <button type="submit" class="login-button">Submit</button>
-        <div id="alertBox" class="hidden">
-  <span id="alertMessage"></span>
-  <button onclick="closeAlert()">Close</button>
-</div>
-      </form>
+      <button type="submit" class="login-button">Submit</button>
+    </form>
     <div id="errorMessages" class="error-message"></div>
+<!--   
+     <div id="alertBox" class="alert-box <%= messageType === 'success' ? 'alert-success' : 'alert-error' %>">
+      <%= message %> -->
+      <div id="toast" class="toast"></div>
+    </div>
+    
   </div>
-  <head>
-    <link rel="stylesheet" href="/css/footer.css">
-</head>
 
-<footer>
+  <footer>
     <p>&copy; 2024 Movie Gallery. All rights reserved.</p>
     <p>Contact us: <a href="mailto:info@moviegallery.com">info@moviegallery.com</a> | Phone: (123) 456-7890</p>
     <p>Follow us on <a href="#">Facebook</a>, <a href="#">Twitter</a>, <a href="#">Instagram</a></p>
-</footer>
-  <style>
+  </footer>
+
+  <script>
    
-    footer {
-    background-color: #333;
-    color: white;
-    text-align: center;
-    padding: 20px 0;
-    margin-top: 20px;
-    position: absolute;
-    margin-bottom: 10px;
-    top:880px;
-    width: 100%;
-}
+  document.getElementById('loginForm').addEventListener('submit', function() {
+    setTimeout(() => {
+      this.reset(); // Clear form fields after submission
+    }, 1000); // Adjust the delay if needed
+  });
 
-footer a {
-    color: #d3d3d3;
-    text-decoration: none;
-}
+    function showToast(message, isSuccess) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = 'toast toast-show ' + (isSuccess ? 'toast-success' : 'toast-error');
+      setTimeout(() => {
+        toast.className = 'toast';
+      }, 3000); // Toast will disappear after 3 seconds
+    }
 
-footer a:hover {
-    text-decoration: underline;
-}
-</style>
-<script>
-  
-  document.addEventListener('DOMContentLoaded', () => {
-    const searchInput = document.getElementById('country');
-    const autocompleteList = document.getElementById('country-list');
+    document.addEventListener('DOMContentLoaded', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const message = urlParams.get('message');
+      const messageType = urlParams.get('messageType');
 
-    searchInput.addEventListener('input', async () => {
+      if (message) {
+        showToast(message, messageType === 'success');
+      }
+
+      // Your existing code for form validation and autocomplete
+    });
+    function validateForm(event) {
+      const form = document.getElementById('loginForm');
+      const errorDiv = document.getElementById('errorMessages');
+      errorDiv.innerHTML = '';
+
+      const firstName = form.querySelector('input[name="firstname"]').value.trim();
+      const lastName = form.querySelector('input[name="lastname"]').value.trim();
+      const email = form.querySelector('input[name="email"]').value.trim();
+      const password = form.querySelector('input[name="password"]').value.trim();
+      const country = form.querySelector('input[name="country"]').value.trim();
+      const phone = form.querySelector('input[name="phone"]').value.trim();
+
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      const phonePattern = /^[0-9]{12}$/;
+
+      let isValid = true;
+
+      if (!firstName || !lastName || !email || !password || !country || !phone) {
+        errorDiv.innerHTML += '<p>Please fill out all required fields.</p>';
+        isValid = false;
+      }
+
+      if (!emailPattern.test(email)) {
+        errorDiv.innerHTML += '<p>Please enter a valid email address.</p>';
+        isValid = false;
+      }
+
+      if (password.length < 8) {
+        errorDiv.innerHTML += '<p>Password must be at least 8 characters long.</p>';
+        isValid = false;
+      }
+
+      if (!phonePattern.test(phone)) {
+        errorDiv.innerHTML += '<p>Please enter a valid phone number (12 digits).</p>';
+        isValid = false;
+      }
+
+      if (!isValid) {
+        event.preventDefault();
+      }
+
+      return isValid;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const searchInput = document.getElementById('country');
+      const autocompleteList = document.getElementById('country-list');
+
+      searchInput.addEventListener('input', async () => {
         const query = searchInput.value.trim().toLowerCase();
-        autocompleteList.innerHTML = ''; // Clear previous suggestions
+        autocompleteList.innerHTML = '';
 
         if (query.length < 2) {
-            return; // No suggestions if query is less than 2 characters
+          return;
         }
 
         try {
-            const response = await fetch('https://restcountries.com/v3.1/all');
-            const countries = await response.json();
+          const response = await fetch('https://restcountries.com/v3.1/all');
+          const countries = await response.json();
 
-            const filteredCountries = countries.filter(country => 
-                country.name.common.toLowerCase().includes(query)
-            );
+          const filteredCountries = countries.filter(country =>
+            country.name.common.toLowerCase().includes(query)
+          );
 
-            autocompleteList.innerHTML = ''; // Clear previous suggestions
-            filteredCountries.forEach(country => {
-                const li = document.createElement('li');
-                li.classList.add('suggestion-item');
-                li.textContent = country.name.common;
-                li.addEventListener('click', () => {
-                    searchInput.value = country.name.common;
-                    autocompleteList.innerHTML = '';
-                });
-                autocompleteList.appendChild(li);
+          autocompleteList.innerHTML = '';
+          filteredCountries.forEach(country => {
+            const li = document.createElement('li');
+            li.classList.add('suggestion-item');
+            li.textContent = country.name.common;
+            li.addEventListener('click', () => {
+              searchInput.value = country.name.common;
+              autocompleteList.innerHTML = '';
             });
+            autocompleteList.appendChild(li);
+          });
         } catch (error) {
-            console.error('Error fetching autocomplete suggestions:', error);
+          console.error('Error fetching autocomplete suggestions:', error);
         }
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!autocompleteList.contains(e.target) && e.target !== searchInput) {
+          autocompleteList.innerHTML = '';
+        }
+      });
     });
-
-});
-
-      // //Filter countries based on the input
-      // const filteredCountries = countries.filter(country => 
-      //   country.toLowerCase().includes(query.toLowerCase())
-      // );
-
-      // // Create and display suggestion items
-      // filteredCountries.forEach(country => {
-      //   const li = document.createElement('div');
-      //   li.classList.add('suggestion-item');
-      //   li.textContent = country; // Set the country name
-
-      //   // Add click event to set input value and clear suggestions
-      //   li.addEventListener('click', () => {
-      //     searchInput.value = country; // Set the input value to the selected country
-      //     autocompleteList.innerHTML = ''; // Clear suggestions
-      //   });
-
-      //   autocompleteList.appendChild(li); // Append suggestion item to the list
-      // });
-    //});
-function showAlert(message, type) {
-  const alertBox = document.getElementById('alertBox');
-  const alertMessage = document.getElementById('alertMessage');
-
-  alertMessage.textContent = message;
-
-  if (type === 'success') {
-    alertBox.classList.remove('error');
-  } else if (type === 'error') {
-    alertBox.classList.add('error');
-  }
-
-  alertBox.classList.remove('hidden');
-}
-
-function closeAlert() {
-  const alertBox = document.getElementById('alertBox');
-  alertBox.classList.add('hidden');
-}
-
-    document.addEventListener('click', (e) => {
-      if (!autocompleteList.contains(e.target) && e.target !== searchInput) {
-        autocompleteList.innerHTML = ''; // Clear suggestions if clicked outside
-      }
-    });
- 
-</script>
-</body>
+  </script>
 </body>
 </html>

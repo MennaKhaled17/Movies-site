@@ -140,11 +140,11 @@ app.get('/details/:id', async (req, res) => {
   }
 });
 
-app.get("/Register",async(req,res)=>{
-  res.render('Register');
-  let countries=getCountries();
- 
-})
+app.get('/Register', (req, res) => {
+  const { message, messageType } = req.query; // Get message and messageType from query parameters
+  res.render('Register', { message: message || '', messageType: messageType || 'success' }); // Pass default values if not present
+});
+
 app.get('/countries',(req,res)=>{
   const countrylist=Object.values(countries).map(country=>{
 country.name});
@@ -174,13 +174,8 @@ app.use(express.urlencoded({extended:true}));
 
 app.post('/Register', async (req, res) => {
   const { firstname, lastname, email, password, country, phone } = req.body;
-// console.log(req.body.firstname);
-// console.log(req.body);
-
-
 
   try {
-    // Create a new user instance
     const user = new usermodel({
       firstname,
       lastname,
@@ -190,19 +185,47 @@ app.post('/Register', async (req, res) => {
       phone
     });
 
-    // Save the user to the database
     await user.save();
     console.log('Saving user to the database...');
-    await user.save();
-    console.log('User saved successfully');
-
-    // Send success response
-    res.status(200).json({ message: 'User registered successfully'});
-  } catch (error) {
+    
+    // Redirect with success message
+    res.redirect('/Register?message=User%20registered%20successfully&messageType=success');
+    } catch (error) {
     console.error('Error registering user:', error);
-    res.status(500).json({ message:'Error registering user'});
-  } 
+    
+    // Redirect with error message
+res.redirect('/Register?message=Error%20registering%20user&messageType=error');
+  }
 });
+app.post('/submit', async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    // Check if the user with the provided email exists
+    const user = await usermodel.findOne({ email: email,password:password });
+
+    if (user) {
+      // Check if the password matches
+      if (password == res.password &&email == res.email ) {
+        console.log('Password matches');
+        // Redirect to home with a Toastr message
+        res.redirect(`/home?message=Welcome%20back,%20${encodeURIComponent(user.firstname)}!`);
+      } else {
+        console.log('Password does not match');
+        // Password doesn't match, return an error
+        res.redirect('/login?error=Invalid%20credentials');
+      }
+    } else {
+      console.log('User not found');
+      // Email doesn't exist in the database
+      res.redirect('/login?error=Invalid%20credentials');
+    }
+  } catch (err) {
+    console.error('Error during login:', err);  
+    res.status(500).send('Server error');
+  }
+});
+
 
 module.exports = app;
 // Callback function when route is incorrect

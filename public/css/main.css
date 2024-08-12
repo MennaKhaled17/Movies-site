@@ -82,6 +82,7 @@ body {
     border-radius: 5px;
     cursor: pointer;
     font-size: 16px;
+    width: 120px;
 }
 
 .login-button:hover {
@@ -402,6 +403,7 @@ body {
     width: calc(100% - 22px); /* Adjust as necessary for container width */
     font-size: 16px;
     font-family: 'Arial', sans-serif; /* Match font with the dropdown */
+    
   }
   
   /* Additional styling for search input */
@@ -506,7 +508,7 @@ select {
 }
 
 /* Button styling */
-.login-button {
+.Register-button {
     padding: 12px 20px;
     border: none;
     border-radius: 5px;
@@ -524,7 +526,7 @@ select {
 }
 
 /* Button hover effects */
-.login-button:hover {
+.Register-button:hover {
     background: linear-gradient(135deg, #ff6f00, #ff8c00);
     transform: translateY(-2px);
 }
@@ -612,8 +614,52 @@ label[for="country"] {
   #alertBox.error {
     background-color: #f44336; /* Red */
   }
-  
+  .alert-box {
+    display: none;
+    padding: 10px;
+    margin: 10px;
+    border-radius: 5px;
+    color: #333;
+  }
+  .alert-success {
+    background-color: lightgreen;
+  }
+  .alert-error {
+    background-color: lightcoral;
+  }
   .hidden {
     display: none;
   }
+  .toast {
+    visibility: hidden; /* Hidden by default */
+    min-width: 250px; /* Minimum width of the toast */
+    margin-left: -125px; /* Center the toast */
+    background-color: #333; /* Default background color */
+    color: #fff; /* Text color */
+    text-align: center; /* Center text inside the toast */
+    border-radius: 2px; /* Rounded corners */
+    position: fixed; /* Fixed position to stay in place */
+    z-index: 1000; /* High z-index to overlay above other content */
+    left: 50%; /* Center horizontally */
+    bottom: 30px; /* Distance from the bottom */
+    font-size: 17px; /* Font size */
+    padding: 16px; /* Padding inside the toast */
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3); /* Shadow for depth */
+    transition: visibility 0s, opacity 0.5s linear; /* Transition for visibility and opacity */
+  }
   
+  /* Toast visible class */
+  .toast-show {
+    visibility: visible; /* Make visible */
+    opacity: 1; /* Fully opaque */
+  }
+  
+  /* Success toast style */
+  .toast-success {
+    background-color: #4CAF50; /* Green background for success */
+  }
+  
+  /* Error toast style */
+  .toast-error {
+    background-color: #f44336; /* Red background for error */
+  }
