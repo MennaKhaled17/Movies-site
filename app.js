@@ -35,7 +35,6 @@ const connectDB = async () => {
   
     await mongoose.connect(uri);
 
-const uri="mongodb+srv://menakhaled:menakhaled@cluster0.klteank.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 const connectDB = async () => { 
   console.log('Attempting to connect to MongoDB...');
   try {

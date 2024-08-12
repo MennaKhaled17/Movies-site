@@ -39,6 +39,7 @@
       <input type="password" id="password" name="password" required placeholder="Enter your password"> <br><br>
 
       <button type="submit"  class="login-button">Login</button>
+      <div id="toast" class="toast"></div>
     </form>
     <div id="errorMessages" class="error-message"></div>
   </div>
@@ -57,8 +58,29 @@
 const submitButton = document.querySelector(".login-button");
 
 
+    function showToast(message, isSuccess) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = 'toast toast-show ' + (isSuccess ? 'toast-success' : 'toast-error');
+      setTimeout(() => {
+        toast.className = 'toast';
+      }, 3000); // Toast will disappear after 3 seconds
+    }
 
-</script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const message = urlParams.get('error'); // Use 'error' for login failure
+
+      if (message) {
+        showToast(message, false);
+      }
+    });
+ </script>
+</body>
+</html>
+
+
+
 <style>
     footer {
     background-color: #333;
