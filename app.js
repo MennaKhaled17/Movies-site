@@ -21,6 +21,25 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.set('view engine', 'ejs');
 app.set('views', 'views');
 
+const uri="mongodb+srv://menakhaled:menakhaled@cluster0.klteank.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+const connectDB = async () => { 
+  console.log('Attempting to connect to MongoDB...');
+  try {
+    await mongoose.connect(uri); 
+    console.log('MongoDB connected...');
+  } catch (err) {
+    console.error('Error connecting to MongoDB:', err.message);
+    process.exit(1);
+  }
+};
+
+module.exports = connectDB();
+
+
+app.use(express.json());
+app.use(express.urlencoded({extended:true}));
+
+
 // Routing
 app.get('/', async (req, res) => {
   try {
@@ -154,23 +173,7 @@ res.json(countrylist);
 app.get("/login",async(req,res)=>{
   res.render('login');
 })
-const uri="mongodb+srv://menakhaled:menakhaled@cluster0.klteank.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
-const connectDB = async () => { 
-  console.log('Attempting to connect to MongoDB...');
-  try {
-    await mongoose.connect(uri); 
-    console.log('MongoDB connected...');
-  } catch (err) {
-    console.error('Error connecting to MongoDB:', err.message);
-    process.exit(1);
-  }
-};
 
-module.exports = connectDB();
-
-
-app.use(express.json());
-app.use(express.urlencoded({extended:true}));
 
 app.post('/Register', async (req, res) => {
   const { firstname, lastname, email, password, country, phone } = req.body;
@@ -202,14 +205,14 @@ app.post('/submit', async (req, res) => {
 
   try {
     // Check if the user with the provided email exists
-    const user = await usermodel.findOne({ email: email,password:password });
+    const user = await usermodel.findOne({ email: email, password:password });
 
     if (user) {
       // Check if the password matches
-      if (password == res.password &&email == res.email ) {
+      if (password == user.password && email == user.email ) {
         console.log('Password matches');
         // Redirect to home with a Toastr message
-        res.redirect(`/home?message=Welcome%20back,%20${encodeURIComponent(user.firstname)}!`);
+        res.redirect(`/index?message=Welcome%20back,%20${encodeURIComponent(user.firstname)}!`);
       } else {
         console.log('Password does not match');
         // Password doesn't match, return an error
