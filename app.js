@@ -267,6 +267,7 @@ app.post('/Login', async (req, res) => {
       process.env.JWT_SECRET, // Your secret key (consider storing this in an environment variable)
       { expiresIn: '1h' } 
     );
+    onsole.log('JWT_SECRET:', process.env.JWT_SECRET);
 
     // Redirect to home with a success message and token
     return res.redirect('/?message=Logged%20In%20Successfully!&token=${token}');
