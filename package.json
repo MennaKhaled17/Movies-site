@@ -12,10 +12,12 @@
         "bcrypt": "^5.1.1",
         "countries-list": "^3.1.1",
         "country-state-picker": "^1.1.5",
+        "dotenv": "^16.4.5",
         "ejs": "^3.1.10",
         "express": "^4.19.2",
         "jsonwebtoken": "^9.0.2",
-        "mongoose": "^8.5.2"
+        "mongoose": "^8.5.2",
+        "toastr": "^2.1.4"
     },
     "devDependencies": {
         "nodemon": "^3.1.4"

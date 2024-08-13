@@ -11,7 +11,7 @@ const mongoose = require("mongoose");
 const usermodel = require('./models/Schema');
 const bcrypt = require("bcrypt");
 const jwt = require('jsonwebtoken');
-
+require('dotenv').config();
 // API Data
 const API_KEY = '2306111c328b44f1be3d16ba83e418a6';
 const BASE_URL = 'https://api.themoviedb.org/3';
@@ -239,47 +239,39 @@ app.post('/Login', async (req, res) => {
   const { email, password } = req.body;
 
   try {
-
+    // Find the user by email
     const user = await usermodel.findOne({ email: email });
 
     if (!user) {
-
-    // Check if the user with the provided email exists
-    const user = await usermodel.findOne({ email: email, password:password });
-
-    if (user) {
-      // Check if the password matches
-      if (password == user.password && email == user.email ) {
-        console.log('Password matches');
-        // Redirect to home with a Toastr message
-        res.redirect(`/index?message=Welcome%20back,%20${encodeURIComponent(user.firstname)}!`);
-      } else {
-        console.log('Password does not match');
-        // Password doesn't match, return an error
-        res.redirect('/login?error=Invalid%20credentials');
-      }
-    } else {
-
+      // User not found
       console.log('User not found');
       return res.redirect('/Login?error=Invalid%20credentials');
     }
 
+    // Compare the provided password with the stored hashed password
     const isPasswordCorrect = await bcrypt.compare(password, user.password);
+
     if (!isPasswordCorrect) {
+      // Password does not match
       console.log('Password does not match');
       return res.redirect('/Login?error=Invalid%20credentials');
     }
 
+    // Password matches
+    console.log('Password matches');
+   
+    
+    // Generate a token (assuming you want to use JWT)
     const token = jwt.sign(
       { id: user._id, email: user.email },
-      'mena12',
-      { expiresIn: '1h' }
+      process.env.JWT_SECRET, // Your secret key (consider storing this in an environment variable)
+      { expiresIn: '1h' } 
     );
 
-    console.log('Password matches');
-     
-    res.redirect(`/index?message=Welcome%20back,%20${encodeURIComponent(user.firstname)}&token=${token}`);
-  }} catch (err) {
+    // Redirect to home with a success message and token
+    return res.redirect('/?message=Logged%20In%20Successfully!&token=${token}');
+
+  } catch (err) {
     console.error('Error during login:', err);
     res.status(500).send('Server error');
   }
@@ -292,7 +284,7 @@ async function createAdminUser() {
     if (!existingAdmin) {
       const hashedPassword = await bcrypt.hash('adminpassword', 12); // Hash the admin's password
 
-      const adminUser = new User({
+      const adminUser = new usermodel({
         firstname: 'Admin',
         lastname: 'User',
         email: 'admin@example.com',
@@ -314,7 +306,7 @@ async function createAdminUser() {
 
 // Call the function when your application starts
 createAdminUser();
-exports.restrictTo = (...roles) => {
+restrictTo = (...roles) => {
   return (req, res, next) => {
     // roles is an array ['admin', 'user', etc.]
     if (!roles.includes(req.usermodel.role)) {
