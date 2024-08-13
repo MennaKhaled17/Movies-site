@@ -287,7 +287,7 @@ app.post('/Login', async (req, res) => {
 
 async function createAdminUser() {
   try {
-    const existingAdmin = await User.findOne({ email: 'admin@example.com' });
+    const existingAdmin = await usermodel.findOne({ email: 'admin@example.com' });
 
     if (!existingAdmin) {
       const hashedPassword = await bcrypt.hash('adminpassword', 12); // Hash the admin's password
@@ -317,7 +317,7 @@ createAdminUser();
 exports.restrictTo = (...roles) => {
   return (req, res, next) => {
     // roles is an array ['admin', 'user', etc.]
-    if (!roles.includes(req.user.role)) {
+    if (!roles.includes(req.usermodel.role)) {
       return res.status(403).json({
         status: 'fail',
         message: 'You do not have permission to perform this action'
