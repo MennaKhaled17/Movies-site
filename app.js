@@ -284,6 +284,64 @@ app.post('/Login', async (req, res) => {
     res.status(500).send('Server error');
   }
 });
+
+async function createAdminUser() {
+  try {
+    const existingAdmin = await User.findOne({ email: 'admin@example.com' });
+
+    if (!existingAdmin) {
+      const hashedPassword = await bcrypt.hash('adminpassword', 12); // Hash the admin's password
+
+      const adminUser = new User({
+        firstname: 'Admin',
+        lastname: 'User',
+        email: 'admin@example.com',
+        password: hashedPassword,
+        country: 'AdminCountry',
+        phone: '1234567890',
+        role: 'admin' // Set the role to 'admin'
+      });
+
+      await adminUser.save();
+      console.log('Admin user created successfully');
+    } else {
+      console.log('Admin user already exists');
+    }
+  } catch (err) {
+    console.error('Error creating admin user:', err);
+  }
+}
+
+// Call the function when your application starts
+createAdminUser();
+exports.restrictTo = (...roles) => {
+  return (req, res, next) => {
+    // roles is an array ['admin', 'user', etc.]
+    if (!roles.includes(req.user.role)) {
+      return res.status(403).json({
+        status: 'fail',
+        message: 'You do not have permission to perform this action'
+      });
+    }
+    next();
+  };
+};
+app.patch('/updateUser/:id', restrictTo('admin'), (req, res) => {
+  // Logic to update user
+  res.status(200).json({
+    status: 'success',
+    message: 'User updated successfully'
+  });
+});
+
+// Assuming you have a route to delete a user
+app.delete('/deleteUser/:id', restrictTo('admin'), (req, res) => {
+  // Logic to delete user
+  res.status(204).json({
+    status: 'success',
+    message: 'User deleted successfully'
+  });
+});
 // Countries API route
 app.get('/countries', (req, res) => {
   const countrylist = Object.values(getCountries()).map(country => country.name);
