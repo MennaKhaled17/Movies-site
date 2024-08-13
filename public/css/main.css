@@ -519,6 +519,7 @@ input[type="text"],
 input[type="email"],
 input[type="password"],
 input[type="tel"],
+input[type="role"],
 select {
     width: 200px; /* Fixed width for inputs */
     padding: 8px; /* Standard padding for better height */

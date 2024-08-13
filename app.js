@@ -267,7 +267,7 @@ app.post('/Login', async (req, res) => {
       process.env.JWT_SECRET, // Your secret key (consider storing this in an environment variable)
       { expiresIn: '1h' } 
     );
-    onsole.log('JWT_SECRET:', process.env.JWT_SECRET);
+    console.log('JWT_SECRET:', process.env.JWT_SECRET);
 
     // Redirect to home with a success message and token
     return res.redirect('/?message=Logged%20In%20Successfully!&token=${token}');
@@ -278,35 +278,33 @@ app.post('/Login', async (req, res) => {
   }
 });
 
-async function createAdminUser() {
-  try {
-    const existingAdmin = await usermodel.findOne({ email: 'admin@example.com' });
 
-    if (!existingAdmin) {
-      const hashedPassword = await bcrypt.hash('adminpassword', 12); // Hash the admin's password
-
-      const adminUser = new usermodel({
-        firstname: 'Admin',
-        lastname: 'User',
-        email: 'admin@example.com',
-        password: hashedPassword,
-        country: 'AdminCountry',
-        phone: '1234567890',
-        role: 'admin' // Set the role to 'admin'
-      });
-
-      await adminUser.save();
-      console.log('Admin user created successfully');
-    } else {
-      console.log('Admin user already exists');
-    }
-  } catch (err) {
-    console.error('Error creating admin user:', err);
-  }
-}
 
 // Call the function when your application starts
-createAdminUser();
+const authenticateUser = async (req, res, next) => {
+  try {
+    // Extract token from headers or cookies
+    const token = req.headers.authorization?.split(' ')[1];
+    
+    // Verify token and extract user info
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    
+    // Fetch user from database
+    const user = await usermodel.findById(decoded.id);
+    
+    // Set user on request
+    req.user = user;
+
+    next();
+  } catch (err) {
+    res.status(401).json({
+      status: 'fail',
+      message: 'Authentication failed'
+    });
+  }
+};
+
+app.use(authenticateUser);
 restrictTo = (...roles) => {
   return (req, res, next) => {
     // roles is an array ['admin', 'user', etc.]
@@ -335,6 +333,38 @@ app.delete('/deleteUser/:id', restrictTo('admin'), (req, res) => {
     message: 'User deleted successfully'
   });
 });
+app.get('/forgot-password', (req, res) => {
+  res.render('forgot-password');
+});
+
+// Handle the password reset request
+app.post('/forgot-password', async (req, res) => {
+  const { email } = req.body;
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    return res.status(400).json({ message: 'No user with that email address' });
+  }
+
+  // Generate a password reset token
+  const token = crypto.randomBytes(20).toString('hex');
+  
+  // Set token and expiry in the user's record
+  user.resetPasswordToken = token;
+  user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+  await user.save();
+
+  // Send reset link to user's email
+  const transporter = nodemailer.createTransport({
+    service: 'Gmail',
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    }
+  });
+}
+)
+
 // Countries API route
 app.get('/countries', (req, res) => {
   const countrylist = Object.values(getCountries()).map(country => country.name);
