@@ -281,30 +281,30 @@ app.post('/Login', async (req, res) => {
 
 
 // Call the function when your application starts
-const authenticateUser = async (req, res, next) => {
-  try {
-    // Extract token from headers or cookies
-    const token = req.headers.authorization?.split(' ')[1];
+// const authenticateUser = async (req, res, next) => {
+//   try {
+//     // Extract token from headers or cookies
+//     const token = req.headers.authorization?.split(' ')[1];
     
-    // Verify token and extract user info
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+//     // Verify token and extract user info
+//     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     
-    // Fetch user from database
-    const user = await usermodel.findById(decoded.id);
+//     // Fetch user from database
+//     const user = await usermodel.findById(decoded.id);
     
-    // Set user on request
-    req.user = user;
+//     // Set user on request
+//     req.user = user;
 
-    next();
-  } catch (err) {
-    res.status(401).json({
-      status: 'fail',
-      message: 'Authentication failed'
-    });
-  }
-};
+//     next();
+//   } catch (err) {
+//     res.status(401).json({
+//       status: 'fail',
+//       message: 'Authentication failed'
+//     });
+//   }
+// };
 
-app.use(authenticateUser);
+//app.use(authenticateUser);
 restrictTo = (...roles) => {
   return (req, res, next) => {
     // roles is an array ['admin', 'user', etc.]
@@ -333,14 +333,17 @@ app.delete('/deleteUser/:id', restrictTo('admin'), (req, res) => {
     message: 'User deleted successfully'
   });
 });
-app.get('/forgot-password', (req, res) => {
+
+
+
+app.get('/forgotpassword', (req, res) => {
   res.render('forgot-password');
 });
 
 // Handle the password reset request
 app.post('/forgot-password', async (req, res) => {
   const { email } = req.body;
-  const user = await User.findOne({ email });
+  const user = await usermodel.findOne({ email });
 
   if (!user) {
     return res.status(400).json({ message: 'No user with that email address' });
