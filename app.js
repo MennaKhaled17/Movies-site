@@ -280,59 +280,63 @@ app.post('/Login', async (req, res) => {
 
 
 
-// Call the function when your application starts
-// const authenticateUser = async (req, res, next) => {
-//   try {
-//     // Extract token from headers or cookies
-//     const token = req.headers.authorization?.split(' ')[1];
-    
-//     // Verify token and extract user info
-//     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    
-//     // Fetch user from database
-//     const user = await usermodel.findById(decoded.id);
-    
-//     // Set user on request
-//     req.user = user;
 
-//     next();
-//   } catch (err) {
-//     res.status(401).json({
-//       status: 'fail',
-//       message: 'Authentication failed'
-//     });
-//   }
-// };
+function authenticateToken(req, res, next) {
+  const token = req.header('Authorization');
 
-//app.use(authenticateUser);
-restrictTo = (...roles) => {
-  return (req, res, next) => {
-    // roles is an array ['admin', 'user', etc.]
-    if (!roles.includes(req.usermodel.role)) {
-      return res.status(403).json({
-        status: 'fail',
-        message: 'You do not have permission to perform this action'
-      });
-    }
+  if (!token) {
+    return res.status(401).json({ message: 'Access denied. No token provided.' });
+  }
+
+  try {
+    const verified = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = verified;
     next();
-  };
-};
-app.patch('/updateUser/:id', restrictTo('admin'), (req, res) => {
-  // Logic to update user
-  res.status(200).json({
-    status: 'success',
-    message: 'User updated successfully'
-  });
+  } catch (err) {
+    res.status(400).json({ message: 'Invalid token.' });
+  }
+}
+
+module.exports = authenticateToken;
+app.get('/admin', authenticateToken, restrictTo('admin'), async (req, res) => {
+  try {
+    const users = await usermodel.find();
+    res.render('admin', { users });
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    res.status(500).send('Server Error');
+  }
 });
 
-// Assuming you have a route to delete a user
-app.delete('/deleteUser/:id', restrictTo('admin'), (req, res) => {
-  // Logic to delete user
-  res.status(204).json({
-    status: 'success',
-    message: 'User deleted successfully'
-  });
-});
+
+// restrictTo = (...roles) => {
+//   return (req, res, next) => {
+//     // roles is an array ['admin', 'user', etc.]
+//     if (!roles.includes(req.usermodel.role)) {
+//       return res.status(403).json({
+//         status: 'fail',
+//         message: 'You do not have permission to perform this action'
+//       });
+//     }
+//     next();
+//   };
+// };
+// app.patch('/updateUser/:id', restrictTo('admin'), (req, res) => {
+//   // Logic to update user
+//   res.status(200).json({
+//     status: 'success',
+//     message: 'User updated successfully'
+//   });
+// });
+
+// // Assuming you have a route to delete a user
+// app.delete('/deleteUser/:id', restrictTo('admin'), (req, res) => {
+//   // Logic to delete user
+//   res.status(204).json({
+//     status: 'success',
+//     message: 'User deleted successfully'
+//   });
+// });
 
 
 app.post('/reset-password', async (req, res) => {
