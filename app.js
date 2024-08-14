@@ -335,39 +335,36 @@ app.delete('/deleteUser/:id', restrictTo('admin'), (req, res) => {
 });
 
 
+app.post('/reset-password', async (req, res) => {
+  const { email, newPassword, confirmPassword } = req.body;
 
-app.get('/forgotpassword', (req, res) => {
-  res.render('forgot-password');
-});
-
-// Handle the password reset request
-app.post('/forgot-password', async (req, res) => {
-  const { email } = req.body;
-  const user = await usermodel.findOne({ email });
-
-  if (!user) {
-    return res.status(400).json({ message: 'No user with that email address' });
-  }
-
-  // Generate a password reset token
-  const token = crypto.randomBytes(20).toString('hex');
-  
-  // Set token and expiry in the user's record
-  user.resetPasswordToken = token;
-  user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
-  await user.save();
-
-  // Send reset link to user's email
-  const transporter = nodemailer.createTransport({
-    service: 'Gmail',
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
+  try {
+    // Check if passwords match
+    if (newPassword !== confirmPassword) {
+      return res.redirect('/?error=Passwords%20do%20not%20match');
     }
-  });
-}
-)
 
+    // Find the user by email
+    const user = await usermodel.findOne({ email: email });
+    if (!user) {
+      return res.redirect('/?error=No%20user%20found%20with%20this%20email');
+    }
+
+    // Hash the new password
+    const hashedPassword = await bcrypt.hash(newPassword, 12);
+
+    // Update the user's password in the database
+    user.password = hashedPassword;
+    await user.save();
+
+    // Redirect to home with a success message
+    return res.redirect('/?message=Password%20reset%20successfully');
+
+  } catch (err) {
+    console.error('Error during password reset:', err);
+    res.status(500).send('Server error');
+  }
+});
 // Countries API route
 app.get('/countries', (req, res) => {
   const countrylist = Object.values(getCountries()).map(country => country.name);

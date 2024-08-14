@@ -88,6 +88,8 @@
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
       padding: 20px;
       z-index: 1000; /* Ensure it's on top */
+      position: relative;
+      width: 36% ;
     }
 
     .popup.active {
@@ -98,7 +100,7 @@
       position: fixed;
       top: 0;
       left: 0;
-      width: 100%;
+      width: 200%;
       height: 100%;
       background: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
       z-index: 999;
@@ -117,8 +119,8 @@
     }
 
     .popup form {
-      display: flex;
-      flex-direction: column;
+      position: relative;
+      left: 180px;
     }
 
     .popup form label {
@@ -137,14 +139,23 @@
       padding: 10px;
       border: none;
       border-radius: 4px;
-      background-color: #007bff;
+      background-color: #f66d05;
       color: #fff;
       font-size: 16px;
       cursor: pointer;
+      position: relative;
+      width:50%;
+      right:27px;
     }
 
     .popup form button:hover {
-      background-color: #0056b3;
+      background-color: #f66d05;
+    }
+    #forgotPasswordLink{
+      position: relative;
+      right:190px;
+      top:15px;
+      color:#f66d05
     }
   </style>
 </head>
@@ -167,28 +178,27 @@
       <input type="password" id="password" name="password" required placeholder="Enter your password"  autocomplete="off"> <br><br>
 
       <button type="submit"  class="login-button">Login</button>
-
-  <p><a href="/forgot-password">Forgot your password?</a></p>
+<a href="#" id="forgotPasswordLink">Forgot Password?</a>
       <div id="toast" class="toast"></div>
     </form>
     <div id="errorMessages" class="error-message"></div>
   </div>
-  <a href="#" id="forgotPasswordLink">Forgot Password?</a>
+  
 
   <!-- Popup HTML -->
   <div class="popup-overlay" id="popupOverlay"></div>
   <div class="popup" id="popup">
     <button class="close" id="popupClose">&times;</button>
-    <h1>Reset Password</h1>
+    <h1 style=color:#f66d05>Change Password</h1>
     <form action="/reset-password" method="post">
       <label for="email">Enter your email address:</label>
-      <input type="email" id="email" name="email" required>
+      <input type="email" id="email" name="email" required autocomplete="off">
 
       <label for="newPassword">New Password:</label>
-      <input type="password" id="newPassword" name="newPassword" required>
+      <input type="password" id="newPassword" name="newPassword" required autocomplete="off">
 
       <label for="confirmPassword">Confirm New Password:</label>
-      <input type="password" id="confirmPassword" name="confirmPassword" required>
+      <input type="password" id="confirmPassword" name="confirmPassword" required autocomplete="off">
 
       <button type="submit">Reset Password</button>
     </form>
@@ -204,6 +214,31 @@
 </footer>
 </body>
 <script>
+   document.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const message = urlParams.get('message');
+    const error = urlParams.get('error');
+
+    if (message) {
+      Toastify({
+        text: decodeURIComponent(message),
+        duration: 3000,
+        gravity: 'top',
+        position: 'right',
+        backgroundColor: 'linear-gradient(to right, #00b09b, #96c93d)'
+      }).showToast();
+    }
+
+    if (error) {
+      Toastify({
+        text: decodeURIComponent(error),
+        duration: 3000,
+        gravity: 'top',
+        position: 'right',
+        backgroundColor: 'linear-gradient(to right, #FF5F6D, #FFC371)'
+      }).showToast();
+    }
+  });
     document.getElementById('forgotPasswordLink').addEventListener('click', function(e) {
       e.preventDefault();
       document.getElementById('popup').classList.add('active');
