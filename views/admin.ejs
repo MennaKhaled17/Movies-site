@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/css/admin.css" />
+  <title>Admin Panel</title>
+</head>
+<style>
+    /* General styling for the admin panel */
+.admin-container {
+    display: flex;
+    height: 100vh;
+    background-color: #f4f6f9;
+}
+
+.admin-sidebar {
+    width: 250px;
+    background-color: #343a40;
+    padding: 20px;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.admin-sidebar a {
+    color: white;
+    text-decoration: none;
+    margin: 15px 0;
+    padding: 10px 15px;
+    display: block;
+    text-align: center;
+    border-radius: 5px;
+}
+
+.admin-sidebar a:hover {
+    background-color: #495057;
+}
+
+.admin-header {
+    padding: 20px;
+    background-color: #fff;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.admin-header h1 {
+    margin: 0;
+    font-size: 24px;
+    color: #343a40;
+}
+
+.admin-content {
+    padding: 20px;
+    width: 100%;
+    overflow-y: auto;
+}
+
+.admin-content table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.admin-content table thead {
+    background-color: #343a40;
+    color: white;
+}
+
+.admin-content table th, 
+.admin-content table td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.admin-content table tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+.admin-content table tr:hover {
+    background-color: #ddd;
+}
+
+</style>
+<body>
+
+
+<div class="admin-container">
+    <div class="admin-sidebar">
+        <h2>Admin Panel</h2>
+        <a href="/admin/users">Users</a>
+        <a href="/">Home</a>
+    </div>
+    <div class="admin-main">
+        <div class="admin-header">
+            <h1>Users List</h1>
+            <button class="logout-button" onclick="location.href='/logout';">Logout</button>
+        </div>
+        <div class="admin-content">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Email</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% users.forEach(user => { %>
+                        <tr>
+                            <td><%= user._id %></td>
+                            <td><%= user.firstname %></td>
+                            <td><%= user.lastname %></td>
+                            <td><%= user.email %></td>
+                            <td>
+                                <a href="/admin/edit/<%= user._id %>">Edit</a> |
+                                <a href="/admin/delete/<%= user._id %>">Delete</a>
+                            </td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>

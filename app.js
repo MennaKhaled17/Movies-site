@@ -279,7 +279,9 @@ app.post('/Login', async (req, res) => {
 });
 
 
-
+app.get('/admin',(req,res)=>{
+  res.render('/admin');
+})
 
 function authenticateToken(req, res, next) {
   const token = req.header('Authorization');
@@ -296,31 +298,36 @@ function authenticateToken(req, res, next) {
     res.status(400).json({ message: 'Invalid token.' });
   }
 }
-
+restrictTo = (...roles) => {
+  return (req, res, next) => {
+    // roles is an array ['admin', 'user', etc.]
+    if (!roles.includes(req.usermodel.role)) {
+      return res.status(403).json({
+        status: 'fail',
+        message: 'You do not have permission to perform this action'
+      });
+    }
+    next();
+  };
+};
 module.exports = authenticateToken;
-app.get('/admin', authenticateToken, restrictTo('admin'), async (req, res) => {
-  try {
-    const users = await usermodel.find();
-    res.render('admin', { users });
-  } catch (error) {
-    console.error('Error fetching users:', error);
-    res.status(500).send('Server Error');
-  }
+app.get('/', authenticateToken, (req, res) => {
+  // Pass the user object to the template
+  res.render('index', { user: req.user });
 });
 
+// app.get('/admin', authenticateToken, restrictTo('admin'), async (req, res) => {
+//   try {
+//     const users = await usermodel.find();
+//     res.render('admin', { users });
+//   } catch (error) {
+//     console.error('Error fetching users:', error);
+//     res.status(500).send('Server Error');
+//   }
+// });
 
-// restrictTo = (...roles) => {
-//   return (req, res, next) => {
-//     // roles is an array ['admin', 'user', etc.]
-//     if (!roles.includes(req.usermodel.role)) {
-//       return res.status(403).json({
-//         status: 'fail',
-//         message: 'You do not have permission to perform this action'
-//       });
-//     }
-//     next();
-//   };
-// };
+
+
 // app.patch('/updateUser/:id', restrictTo('admin'), (req, res) => {
 //   // Logic to update user
 //   res.status(200).json({
