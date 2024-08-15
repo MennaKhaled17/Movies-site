@@ -279,46 +279,64 @@ app.post('/Login', async (req, res) => {
 });
 
 
-app.get('/admin',(req,res)=>{
-  res.render('/admin');
-})
-
-function authenticateToken(req, res, next) {
-  const token = req.header('Authorization');
-
-  if (!token) {
-    return res.status(401).json({ message: 'Access denied. No token provided.' });
-  }
-
+app.get('/admin', async (req, res) => {
   try {
-    const verified = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = verified;
-    next();
+      const users = await usermodel.find(); // Fetch all users from the database
+      res.render('admin', { users: users }); // Pass users to the template
+     
   } catch (err) {
-    res.status(400).json({ message: 'Invalid token.' });
+      console.error(err);
+      res.status(500).send('Server Error');
   }
-}
-restrictTo = (...roles) => {
-  return (req, res, next) => {
-    // roles is an array ['admin', 'user', etc.]
-    if (!roles.includes(req.usermodel.role)) {
-      return res.status(403).json({
-        status: 'fail',
-        message: 'You do not have permission to perform this action'
-      });
-    }
-    next();
-  };
-};
-module.exports = authenticateToken;
-app.get('/', authenticateToken, (req, res) => {
-  // Pass the user object to the template
-  res.render('index', { user: req.user });
 });
+
+// Route for the index page
+app.get('/', (req, res) => {
+  res.render('index', {
+    isAdmin: req.user && req.user.role === 'admin' // Pass the admin status to the view
+  });
+});
+
+
+
+
+
+// function authenticateToken(req, res, next) {
+//   const token = req.header('Authorization');
+
+//   if (!token) {
+//     return res.status(401).json({ message: 'Access denied. No token provided.' });
+//   }
+
+//   try {
+//     const verified = jwt.verify(token, process.env.JWT_SECRET);
+//     req.user = verified;
+//     next();
+//   } catch (err) {
+//     res.status(400).json({ message: 'Invalid token.' });
+//   }
+// }
+// restrictTo = (...roles) => {
+//   return (req, res, next) => {
+//     // roles is an array ['admin', 'user', etc.]
+//     if (!roles.includes(req.usermodel.role)) {
+//       return res.status(403).json({
+//         status: 'fail',
+//         message: 'You do not have permission to perform this action'
+//       });
+//     }
+//     next();
+//   };
+// };
+// module.exports = authenticateToken;
+// app.get('/', authenticateToken, (req, res) => {
+//   // Pass the user object to the template
+//   res.render('index', { user: req.user });
+// });
 
 // app.get('/admin', authenticateToken, restrictTo('admin'), async (req, res) => {
 //   try {
-//     const users = await usermodel.find();
+//     const users = awai t usermodel.find();
 //     res.render('admin', { users });
 //   } catch (error) {
 //     console.error('Error fetching users:', error);

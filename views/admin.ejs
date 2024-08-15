@@ -1,133 +1,211 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="/css/admin.css" />
   <title>Admin Panel</title>
-</head>
-<style>
+  <style>
     /* General styling for the admin panel */
-.admin-container {
-    display: flex;
-    height: 100vh;
-    background-color: #f4f6f9;
-}
+    .admin-panel {
+        background-color: #f3f3f3;
+        padding: 20px;
+        font-family: Arial, sans-serif;
+    }
 
-.admin-sidebar {
-    width: 250px;
-    background-color: #343a40;
-    padding: 20px;
-    color: white;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
+    /* Admin Panel Header */
+    .admin-panel-header {
+        background-color: #ff8c00; /* Main orange color */
+        color: white;
+        padding: 15px;
+        border-radius: 5px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
 
-.admin-sidebar a {
-    color: white;
-    text-decoration: none;
-    margin: 15px 0;
-    padding: 10px 15px;
-    display: block;
-    text-align: center;
-    border-radius: 5px;
-}
+    .admin-panel-header h1 {
+        margin: 0;
+        font-size: 2em;
+    }
 
-.admin-sidebar a:hover {
-    background-color: #495057;
-}
+    .admin-panel-header button {
+        background-color: #ff8c00; /* Main orange color */
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background-color 0.3s;
+    }
 
-.admin-header {
-    padding: 20px;
-    background-color: #fff;
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid #dee2e6;
-}
+    .admin-panel-header button:hover {
+        background-color: #f60; /* Darker orange for hover */
+    }
 
-.admin-header h1 {
-    margin: 0;
-    font-size: 24px;
-    color: #343a40;
-}
+    /* Admin Panel Navigation */
+    .admin-nav {
+        margin-bottom: 20px;
+    }
 
-.admin-content {
-    padding: 20px;
-    width: 100%;
-    overflow-y: auto;
-}
+    .admin-nav a {
+        background-color: #ff8c00; /* Main orange color */
+        color: white;
+        padding: 10px 20px;
+        text-decoration: none;
+        border-radius: 5px;
+        margin-right: 10px;
+        font-size: 16px;
+        transition: background-color 0.3s;
+    }
 
-.admin-content table {
-    width: 100%;
-    border-collapse: collapse;
-}
+    .admin-nav a:hover {
+        background-color: #f60; /* Darker orange for hover */
+    }
 
-.admin-content table thead {
-    background-color: #343a40;
-    color: white;
-}
+    /* Admin Panel Table */
+    .admin-panel table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+    }
 
-.admin-content table th, 
-.admin-content table td {
-    padding: 10px;
-    text-align: left;
-    border-bottom: 1px solid #dee2e6;
-}
+    .admin-panel th, .admin-panel td {
+        padding: 15px;
+        border: 1px solid #ff8c00; /* Orange border color */
+        text-align: left;
+    }
 
-.admin-content table tr:nth-child(even) {
-    background-color: #f2f2f2;
-}
+    .admin-panel th {
+        background-color: #ff8c00; /* Header background color */
+        color: white;
+        border-bottom: 2px solid #ff8c00; /* Bottom border for header cells */
+    }
 
-.admin-content table tr:hover {
-    background-color: #ddd;
-}
+    .admin-panel tr:nth-child(even) {
+        background-color: #f8f8f8;
+    }
 
-</style>
+    .admin-panel tr:hover {
+        background-color: #e0e0e0;
+    }
+
+    /* Admin Panel Buttons */
+    .admin-panel button {
+        background-color: #ff8c00; /* Matches the navbar color */
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background-color 0.3s;
+    }
+
+    .admin-panel button:hover {
+        background-color: #f60; /* Darker orange for hover */
+    }
+
+    /* Admin Panel Forms */
+    .admin-panel form {
+        margin-top: 20px;
+    }
+
+    .admin-panel form input[type="text"],
+    .admin-panel form input[type="email"],
+    .admin-panel form input[type="password"],
+    .admin-panel form input[type="tel"],
+    .admin-panel form select {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 14px;
+        margin-bottom: 15px;
+        box-sizing: border-box;
+    }
+
+    .admin-panel form input:focus,
+    .admin-panel form select:focus {
+        border-color: #ff8c00;
+        box-shadow: 0 0 5px rgba(255, 140, 0, 0.5);
+        outline: none;
+    }
+
+    /* Admin Panel Alerts */
+    .admin-panel .alert-box {
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 5px;
+        color: #fff;
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .admin-panel .alert-success {
+        background-color: #4CAF50;
+    }
+
+    .admin-panel .alert-error {
+        background-color: #f44336;
+    }
+
+    .admin-panel .alert-box button {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 16px;
+        cursor: pointer;
+    }
+
+    .admin-panel .alert-box button:hover {
+        color: #ddd;
+    }
+  </style>
+</head>
 <body>
-
-
-<div class="admin-container">
-    <div class="admin-sidebar">
-        <h2>Admin Panel</h2>
-        <a href="/admin/users">Users</a>
-        <a href="/">Home</a>
+  <div class="admin-panel">
+    <div class="admin-panel-header">
+      <h1>Admin Panel</h1>
+      <button onclick="location.href='/';">Logout</button>
     </div>
-    <div class="admin-main">
-        <div class="admin-header">
-            <h1>Users List</h1>
-            <button class="logout-button" onclick="location.href='/logout';">Logout</button>
-        </div>
-        <div class="admin-content">
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>First Name</th>
-                        <th>Last Name</th>
-                        <th>Email</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <% users.forEach(user => { %>
-                        <tr>
-                            <td><%= user._id %></td>
-                            <td><%= user.firstname %></td>
-                            <td><%= user.lastname %></td>
-                            <td><%= user.email %></td>
-                            <td>
-                                <a href="/admin/edit/<%= user._id %>">Edit</a> |
-                                <a href="/admin/delete/<%= user._id %>">Delete</a>
-                            </td>
-                        </tr>
-                    <% }) %>
-                </tbody>
-            </table>
-        </div>
+    <div class="admin-nav">
+      <a href="/admin">Users</a>
+      <a href="/">Home</a>  
     </div>
-</div>
+    <div class="admin-content">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% users.forEach(userr => { %>
+            <tr>
+              <td><%= userr._id %></td>
+              <td><%= userr.firstname %></td>
+              <td><%= userr.lastname %></td>
+              <td><%= userr.email %></td>
+              <td><%= userr.role %></td>
+              <td>
+                <button onclick="location.href='/edit/<%= userr._id %>';">Edit</button>
+                <button onclick="location.href='/delete/<%= userr._id %>';">Delete</button>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
 </body>
+</html>
