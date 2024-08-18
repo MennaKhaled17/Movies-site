@@ -31,6 +31,7 @@ const userSchema = new mongoose.Schema({
       default:"user",
 
     },
+   
     });
   const User = mongoose.model('User', userSchema); //hsmy al usersachema user dah asm al model
 

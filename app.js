@@ -100,7 +100,7 @@ app.get('/', async (req, res) => {
 
   } catch (error) {
     console.error('Error fetching popular movies:', error);
-    res.render('index', { movies: [], totalMovies: 0, page: 1, totalPages: 0, query: null, user: req.user });
+    res.render('index', { movies: [], totalMovies: 0, page: 1, totalPages: 0, query: null, user: req.user ,user:user});
   }
 });
 
@@ -201,19 +201,22 @@ app.get("/login",async(req,res)=>{
 
 
 app.post('/Register', async (req, res) => {
-  const { firstname, lastname, email, password, country, phone } = req.body;
+  const { firstname, lastname, email, password, country, phone,role,active } = req.body;
   // console.log(req.body);
 
   try {
     const hashedPassword = await bcrypt.hash(password, 6);
-
+const userRole = role || 'user'
     const user = new usermodel({
       firstname,
       lastname,
       email,
       password: hashedPassword,
       country,
-      phone
+      phone,
+      role:userRole,
+      
+      active: { type: Boolean, default: true }  
     });
 
     await user.save();
@@ -238,6 +241,8 @@ app.use(express.json());
 app.post('/Login', async (req, res) => {
   const { email, password } = req.body;
 
+  
+  // Log the user object to see if it's being stored correctly
   try {
     // Find the user by email
     const user = await usermodel.findOne({ email: email });
@@ -271,7 +276,7 @@ app.post('/Login', async (req, res) => {
 
     // Redirect to home with a success message and token
     return res.redirect('/?message=Logged%20In%20Successfully!&token=${token}');
-
+    
   } catch (err) {
     console.error('Error during login:', err);
     res.status(500).send('Server error');
@@ -289,6 +294,53 @@ app.get('/admin', async (req, res) => {
       res.status(500).send('Server Error');
   }
 });
+app.patch('/admin/deactivated/:_id', async (req, res) => {
+  try {
+    const idd = req.params._id;
+    if (!mongoose.Types.ObjectId.isValid(idd)) {
+      return res.status(400).json({ success: false, message: 'Invalid User ID' });
+    }
+
+    await usermodel.findByIdAndUpdate(idd, { active: false });
+    res.json({ success: true, message: 'User deactivated successfully.' });
+  } catch (error) {
+    console.error(error);
+    res.json({ success: false, message: 'Failed to deactivate user.' });
+  }
+});
+
+app.patch('/admin/update/:_id', async (req, res) => {
+  const { _id } = req.params;
+  console.log("Received _id:", _id);  // Log the received _id
+  
+  const { firstname, lastname, country, phone, email, password } = req.body;
+
+  try {
+    const objectId = new mongoose.Types.ObjectId(_id);
+    console.log("Querying with ObjectId:", objectId); // Log the ObjectId being queried
+
+    // Fetch user by ObjectId
+    const user = await usermodel.findById(objectId);
+    if (!user) {
+      console.log("User not found with ID:", _id);
+      return res.status(404).json({ success: false, message: 'User not found.' });
+    }
+
+    user.firstname = firstname || user.firstname;
+    user.lastname = lastname || user.lastname;
+    user.country = country || user.country;
+    user.phone = phone || user.phone;
+    user.email = email || user.email;
+    user.password = password || user.password;
+
+    const updatedUser = await user.save();  // Save the updated user
+    res.json({ success: true, message: 'User updated successfully.', updatedUser });
+  } catch (error) {
+    console.error("Update failed:", error.message);
+    res.status(500).json({ success: false, message: 'Failed to update user. Error: ' + error.message });
+  }
+});
+
 
 // Route for the index page
 app.get('/', (req, res) => {

@@ -192,14 +192,14 @@
         <tbody>
           <% users.forEach(userr => { %>
             <tr>
-              <td><%= userr._id %></td>
+              <td><%= userr._id %></td> 
               <td><%= userr.firstname %></td>
               <td><%= userr.lastname %></td>
               <td><%= userr.email %></td>
               <td><%= userr.role %></td>
               <td>
-                <button onclick="location.href='/edit/<%= userr._id %>';">Edit</button>
-                <button onclick="location.href='/delete/<%= userr._id %>';">Delete</button>
+                <button onclick="return  edit('<%=userr._id%>')">Edit</button>
+                <button onclick="return deactivateUser('<%= userr._id %>',this.parentNode.parentNode)" >Delete</button>
               </td>
             </tr>
           <% }) %>
@@ -208,4 +208,63 @@
     </div>
   </div>
 </body>
+<script>
+  function edit(userId){
+    if (confirm("Are you sure you want to Upadate this user?")) {
+      const updatedUser = {
+        firstname: document.getElementById(`firstname-${userId}`),
+        lastname: document.getElementById(`lastname-${userId}`),
+        country: document.getElementById(`country-${userId}`),
+        phone: document.getElementById(`phone-${userId}`),
+        email: document.getElementById(`email-${userId}`),
+        password: document.getElementById(`password-${userId}`),
+      };
+  fetch(`/admin/update/${userId}`, {
+      method: 'PATCH', // Use PATCH instead of DELETE for updates
+      headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(updatedUser)
+      })
+
+    
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+      
+        alert('User Upadted successfully.');
+      } else {
+        alert('Failed to Upadte user.');
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('An error occurred.');
+    });
+  }
+}
+ 
+  function deactivateUser(userId, row) {
+  if (confirm("Are you sure you want to deactivate this user?")) {
+    fetch(`/admin/deactivated/${userId}`, {
+      method: 'PATCH', // Use PATCH instead of DELETE for updates
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        row.remove(); // Remove the row from the UI
+        alert('User deactivated successfully.');
+      } else {
+        alert('Failed to deactivate user.');
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('An error occurred.');
+    });
+  }
+}
+
+</script>
+
 </html>
