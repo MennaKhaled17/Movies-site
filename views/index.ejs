@@ -21,8 +21,10 @@
         <button id="search-button">Go</button>
       </form>
       <div class="buttonss">
-      <button class="login-button" onclick="location.href='/Register';">Register</button>
+      <button class="reigration-button" onclick="location.href='/Register';">Register</button>
       <button class="login-button" onclick="location.href='/Login';">Login</button>
+      <div id="user-status" data-logged-in="<%= user ? 'true' : 'false' %>" style="display:none;"></div>
+
 </div>
       
       </div> 
@@ -113,6 +115,31 @@
         }
       });
     });
+    // Define a variable to determine if the user is logged in
+
+ 
+
+
+    document.addEventListener('DOMContentLoaded', () => {
+    
+      const userStatusElement = document.getElementById('user-status');
+    const userLoggedIn = userStatusElement.getAttribute('data-logged-in') === 'true';
+
+    console.log('User Logged In:', userLoggedIn); // Debugging line
+
+    // Access buttons by class name
+    const loginButtons = document.getElementsByClassName('login-button');
+    const registerButtons = document.getElementsByClassName('reigration-button');
+
+    // Hide buttons if user is logged in
+    if (userLoggedIn) {
+      Array.from(loginButtons).forEach(button => button.style.display = 'none');
+      Array.from(registerButtons).forEach(button => button.style.display = 'none');
+    }
+
+      // Existing JavaScript code for search input, autocomplete, etc.
+    });
+  
   </script>
    <%- include('./partials/footer.ejs') %>
 </body>

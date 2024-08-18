@@ -11,6 +11,7 @@ const mongoose = require("mongoose");
 const usermodel = require('./models/Schema');
 const bcrypt = require("bcrypt");
 const jwt = require('jsonwebtoken');
+const session = require('express-session');
 require('dotenv').config();
 // API Data
 const API_KEY = '2306111c328b44f1be3d16ba83e418a6';
@@ -238,6 +239,12 @@ app.get("/Login", async (req, res) => {
 });
 app.use(express.urlencoded({ extended: true })); // For parsing application/x-www-form-urlencoded
 app.use(express.json());
+app.use(session({
+  secret: 'kkkkk', // Secret key to sign the session ID cookie
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: false } // Set `secure: true` for HTTPS
+}));
 app.post('/Login', async (req, res) => {
   const { email, password } = req.body;
 
@@ -260,8 +267,8 @@ app.post('/Login', async (req, res) => {
       // Password does not match
       console.log('Password does not match');
       return res.redirect('/Login?error=Invalid%20credentials');
-    }
-
+    } 
+   
     // Password matches
     console.log('Password matches');
    
@@ -276,6 +283,7 @@ app.post('/Login', async (req, res) => {
 
     // Redirect to home with a success message and token
     return res.redirect('/?message=Logged%20In%20Successfully!&token=${token}');
+   
     
   } catch (err) {
     console.error('Error during login:', err);
@@ -311,14 +319,13 @@ app.patch('/admin/deactivated/:_id', async (req, res) => {
 
 app.patch('/admin/update/:_id', async (req, res) => {
   const { _id } = req.params;
-  console.log("Received _id:", _id);  // Log the received _id
+  console.log("Received _id:", _id); 
   
   const { firstname, lastname, country, phone, email, password } = req.body;
 
   try {
     const objectId = new mongoose.Types.ObjectId(_id);
-    console.log("Querying with ObjectId:", objectId); // Log the ObjectId being queried
-
+    console.log("Querying with ObjectId:", objectId); 
     // Fetch user by ObjectId
     const user = await usermodel.findById(objectId);
     if (!user) {
