@@ -35,9 +35,14 @@ app.use(cookieParser());
 const uri = "mongodb+srv://menakhaled:menakhaled@cluster0.klteank.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 
 // Auth Middleware
+const maxAge=3*24*60*60;
+const secret=process.env.JWT_SECRET;
+const createToken=(id)=>{
+    return jwt.sign({id},secret,{expiresIn: maxAge});
+}
 
 const requireAuth = (req, res, next) => {
-  const secret = process.env.JWT_SECRET;
+  const secret = process.env.secret;
   const token = req.cookies.jwt;
   //check jwt if exist and verified
   if (token) {
@@ -56,40 +61,25 @@ const requireAuth = (req, res, next) => {
 }
 // check current user
 const checkUser = (req, res, next) => {
-  console.log('CheckUser Middleware Invoked');
-
   const token = req.cookies.jwt;
   const secret = process.env.JWT_SECRET;
-  console.log('Token:', token);
-
   if (token) {
     jwt.verify(token, secret, async (err, decodedToken) => {
       if (err) {
-        console.log('JWT Verification Failed:', err.message);
         res.locals.user = null;
         next();
       } else {
-        console.log('Decoded Token:', decodedToken);
-        try {
-          let user = await usermodel.findById(decodedToken.id);
-          res.locals.user = user;
-          console.log('User Found:', user);
-        } catch (findError) {
-          console.log('Error Finding User:', findError.message);
-          res.locals.user = null;
-        }
+        let user = await usermodel.findById(decodedToken.id);
+        res.locals.user = user;
         next();
       }
     });
   } else {
-    console.log('No Token Found');
     res.locals.user = null;
     next();
   }
 };
-
 module.exports = { requireAuth, checkUser };
-
 
 //DB connection
 const connectDB = async () => {
@@ -297,37 +287,21 @@ app.use(express.urlencoded({ extended: true })); // For parsing application/x-ww
 app.use(express.json());
 
 app.post('/Login', async (req, res) => {
-  const { email, password } = req.body;
-
   try {
-    const user = await usermodel.findOne({ email });
+    const user = await usermodel.findOne({ email: req.body.email });
 
-    if (!user) {
-      console.log('User not found');
-      return res.redirect('/Login?error=Invalid%20credentials');
+    if (user && bcrypt.compareSync(req.body.password, user.password)) {
+      const token = createToken(user._id);
+      res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 1000 });
+      console.log("User authenticated", token);
+      res.redirect('/');
+    } else if (!user) {
+      //res.render('login', { title: 'Log in',error:'Email not registered'});
+      console.log("User not found");
+    } else {
+      console.log("Invalid credentials");
+      //res.render('login', { title: 'Log in',error:'Incorrect password'});
     }
-
-    const isPasswordCorrect = await bcrypt.compare(password, user.password);
-
-    if (!isPasswordCorrect) {
-      console.log('Password does not match');
-      return res.redirect('/Login?error=Invalid%20credentials');
-    }
-
-    const token = jwt.sign(
-      { id: user._id, email: user.email, role: user.role },
-      process.env.JWT_SECRET,
-      { expiresIn: '1h' }
-    );
-
-    // Log the token to confirm it was created
-    console.log('Generated JWT Token:', token);
-
-    // Set the cookie
-    res.cookie('jwt', token, { httpOnly: true, maxAge: 3600000 });
-    console.log('JWT set in cookie');
-
-    return res.redirect('/?message=Logged%20In%20Successfully');
   } catch (err) {
     console.error('Error during login:', err);
     res.status(500).send('Server error');
