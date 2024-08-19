@@ -56,27 +56,38 @@ const requireAuth = (req, res, next) => {
 }
 // check current user
 const checkUser = (req, res, next) => {
-  console.log('7');  
+  console.log('CheckUser Middleware Invoked');
 
   const token = req.cookies.jwt;
   const secret = process.env.JWT_SECRET;
+  console.log('Token:', token);
+
   if (token) {
     jwt.verify(token, secret, async (err, decodedToken) => {
       if (err) {
+        console.log('JWT Verification Failed:', err.message);
         res.locals.user = null;
         next();
       } else {
-        let user = await userModel.findById(decodedToken.id);
-        res.locals.user = user;
-        console.log(user);
+        console.log('Decoded Token:', decodedToken);
+        try {
+          let user = await usermodel.findById(decodedToken.id);
+          res.locals.user = user;
+          console.log('User Found:', user);
+        } catch (findError) {
+          console.log('Error Finding User:', findError.message);
+          res.locals.user = null;
+        }
         next();
       }
     });
   } else {
+    console.log('No Token Found');
     res.locals.user = null;
     next();
   }
 };
+
 module.exports = { requireAuth, checkUser };
 
 
@@ -288,47 +299,41 @@ app.use(express.json());
 app.post('/Login', async (req, res) => {
   const { email, password } = req.body;
 
-
-  // Log the user object to see if it's being stored correctly
   try {
-    // Find the user by email
-    const user = await usermodel.findOne({ email: email });
+    const user = await usermodel.findOne({ email });
 
     if (!user) {
-      // User not found
       console.log('User not found');
       return res.redirect('/Login?error=Invalid%20credentials');
     }
 
-    // Compare the provided password with the stored hashed password
     const isPasswordCorrect = await bcrypt.compare(password, user.password);
 
     if (!isPasswordCorrect) {
-      // Password does not match
       console.log('Password does not match');
       return res.redirect('/Login?error=Invalid%20credentials');
     }
 
-    // Password matches
-    console.log('Password matches');
-
-
-    // Generate a token (assuming you want to use JWT)
     const token = jwt.sign(
       { id: user._id, email: user.email, role: user.role },
-      process.env.JWT_SECRET, // Your secret key (consider storing this in an environment variable)
+      process.env.JWT_SECRET,
       { expiresIn: '1h' }
     );
-    console.log('JWT_SECRET:', process.env.JWT_SECRET);
 
-    // Redirect to home with a success message and token
-    return res.redirect('/?message=Logged%20In%20Successfully!&token=${token}');
+    // Log the token to confirm it was created
+    console.log('Generated JWT Token:', token);
 
+    // Set the cookie
+    res.cookie('jwt', token, { httpOnly: true, maxAge: 3600000 });
+    console.log('JWT set in cookie');
+
+    return res.redirect('/?message=Logged%20In%20Successfully');
   } catch (err) {
     console.error('Error during login:', err);
     res.status(500).send('Server error');
   }
 });
+
 
 
 app.get('/admin', async (req, res) => {
