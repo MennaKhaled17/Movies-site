@@ -7,6 +7,8 @@ const axios = require('axios');
 const { render } = require('ejs');
 const { getCountries } = require('country-state-picker');
 const app = express();
+const cookieParser = require('cookie-parser');
+
 const mongoose = require("mongoose");
 const usermodel = require('./models/Schema');
 const bcrypt = require("bcrypt");
@@ -28,18 +30,73 @@ app.set('views', 'views');
 // Middleware to parse request bodies
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 // Connecting to MongoDB
 const uri = "mongodb+srv://menakhaled:menakhaled@cluster0.klteank.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+
+// Auth Middleware
+
+const requireAuth = (req, res, next) => {
+  const secret = process.env.JWT_SECRET;
+  const token = req.cookies.jwt;
+  //check jwt if exist and verified
+  if (token) {
+    jwt.verify(token, secret, (err, decodedToken) => {
+      if (err) {
+        console.log(err.message)
+        res.redirect('/login');
+      } else {
+        console.log(decodedToken);
+        next();
+      }
+    })
+  } else {
+    res.redirect('/login');
+  }
+}
+// check current user
+const checkUser = (req, res, next) => {
+  console.log('CheckUser Middleware Invoked');
+
+  const token = req.cookies.jwt;
+  const secret = process.env.JWT_SECRET;
+  console.log('Token:', token);
+
+  if (token) {
+    jwt.verify(token, secret, async (err, decodedToken) => {
+      if (err) {
+        console.log('JWT Verification Failed:', err.message);
+        res.locals.user = null;
+        next();
+      } else {
+        console.log('Decoded Token:', decodedToken);
+        try {
+          let user = await usermodel.findById(decodedToken.id);
+          res.locals.user = user;
+          console.log('User Found:', user);
+        } catch (findError) {
+          console.log('Error Finding User:', findError.message);
+          res.locals.user = null;
+        }
+        next();
+      }
+    });
+  } else {
+    console.log('No Token Found');
+    res.locals.user = null;
+    next();
+  }
+};
+
+module.exports = { requireAuth, checkUser };
+
+
+//DB connection
 const connectDB = async () => {
   console.log('Attempting to connect to MongoDB...');
-  
-    await mongoose.connect(uri);
-
-const connectDB = async () => { 
-  console.log('Attempting to connect to MongoDB...');
   try {
-    await mongoose.connect(uri); 
+    await mongoose.connect(uri);
 
     console.log('MongoDB connected...');
   } catch (err) {
@@ -48,32 +105,32 @@ const connectDB = async () => {
   }
 };
 
-connectDB();
-  }
+app.get('*', checkUser);
+app.post('*', checkUser);
 
 // Authentication Middleware
-function authenticateToken(req, res, next) {
-  const token = req.query.token || req.headers['authorization'];
+// function authenticateToken(req, res, next) {
+//   const token = req.query.token || req.headers['authorization'];
 
-  if (!token) {
-    return res.redirect('/login?error=Access%20denied.%20Please%20login%20first.');
-  }
+//   if (!token) {
+//     return res.redirect('/login?error=Access%20denied.%20Please%20login%20first.');
+//   }
 
-  jwt.verify(token, 'mena1234', (err, user) => {
-    if (err) {
-      console.error('Token verification failed:', err);
-      return res.redirect('/login?error=Invalid%20token.%20Please%20login%20again.');
-    }
-    req.user = user; // Attach the decoded user to the request
-    next(); // Proceed to the next middleware or route handler
-  });
-}
+//   jwt.verify(token, 'mena1234', (err, user) => {
+//     if (err) {
+//       console.error('Token verification failed:', err);
+//       return res.redirect('/login?error=Invalid%20token.%20Please%20login%20again.');
+//     }
+//     req.user = user; // Attach the decoded user to the request
+//     next(); // Proceed to the next middleware or route handler
+//   });
+// }
 
 module.exports = connectDB();
 
 
 app.use(express.json());
-app.use(express.urlencoded({extended:true}));
+app.use(express.urlencoded({ extended: true }));
 
 
 
@@ -101,10 +158,9 @@ app.get('/', async (req, res) => {
 
   } catch (error) {
     console.error('Error fetching popular movies:', error);
-    res.render('index', { movies: [], totalMovies: 0, page: 1, totalPages: 0, query: null, user: req.user ,user:user});
+    res.render('index', { movies: [], totalMovies: 0, page: 1, totalPages: 0, query: null, user: req.user });
   }
 });
-
 // Route to search movies
 app.get('/search', async (req, res) => {
   const query = req.query.q; // Query from the search bar
@@ -141,23 +197,23 @@ app.get('/search', async (req, res) => {
 
 // Autocomplete route
 app.get('/autocomplete', async (req, res) => {
-  const query = req.query.q; 
+  const query = req.query.q;
   if (!query) {
     return res.json([]);
   }
 
   try {
-    const response = await axios.get(`${BASE_URL}/search/movie`, { 
+    const response = await axios.get(`${BASE_URL}/search/movie`, {
       params: {
-        api_key: API_KEY, 
+        api_key: API_KEY,
         query: query,
       },
     });
 
     const movies = response.data.results
-      .filter(movie => movie.poster_path) 
-      .slice(0, 10) 
-      .map(movie => ({ title: movie.title })); 
+      .filter(movie => movie.poster_path)
+      .slice(0, 10)
+      .map(movie => ({ title: movie.title }));
 
     res.json(movies);
   } catch (error) {
@@ -190,24 +246,25 @@ app.get('/Register', (req, res) => {
 });
 
 
-app.get('/countries',(req,res)=>{
-  const countrylist=Object.values(countries).map(country=>{
-country.name});
-res.json(countrylist);
-  
+app.get('/countries', (req, res) => {
+  const countrylist = Object.values(countries).map(country => {
+    country.name
+  });
+  res.json(countrylist);
+
 })
-app.get("/login",async(req,res)=>{
+app.get("/login", async (req, res) => {
   res.render('login');
 })
 
 
 app.post('/Register', async (req, res) => {
-  const { firstname, lastname, email, password, country, phone,role,active } = req.body;
+  const { firstname, lastname, email, password, country, phone, role, active } = req.body;
   // console.log(req.body);
 
   try {
     const hashedPassword = await bcrypt.hash(password, 6);
-const userRole = role || 'user'
+    const userRole = role || 'user'
     const user = new usermodel({
       firstname,
       lastname,
@@ -215,14 +272,14 @@ const userRole = role || 'user'
       password: hashedPassword,
       country,
       phone,
-      role:userRole,
-      
-      active: { type: Boolean, default: true }  
+      role: userRole,
+
+      active: { type: Boolean, default: true }
     });
 
     await user.save();
     console.log('Saving user to the database...');
-    
+
     // Redirect with success message
     res.redirect('/Register?message=User%20registered%20successfully&messageType=success');
   } catch (error) {
@@ -239,34 +296,33 @@ app.get("/Login", async (req, res) => {
 });
 app.use(express.urlencoded({ extended: true })); // For parsing application/x-www-form-urlencoded
 app.use(express.json());
+<<<<<<< HEAD
 app.use(session({
   secret: 'kkkkk', // Secret key to sign the session ID cookie
   resave: false,
   saveUninitialized: true,
   cookie: { secure: false } // Set `secure: true` for HTTPS
 }));
+=======
+
+>>>>>>> b98bd08ca13ccf7bf2c2b19f78c31773e664803f
 app.post('/Login', async (req, res) => {
   const { email, password } = req.body;
 
-  
-  // Log the user object to see if it's being stored correctly
   try {
-    // Find the user by email
-    const user = await usermodel.findOne({ email: email });
+    const user = await usermodel.findOne({ email });
 
     if (!user) {
-      // User not found
       console.log('User not found');
       return res.redirect('/Login?error=Invalid%20credentials');
     }
 
-    // Compare the provided password with the stored hashed password
     const isPasswordCorrect = await bcrypt.compare(password, user.password);
 
     if (!isPasswordCorrect) {
-      // Password does not match
       console.log('Password does not match');
       return res.redirect('/Login?error=Invalid%20credentials');
+<<<<<<< HEAD
     } 
    
     // Password matches
@@ -274,17 +330,31 @@ app.post('/Login', async (req, res) => {
    
     
     // Generate a token (assuming you want to use JWT)
-    const token = jwt.sign(
-      { id: user._id, email: user.email },
-      process.env.JWT_SECRET, // Your secret key (consider storing this in an environment variable)
-      { expiresIn: '1h' } 
-    );
-    console.log('JWT_SECRET:', process.env.JWT_SECRET);
+=======
+    }
 
+>>>>>>> b98bd08ca13ccf7bf2c2b19f78c31773e664803f
+    const token = jwt.sign(
+      { id: user._id, email: user.email, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: '1h' }
+    );
+
+<<<<<<< HEAD
     // Redirect to home with a success message and token
     return res.redirect('/?message=Logged%20In%20Successfully!&token=${token}');
    
     
+=======
+    // Log the token to confirm it was created
+    console.log('Generated JWT Token:', token);
+
+    // Set the cookie
+    res.cookie('jwt', token, { httpOnly: true, maxAge: 3600000 });
+    console.log('JWT set in cookie');
+
+    return res.redirect('/?message=Logged%20In%20Successfully');
+>>>>>>> b98bd08ca13ccf7bf2c2b19f78c31773e664803f
   } catch (err) {
     console.error('Error during login:', err);
     res.status(500).send('Server error');
@@ -292,14 +362,15 @@ app.post('/Login', async (req, res) => {
 });
 
 
+
 app.get('/admin', async (req, res) => {
   try {
-      const users = await usermodel.find(); // Fetch all users from the database
-      res.render('admin', { users: users }); // Pass users to the template
-     
+    const users = await usermodel.find(); // Fetch all users from the database
+    res.render('admin', { users: users }); // Pass users to the template
+
   } catch (err) {
-      console.error(err);
-      res.status(500).send('Server Error');
+    console.error(err);
+    res.status(500).send('Server Error');
   }
 });
 app.patch('/admin/deactivated/:_id', async (req, res) => {
@@ -319,8 +390,13 @@ app.patch('/admin/deactivated/:_id', async (req, res) => {
 
 app.patch('/admin/update/:_id', async (req, res) => {
   const { _id } = req.params;
+<<<<<<< HEAD
   console.log("Received _id:", _id); 
   
+=======
+  console.log("Received _id:", _id);  // Log the received _id
+
+>>>>>>> b98bd08ca13ccf7bf2c2b19f78c31773e664803f
   const { firstname, lastname, country, phone, email, password } = req.body;
 
   try {

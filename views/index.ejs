@@ -9,6 +9,9 @@
   <title>Movies</title>
 </head>
 
+
+<%if(!user){%>
+
 <body>
   <nav class="navbar">
     <div class="navbar-top">
@@ -143,5 +146,7 @@
   </script>
    <%- include('./partials/footer.ejs') %>
 </body>
+<%}%>
+
 
 </html>
