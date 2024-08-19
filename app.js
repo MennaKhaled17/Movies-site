@@ -93,6 +93,24 @@ module.exports = { requireAuth, checkUser };
 
 
 //DB connection
+mongoose.connect(uri, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+});
+
+// Update existing documents
+usermodel.updateMany({}, {
+  $set: {
+    flagg: true, // Set default value for the new field
+   // Initialize the new date field to null
+  }
+}).then((res) => {
+  // console.log(`Updated ${res.test.users} documents`);
+  // mongoose.connection.close();
+}).catch((err) => {
+  console.error('Error updating documents:', err);
+});
+
 const connectDB = async () => {
   console.log('Attempting to connect to MongoDB...');
   try {
@@ -126,7 +144,7 @@ app.post('*', checkUser);
 //   });
 // }
 
-module.exports = connectDB();
+//  
 
 
 app.use(express.json());
@@ -296,16 +314,14 @@ app.get("/Login", async (req, res) => {
 });
 app.use(express.urlencoded({ extended: true })); // For parsing application/x-www-form-urlencoded
 app.use(express.json());
-<<<<<<< HEAD
+
 app.use(session({
   secret: 'kkkkk', // Secret key to sign the session ID cookie
   resave: false,
   saveUninitialized: true,
   cookie: { secure: false } // Set `secure: true` for HTTPS
 }));
-=======
 
->>>>>>> b98bd08ca13ccf7bf2c2b19f78c31773e664803f
 app.post('/Login', async (req, res) => {
   const { email, password } = req.body;
 
@@ -322,39 +338,36 @@ app.post('/Login', async (req, res) => {
     if (!isPasswordCorrect) {
       console.log('Password does not match');
       return res.redirect('/Login?error=Invalid%20credentials');
-<<<<<<< HEAD
-    } 
+    }
    
     // Password matches
     console.log('Password matches');
    
     
     // Generate a token (assuming you want to use JWT)
-=======
-    }
 
->>>>>>> b98bd08ca13ccf7bf2c2b19f78c31773e664803f
+
     const token = jwt.sign(
       { id: user._id, email: user.email, role: user.role },
       process.env.JWT_SECRET,
       { expiresIn: '1h' }
     );
 
-<<<<<<< HEAD
+
     // Redirect to home with a success message and token
-    return res.redirect('/?message=Logged%20In%20Successfully!&token=${token}');
+    // return res.redirect('/?message=Logged%20In%20Successfully!&token=${token}');
    
     
-=======
+
     // Log the token to confirm it was created
     console.log('Generated JWT Token:', token);
 
     // Set the cookie
-    res.cookie('jwt', token, { httpOnly: true, maxAge: 3600000 });
-    console.log('JWT set in cookie');
+    // res.cookie('jwt', token, { httpOnly: true, maxAge: 3600000 });
+    // console.log('JWT set in cookie');
 
     return res.redirect('/?message=Logged%20In%20Successfully');
->>>>>>> b98bd08ca13ccf7bf2c2b19f78c31773e664803f
+
   } catch (err) {
     console.error('Error during login:', err);
     res.status(500).send('Server error');
@@ -365,62 +378,59 @@ app.post('/Login', async (req, res) => {
 
 app.get('/admin', async (req, res) => {
   try {
-    const users = await usermodel.find(); // Fetch all users from the database
-    res.render('admin', { users: users }); // Pass users to the template
-
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('Server Error');
-  }
-});
-app.patch('/admin/deactivated/:_id', async (req, res) => {
-  try {
-    const idd = req.params._id;
-    if (!mongoose.Types.ObjectId.isValid(idd)) {
-      return res.status(400).json({ success: false, message: 'Invalid User ID' });
-    }
-
-    await usermodel.findByIdAndUpdate(idd, { active: false });
-    res.json({ success: true, message: 'User deactivated successfully.' });
+    const users = await usermodel.find(); // Fetch only active users
+    console.log(users);
+    res.render('admin', { users });
   } catch (error) {
-    console.error(error);
-    res.json({ success: false, message: 'Failed to deactivate user.' });
+    console.error('Error fetching users:', error);
+    res.status(500).send('Internal server error.');
   }
 });
-
-app.patch('/admin/update/:_id', async (req, res) => {
-  const { _id } = req.params;
-<<<<<<< HEAD
-  console.log("Received _id:", _id); 
-  
-=======
-  console.log("Received _id:", _id);  // Log the received _id
-
->>>>>>> b98bd08ca13ccf7bf2c2b19f78c31773e664803f
-  const { firstname, lastname, country, phone, email, password } = req.body;
-
+app.patch('/admin/deactivated/:id', async (req, res) => {
   try {
-    const objectId = new mongoose.Types.ObjectId(_id);
-    console.log("Querying with ObjectId:", objectId); 
-    // Fetch user by ObjectId
-    const user = await usermodel.findById(objectId);
-    if (!user) {
-      console.log("User not found with ID:", _id);
+    const userId = req.params.id;
+    const result = await usermodel.findByIdAndUpdate(userId, { flagg: false });
+
+    if (!result) {
       return res.status(404).json({ success: false, message: 'User not found.' });
     }
-
-    user.firstname = firstname || user.firstname;
-    user.lastname = lastname || user.lastname;
-    user.country = country || user.country;
-    user.phone = phone || user.phone;
-    user.email = email || user.email;
-    user.password = password || user.password;
-
-    const updatedUser = await user.save();  // Save the updated user
-    res.json({ success: true, message: 'User updated successfully.', updatedUser });
+    
+    res.json({ success: true, message: 'User deactivated successfully.' });
   } catch (error) {
-    console.error("Update failed:", error.message);
-    res.status(500).json({ success: false, message: 'Failed to update user. Error: ' + error.message });
+    console.error('Error deactivating user:', error);
+    res.status(500).json({ success: false, message: 'Internal server error.' });
+  }
+});
+app.patch('/admin/update/:_id', async (req, res) => {
+  const { _id } = req.params;
+
+  try {
+    // Find the user by ID
+    const user = await usermodel.findById(_id);
+
+    // Check if the user exists
+    if (!user) {
+      console.log(`User with ID ${_id} not found.`);
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    console.log(`User found: ${user}`);
+
+    // Toggle the flagg value
+    const originalFlag = user.flagg;
+    user.flagg = !originalFlag;
+
+    // Save the updated user in the database
+    const updatedUser = await user.save();
+
+    console.log(`User flag updated from ${originalFlag} to ${updatedUser.flagg}`);
+
+    // Respond with the updated user data
+    res.status(200).json({ message: 'Flag updated successfully', user: updatedUser });
+  } catch (error) {
+    // Log the error and send a response
+    console.error('Error updating flag:', error);
+    res.status(500).json({ error: 'Failed to update the flag' });
   }
 });
 

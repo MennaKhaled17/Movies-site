@@ -165,6 +165,42 @@
     .admin-panel .alert-box button:hover {
         color: #ddd;
     }
+    .total-users {
+    margin: 20px 0;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    font-size: 16px;
+    font-family: Arial, sans-serif;
+  }
+
+  .total-users p {
+    margin: 0; 
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+  }
+
+  .total-users.found {
+    background-color: #4CAF50; /* Green for success */
+    color: white;
+   
+  }
+
+  .total-users.not-found {
+    background-color: #f44336; /* Red for error */
+    color: white;
+  }
+  .admin-panel tr.inactive {
+    background-color: #f0f0f0; /* Light gray for inactive users */
+  }
+
+  .admin-panel tr.active {
+    background-color: #ffffff; /* White for active users */
+  }
+
+  /* Optionally, different shades for various statuses can be added */
+  .admin-panel tr.inactive.active {
+    background-color: #d0ffd0; /* Light green for users who are reactivated */
+  }
   </style>
 </head>
 <body>
@@ -186,19 +222,21 @@
             <th>Last Name</th>
             <th>Email</th>
             <th>Role</th>
+            <th>Flag</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
-          <% users.forEach(userr => { %>                
+          <% users.forEach(userr => { %>
             <tr>
-              <td><%= userr._id %></td>                                                                                                                                                                   
+              <td><%= userr._id %></td> 
               <td><%= userr.firstname %></td>
               <td><%= userr.lastname %></td>
               <td><%= userr.email %></td>
               <td><%= userr.role %></td>
+              <td><%= userr.flagg %></td>
               <td>
-                <button onclick="return  edit('<%=userr._id%>')">Edit</button>
+                <button onclick="return  edit('<%=userr._id%>')">Change Flag</button>
                 <button onclick="return deactivateUser('<%= userr._id %>',this.parentNode.parentNode)" >Delete</button>
               </td>
             </tr>
@@ -207,50 +245,45 @@
       </table>
     </div>
   </div>
+  <div>
+    <% if(users && users.length > 0) { %>
+      <div class="total-users">
+        <p>Total users found: <%= users.length %></p>
+      </div>
+    <% } else { %>
+      <div class="total-users">
+        <p>No users found.</p>
+      </div>
+    <% } %>
+  </div>
 </body>
 <script>
- function edit(userId) {
-  if (confirm("Are you sure you want to update this user?")) {
-    // Attempt to get the DOM elements
-    const firstname = document.getElementById(`firstname-${userId}`);
-    const lastname = document.getElementById(`lastname-${userId}`);
-    const country = document.getElementById(`country-${userId}`);
-    const phone = document.getElementById(`phone-${userId}`);
-    const email = document.getElementById(`email-${userId}`);
-    const role = document.getElementById(`role-${userId}`);
-
-    // Log out the elements to see if they exist
-    console.log(firstname, lastname, country, phone, email, role);
-
-    // Check if any element is null
-    if (!firstname || !lastname || !country || !phone || !email || !role) {
-      alert('Error: One or more elements could not be found. Please check the IDs.');
-      return;
-    }
-
-    // Proceed if all elements are found
-    const updatedUser = {
-      firstname: firstname.value,
-      lastname: lastname.value,
-      country: country.value,
-      phone: phone.value,
-      email: email.value,
-      role: role.value
-    };
-
-    fetch(`/admin/update/${userId}`, {
-      method: 'PATCH',
+  function edit(userId){
+    if (confirm("Are you sure you want to Upadate this user?")) {
+      const updatedUser = {
+        firstname: document.getElementById(`firstname-${userId}`),
+        lastname: document.getElementById(`lastname-${userId}`),
+        country: document.getElementById(`country-${userId}`),
+        phone: document.getElementById(`phone-${userId}`),
+        email: document.getElementById(`email-${userId}`),
+        password: document.getElementById(`password-${userId}`),
+      };
+  fetch(`/admin/update/${userId}`, {
+      method: 'PATCH', // Use PATCH instead of DELETE for updates
       headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(updatedUser)
-    })
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(updatedUser)
+      })
+
+    
     .then(response => response.json())
     .then(data => {
       if (data.success) {
-        alert('User updated successfully.');
+      
+        alert('User Upadted successfully.');
       } else {
-        alert('Failed to update user.');
+        alert('Failed to Upadte user.');
       }
     })
     .catch(error => {
@@ -268,7 +301,7 @@
     .then(response => response.json())
     .then(data => {
       if (data.success) {
-        row.remove(); // Remove the row from the UI
+        // row.remove(); // Remove the row from the UI
         alert('User deactivated successfully.');
       } else {
         alert('Failed to deactivate user.');

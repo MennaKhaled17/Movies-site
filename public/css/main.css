@@ -409,6 +409,8 @@ body {
 /* Style for the autocomplete list */
 #autocomplete-list {
     position: absolute;
+    top:35px;
+    left:-30px;
     background-color: white;
     border: 1px solid #ddd;
     border-radius: 5px;
