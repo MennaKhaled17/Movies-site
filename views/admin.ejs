@@ -165,42 +165,6 @@
     .admin-panel .alert-box button:hover {
         color: #ddd;
     }
-    .total-users {
-    margin: 20px 0;
-    padding: 15px;
-    border-radius: 5px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    font-size: 16px;
-    font-family: Arial, sans-serif;
-  }
-
-  .total-users p {
-    margin: 0; 
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-  }
-
-  .total-users.found {
-    background-color: #4CAF50; /* Green for success */
-    color: white;
-   
-  }
-
-  .total-users.not-found {
-    background-color: #f44336; /* Red for error */
-    color: white;
-  }
-  .admin-panel tr.inactive {
-    background-color: #f0f0f0; /* Light gray for inactive users */
-  }
-
-  .admin-panel tr.active {
-    background-color: #ffffff; /* White for active users */
-  }
-
-  /* Optionally, different shades for various statuses can be added */
-  .admin-panel tr.inactive.active {
-    background-color: #d0ffd0; /* Light green for users who are reactivated */
-  }
   </style>
 </head>
 <body>
@@ -222,7 +186,6 @@
             <th>Last Name</th>
             <th>Email</th>
             <th>Role</th>
-            <th>Flag</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -234,9 +197,8 @@
               <td><%= userr.lastname %></td>
               <td><%= userr.email %></td>
               <td><%= userr.role %></td>
-              <td><%= userr.flagg %></td>
               <td>
-                <button onclick="return  edit('<%=userr._id%>')">Change Flag</button>
+                <button onclick="return  edit('<%=userr._id%>')">Edit</button>
                 <button onclick="return deactivateUser('<%= userr._id %>',this.parentNode.parentNode)" >Delete</button>
               </td>
             </tr>
@@ -244,17 +206,6 @@
         </tbody>
       </table>
     </div>
-  </div>
-  <div>
-    <% if(users && users.length > 0) { %>
-      <div class="total-users">
-        <p>Total users found: <%= users.length %></p>
-      </div>
-    <% } else { %>
-      <div class="total-users">
-        <p>No users found.</p>
-      </div>
-    <% } %>
   </div>
 </body>
 <script>
@@ -301,7 +252,7 @@
     .then(response => response.json())
     .then(data => {
       if (data.success) {
-        // row.remove(); // Remove the row from the UI
+        row.remove(); // Remove the row from the UI
         alert('User deactivated successfully.');
       } else {
         alert('Failed to deactivate user.');

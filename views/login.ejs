@@ -172,7 +172,7 @@
     <h1 style="color:#ff8c00">Login Form</h1>
     <form action="/Login" id="loginForm" method="post" onsubmit="validateForm(event)">
       <label for="email">Email: </label>
-      <input type="email" id="emaill" name="email" required placeholder="Enter your email address" autocomplete="off"> <br><br>
+      <input type="email" id="email" name="email" required placeholder="Enter your email address" autocomplete="off"> <br><br>
       
       <label for="password">Password:</label>
       <input type="password" id="password" name="password" required placeholder="Enter your password"  autocomplete="off"> <br><br>
@@ -273,8 +273,6 @@ const submitButton = document.querySelector(".login-button");
     const successMessage = urlParams.get('success');
     if (successMessage) {
       showToast(decodeURIComponent(successMessage), true);
-      
-
     }
 
     // Handle error messages
@@ -283,9 +281,6 @@ const submitButton = document.querySelector(".login-button");
       showToast(decodeURIComponent(errorMessage), false);
     }
   });
-  
-     
-    
 </script>
 
 </body>

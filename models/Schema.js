@@ -31,11 +31,6 @@ const userSchema = new mongoose.Schema({
       default:"user",
 
     },
-    flagg:{
-      type:Boolean,
-      default:true,
-      required: true,
-    }
    
     });
   const User = mongoose.model('User', userSchema); //hsmy al usersachema user dah asm al model

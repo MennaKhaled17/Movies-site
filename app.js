@@ -8,13 +8,14 @@ const { render } = require('ejs');
 const { getCountries } = require('country-state-picker');
 const app = express();
 const cookieParser = require('cookie-parser');
-
+const { requireAuth, checkUser } = require('./middleware/Auth.js');
 const mongoose = require("mongoose");
 const usermodel = require('./models/Schema');
 const bcrypt = require("bcrypt");
 const jwt = require('jsonwebtoken');
-const session = require('express-session');
 require('dotenv').config();
+const authRoutes=require('./routes/authroutes');
+
 // API Data
 const API_KEY = '2306111c328b44f1be3d16ba83e418a6';
 const BASE_URL = 'https://api.themoviedb.org/3';
@@ -35,72 +36,9 @@ app.use(cookieParser());
 // Connecting to MongoDB
 const uri = "mongodb+srv://menakhaled:menakhaled@cluster0.klteank.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 
-// Auth Middleware
-const maxAge=3*24*60*60;
-const secret=process.env.JWT_SECRET;
-const createToken=(id)=>{
-    return jwt.sign({id},secret,{expiresIn: maxAge});
-}
 
-const requireAuth = (req, res, next) => {
-  const secret = process.env.secret;
-  const token = req.cookies.jwt;
-  //check jwt if exist and verified
-  if (token) {
-    jwt.verify(token, secret, (err, decodedToken) => {
-      if (err) {
-        console.log(err.message)
-        res.redirect('/login');
-      } else {
-        console.log(decodedToken);
-        next();
-      }
-    })
-  } else {
-    res.redirect('/login');
-  }
-}
-// check current user
-const checkUser = (req, res, next) => {
-  const token = req.cookies.jwt;
-  const secret = process.env.JWT_SECRET;
-  if (token) {
-    jwt.verify(token, secret, async (err, decodedToken) => {
-      if (err) {
-        res.locals.user = null;
-        next();
-      } else {
-        let user = await usermodel.findById(decodedToken.id);
-        res.locals.user = user;
-        next();
-      }
-    });
-  } else {
-    res.locals.user = null;
-    next();
-  }
-};
-module.exports = { requireAuth, checkUser };
 
 //DB connection
-mongoose.connect(uri, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-});
-
-// Update existing documents
-usermodel.updateMany({}, {
-  $set: {
-    flagg: true, // Set default value for the new field
-   // Initialize the new date field to null
-  }
-}).then((res) => {
-  // console.log(`Updated ${res.test.users} documents`);
-  // mongoose.connection.close();
-}).catch((err) => {
-  console.error('Error updating documents:', err);
-});
-
 const connectDB = async () => {
   console.log('Attempting to connect to MongoDB...');
   try {
@@ -115,6 +53,7 @@ const connectDB = async () => {
 
 app.get('*', checkUser);
 app.post('*', checkUser);
+app.use('/',authRoutes);
 
 // Authentication Middleware
 // function authenticateToken(req, res, next) {
@@ -134,7 +73,7 @@ app.post('*', checkUser);
 //   });
 // }
 
-//  
+module.exports = connectDB();
 
 
 app.use(express.json());
@@ -162,11 +101,11 @@ app.get('/', async (req, res) => {
     // Slice the array to get the movies for the current page
     const paginatedMovies = movies.slice((page - 1) * limit, page * limit);
 
-    res.render('index', { movies: paginatedMovies, totalMovies, page, totalPages, query: null, user: req.user });
+    res.render('index', { movies: paginatedMovies, totalMovies, page, totalPages, query: null,});
 
   } catch (error) {
     console.error('Error fetching popular movies:', error);
-    res.render('index', { movies: [], totalMovies: 0, page: 1, totalPages: 0, query: null, user: req.user });
+    res.render('index', { movies: [], totalMovies: 0, page: 1, totalPages: 0, query: null, });
   }
 });
 // Route to search movies
@@ -266,35 +205,35 @@ app.get("/login", async (req, res) => {
 })
 
 
-app.post('/Register', async (req, res) => {
-  const { firstname, lastname, email, password, country, phone, role, active } = req.body;
-  // console.log(req.body);
+// app.post('/Register', async (req, res) => {
+//   const { firstname, lastname, email, password, country, phone, role, active } = req.body;
+//   // console.log(req.body);
 
-  try {
-    const hashedPassword = await bcrypt.hash(password, 6);
-    const userRole = role || 'user'
-    const user = new usermodel({
-      firstname,
-      lastname,
-      email,
-      password: hashedPassword,
-      country,
-      phone,
-      role: userRole,
+//   try {
+//     const hashedPassword = await bcrypt.hash(password, 6);
+//     const userRole = role || 'user'
+//     const user = new usermodel({
+//       firstname,
+//       lastname,
+//       email,
+//       password: hashedPassword,
+//       country,
+//       phone,
+//       role: userRole,
 
-      active: { type: Boolean, default: true }
-    });
+//       active: { type: Boolean, default: true }
+//     });
 
-    await user.save();
-    console.log('Saving user to the database...');
+//     await user.save();
+//     console.log('Saving user to the database...');
 
-    // Redirect with success message
-    res.redirect('/Register?message=User%20registered%20successfully&messageType=success');
-  } catch (error) {
-    console.error('Error registering user:', error);
-    res.redirect('/Register?message=Error%20registering%20user&messageType=error');
-  }
-});
+//     // Redirect with success message
+//     res.redirect('/Register?message=User%20registered%20successfully&messageType=success');
+//   } catch (error) {
+//     console.error('Error registering user:', error);
+//     res.redirect('/Register?message=Error%20registering%20user&messageType=error');
+//   }
+// });
 
 // Login route
 app.get("/Login", async (req, res) => {
@@ -305,138 +244,72 @@ app.get("/Login", async (req, res) => {
 app.use(express.urlencoded({ extended: true })); // For parsing application/x-www-form-urlencoded
 app.use(express.json());
 
-app.use(session({
-  secret: 'kkkkk', // Secret key to sign the session ID cookie
-  resave: false,
-  saveUninitialized: true,
-  cookie: { secure: false } // Set `secure: true` for HTTPS
-}));
-
-app.post('/Login', async (req, res) => {
-  try {
-    const user = await usermodel.findOne({ email: req.body.email });
-
-    if (user && bcrypt.compareSync(req.body.password, user.password)) {
-      const token = createToken(user._id);
-      res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 1000 });
-      console.log("User authenticated", token);
-      res.redirect('/');
-    } else if (!user) {
-      //res.render('login', { title: 'Log in',error:'Email not registered'});
-      console.log("User not found");
-    } else {
-      console.log("Invalid credentials");
-      //res.render('login', { title: 'Log in',error:'Incorrect password'});
-    }
-
-    const isPasswordCorrect = await bcrypt.compare(password, user.password);
-
-    if (!isPasswordCorrect) {
-      console.log('Password does not match');
-      return res.redirect('/Login?error=Invalid%20credentials');
-    }
-   
-    // Password matches
-    console.log('Password matches');
-   
-    
-    // Generate a token (assuming you want to use JWT)
-
-
-    const token = jwt.sign(
-      { id: user._id, email: user.email, role: user.role },
-      process.env.JWT_SECRET,
-      { expiresIn: '1h' }
-    );
-
-
-    // Redirect to home with a success message and token
-    // return res.redirect('/?message=Logged%20In%20Successfully!&token=${token}');
-   
-    
-
-    // Log the token to confirm it was created
-    console.log('Generated JWT Token:', token);
-
-    // Set the cookie
-    // res.cookie('jwt', token, { httpOnly: true, maxAge: 3600000 });
-    // console.log('JWT set in cookie');
-
-    return res.redirect('/?message=Logged%20In%20Successfully');
-
-  } catch (err) {
-    console.error('Error during login:', err);
-    res.status(500).send('Server error');
-  }
-});
-
 
 
 app.get('/admin', async (req, res) => {
   try {
-    const users = await usermodel.find(); // Fetch only active users
-    console.log(users);
-    res.render('admin', { users });
-  } catch (error) {
-    console.error('Error fetching users:', error);
-    res.status(500).send('Internal server error.');
+    const users = await usermodel.find(); // Fetch all users from the database
+    res.render('admin', { users: users }); // Pass users to the template
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server Error');
   }
 });
-app.patch('/admin/deactivated/:id', async (req, res) => {
+app.patch('/admin/deactivated/:_id', async (req, res) => {
   try {
-    const userId = req.params.id;
-    const result = await usermodel.findByIdAndUpdate(userId, { flagg: false });
-
-    if (!result) {
-      return res.status(404).json({ success: false, message: 'User not found.' });
+    const idd = req.params._id;
+    if (!mongoose.Types.ObjectId.isValid(idd)) {
+      return res.status(400).json({ success: false, message: 'Invalid User ID' });
     }
-    
+
+    await usermodel.findByIdAndUpdate(idd, { active: false });
     res.json({ success: true, message: 'User deactivated successfully.' });
   } catch (error) {
-    console.error('Error deactivating user:', error);
-    res.status(500).json({ success: false, message: 'Internal server error.' });
+    console.error(error);
+    res.json({ success: false, message: 'Failed to deactivate user.' });
   }
 });
+
 app.patch('/admin/update/:_id', async (req, res) => {
   const { _id } = req.params;
+  console.log("Received _id:", _id);  // Log the received _id
+
+  const { firstname, lastname, country, phone, email, password } = req.body;
 
   try {
-    // Find the user by ID
-    const user = await usermodel.findById(_id);
+    const objectId = new mongoose.Types.ObjectId(_id);
+    console.log("Querying with ObjectId:", objectId); // Log the ObjectId being queried
 
-    // Check if the user exists
+    // Fetch user by ObjectId
+    const user = await usermodel.findById(objectId);
     if (!user) {
-      console.log(`User with ID ${_id} not found.`);
-      return res.status(404).json({ error: 'User not found' });
+      console.log("User not found with ID:", _id);
+      return res.status(404).json({ success: false, message: 'User not found.' });
     }
 
-    console.log(`User found: ${user}`);
+    user.firstname = firstname || user.firstname;
+    user.lastname = lastname || user.lastname;
+    user.country = country || user.country;
+    user.phone = phone || user.phone;
+    user.email = email || user.email;
+    user.password = password || user.password;
 
-    // Toggle the flagg value
-    const originalFlag = user.flagg;
-    user.flagg = !originalFlag;
-
-    // Save the updated user in the database
-    const updatedUser = await user.save();
-
-    console.log(`User flag updated from ${originalFlag} to ${updatedUser.flagg}`);
-
-    // Respond with the updated user data
-    res.status(200).json({ message: 'Flag updated successfully', user: updatedUser });
+    const updatedUser = await user.save();  // Save the updated user
+    res.json({ success: true, message: 'User updated successfully.', updatedUser });
   } catch (error) {
-    // Log the error and send a response
-    console.error('Error updating flag:', error);
-    res.status(500).json({ error: 'Failed to update the flag' });
+    console.error("Update failed:", error.message);
+    res.status(500).json({ success: false, message: 'Failed to update user. Error: ' + error.message });
   }
 });
 
 
-// Route for the index page
-app.get('/', (req, res) => {
-  res.render('index', {
-    isAdmin: req.user && req.user.role === 'admin' // Pass the admin status to the view
-  });
-});
+// // Route for the index page
+// app.get('/', (req, res) => {
+//   res.render('index', {
+//     isAdmin: req.user && req.user.role === 'admin' // Pass the admin status to the view
+//   });
+// });
 
 
 
