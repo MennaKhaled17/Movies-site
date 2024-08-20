@@ -15,6 +15,9 @@ const bcrypt = require("bcrypt");
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const authRoutes=require('./routes/authroutes');
+const crypto = require('crypto');
+const nodemailer = require('nodemailer');
+
 
 // API Data
 const API_KEY = '2306111c328b44f1be3d16ba83e418a6';
@@ -102,7 +105,7 @@ app.get('/', async (req, res) => {
     const paginatedMovies = movies.slice((page - 1) * limit, page * limit);
 
     res.render('index', { movies: paginatedMovies, totalMovies, page, totalPages, query: null,});
-
+    res.render('welcome', { user: res.locals.user });
   } catch (error) {
     console.error('Error fetching popular movies:', error);
     res.render('index', { movies: [], totalMovies: 0, page: 1, totalPages: 0, query: null, });
@@ -246,6 +249,9 @@ app.use(express.json());
 
 
 
+// Route to handle GET requests to the homepage or welcome page
+
+
 app.get('/admin', async (req, res) => {
   try {
     const users = await usermodel.find(); // Fetch all users from the database
@@ -377,35 +383,55 @@ app.patch('/admin/update/:_id', async (req, res) => {
 //   });
 // });
 
-
 app.post('/reset-password', async (req, res) => {
-  const { email, newPassword, confirmPassword } = req.body;
-
+  const { email, otp, newPassword, confirmPassword } = req.body;
+  
   try {
     // Check if passwords match
     if (newPassword !== confirmPassword) {
-      return res.redirect('/?error=Passwords%20do%20not%20match');
+      return res.status(400).json({ error: 'Passwords do not match' });
     }
 
     // Find the user by email
-    const user = await usermodel.findOne({ email: email });
+    const user = await usermodel.findOne({ email });
     if (!user) {
-      return res.redirect('/?error=No%20user%20found%20with%20this%20email');
+      return res.status(404).json({ error: 'No user found with this email' });
     }
 
-    // Hash the new password
-    const hashedPassword = await bcrypt.hash(newPassword, 12);
+    // Check if OTP is provided
+    if (otp) {
+      // Check if OTP is valid
+      if (user.resetToken !== otp || Date.now() > user.resetTokenExpiry) {
+        return res.status(400).json({ error: 'Invalid or expired OTP' });
+      }
 
-    // Update the user's password in the database
-    user.password = hashedPassword;
-    await user.save();
+      // Update user password and clear OTP fields
+      user.password = bcrypt.hashSync(newPassword, 10);
+      user.resetToken = undefined;
+      user.resetTokenExpiry = undefined;
+      await user.save();
 
-    // Redirect to home with a success message
-    return res.redirect('/?message=Password%20reset%20successfully');
+      return res.status(200).json({ message: 'Password successfully reset' });
+    } else {
+      // If OTP is not provided, request OTP and send email
+      const otp = crypto.randomBytes(3).toString('hex'); // Generates a 6-digit OTP
+      user.resetToken = otp;
+      user.resetTokenExpiry = Date.now() + 3600000; // OTP valid for 1 hour
+      await user.save();
 
+      const mailOptions = {
+        to: email,
+        from: process.env.EMAIL_USER,
+        subject: 'Password Reset OTP',
+        text: `Your OTP for password reset is: ${otp}`
+      };
+
+      await transporter.sendMail(mailOptions);
+      return res.status(200).json({ message: 'OTP sent to your email' });
+    }
   } catch (err) {
     console.error('Error during password reset:', err);
-    res.status(500).send('Server error');
+    res.status(500).json({ error: 'Server error' });
   }
 });
 // Countries API route
@@ -414,6 +440,67 @@ app.get('/countries', (req, res) => {
   res.json(countrylist);
 });
 
+const transporter = nodemailer.createTransport({
+    service: 'Gmail', // or any other email service provider
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+    }
+});
+
+app.post('/request-reset', async (req, res) => {
+  const email = req.body.email;
+  const user = await usermodel.findOne({ email });
+
+  if (user) {
+      // Generate OTP
+      const otp = crypto.randomBytes(3).toString('hex'); // Generates a 6-digit OTP
+      user.resetToken = otp;
+      user.resetTokenExpiry = Date.now() + 3600000; // OTP valid for 1 hour
+      await user.save();
+
+      // Send email with OTP
+      const mailOptions = {
+          to: email,
+          from: process.env.EMAIL_USER,
+          subject: 'Password Reset OTP',
+          text: `Your OTP for password reset is: ${otp}`
+      };
+
+      await transporter.sendMail(mailOptions);
+      res.send('OTP sent to your email');
+  } else {
+      res.status(404).send('No account with that email address');
+  }
+});
+
+app.post('/reset-password', async (req, res) => {
+  const { email, otp, newPassword, confirmPassword } = req.body;
+    // Find user by email
+    const user = await usermodel.findOne({ email });
+
+    if (!user) {
+        return res.status(400).json({ error: 'User not found' });
+    }
+
+    // Check if OTP is valid
+    if (user.resetToken !== otp || Date.now() > user.resetTokenExpiry) {
+        return res.status(400).json({ error: 'Invalid or expired OTP' });
+    }
+
+    // Check if new password and confirm password match
+    if (newPassword !== confirmPassword) {
+        return res.status(400).json({ error: 'Passwords do not match' });
+    }
+
+    // Update user password and clear OTP fields
+    user.password = bcrypt.hashSync(newPassword, 10);
+    user.resetToken = undefined;
+    user.resetTokenExpiry = undefined;
+    await user.save();
+
+    res.status(200).json({ message: 'Password successfully reset' });
+});
 // Fallback route for undefined paths
 app.use((req, res) => {
   res.status(404).send('Page not found');

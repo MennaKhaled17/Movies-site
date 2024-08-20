@@ -186,23 +186,26 @@
   
 
   <!-- Popup HTML -->
-  <div class="popup-overlay" id="popupOverlay"></div>
   <div class="popup" id="popup">
     <button class="close" id="popupClose">&times;</button>
-    <h1 style=color:#f66d05>Change Password</h1>
-    <form action="/reset-password" method="post">
-      <label for="email">Enter your email address:</label>
-      <input type="email" id="email" name="email" required autocomplete="off">
+    <h1 style="color:#f66d05">Reset Password</h1>
+    <form id="resetPasswordForm" action="/reset-password" method="post">
+        <label for="email">Enter your email address:</label>
+        <input type="email" id="email" name="email" required autocomplete="off">
 
-      <label for="newPassword">New Password:</label>
-      <input type="password" id="newPassword" name="newPassword" required autocomplete="off">
+        <label for="otp">Enter OTP:</label>
+        <input type="text" id="otp" name="otp" required autocomplete="off">
 
-      <label for="confirmPassword">Confirm New Password:</label>
-      <input type="password" id="confirmPassword" name="confirmPassword" required autocomplete="off">
+        <label for="newPassword">New Password:</label>
+        <input type="password" id="newPassword" name="newPassword" required autocomplete="off">
 
-      <button type="submit">Reset Password</button>
+        <label for="confirmPassword">Confirm New Password:</label>
+        <input type="password" id="confirmPassword" name="confirmPassword" required autocomplete="off">
+
+        <button type="submit">Reset Password</button>
     </form>
-  </div>
+</div>
+
 <head>
     <link rel="stylesheet" href="/css/footer.css">
 </head>
@@ -213,7 +216,14 @@
     <p>Follow us on <a href="#">Facebook</a>, <a href="#">Twitter</a>, <a href="#">Instagram</a></p>
 </footer>
 </body>
-<script>
+<script>function showToast(message, isSuccess) {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.className = 'toast toast-show ' + (isSuccess ? 'toast-success' : 'toast-error');
+    setTimeout(() => {
+        toast.className = 'toast';
+    }, 3000); // Toast will disappear after 3 seconds
+}
    document.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
     const message = urlParams.get('message');
@@ -281,6 +291,32 @@ const submitButton = document.querySelector(".login-button");
       showToast(decodeURIComponent(errorMessage), false);
     }
   });
+
+  document.getElementById('resetPasswordForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const email = document.getElementById('email').value;
+    const otp = document.getElementById('otp').value;
+    const newPassword = document.getElementById('newPassword').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+
+    const response = await fetch('/reset-password', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email, otp, newPassword, confirmPassword })
+    });
+
+    const result = await response.json();
+    if (response.ok) {
+        showToast(result.message, true);
+        window.location.href = '/'; // Redirect to home page after successful reset
+    } else {
+        showToast(result.error, false);
+    }
+});
+
 </script>
 
 </body>

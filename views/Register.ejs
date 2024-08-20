@@ -57,7 +57,7 @@
       <label for="phone">Phone Number:</label>
       <input type="tel" id="phone" name="phone" required placeholder="Enter your phone number"autocomplete="off"><br>
       <label for="role">Role:</label>
-      <input type="role" id="role" name="role" required placeholder="Enter your role "autocomplete="off"><br>
+      <input type="text" id="role" name="role" required placeholder="Enter your role "autocomplete="off"><br>
 
       <button type="submit" class="reigration-button">Submit</button>
     </form>
@@ -78,11 +78,11 @@
 
   <script>
    
-  document.getElementById('registrationForm').addEventListener('submit', function() {
-    setTimeout(() => {
-      this.reset(); // Clear form fields after submission
-    }, 1000); // Adjust the delay if needed
-  });
+  // document.getElementById('registrationForm').addEventListener('submit', function() {
+  //   setTimeout(() => {
+  //     this.reset(); // Clear form fields after submission
+  //   }, 1000); // Adjust the delay if needed
+  // });
 
     function showToast(message, isSuccess) {
       const toast = document.getElementById('toast');

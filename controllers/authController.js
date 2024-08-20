@@ -59,6 +59,7 @@ module.exports={
             res.cookie('jwt',token,{httpOnly:true,maxAge:maxAge*1000});
             console.log("User authenticated", token);
             res.redirect('/');
+            res.render('welcome', { user: user });
         }else if (!user) {	
             //res.render('login', { title: 'Log in',error:'Email not registered'});
             console.log("User not found");
