@@ -46,7 +46,12 @@ const connectDB = async () => {
   console.log('Attempting to connect to MongoDB...');
   try {
     await mongoose.connect(uri);
+    await usermodel.updateMany(
+      { resetToken: { $exists: false } }, // Match documents without the field
+      { $set: { resetToken: '', resetTokenExpiry: new Date(0) } } // Set default values
+    );
 
+    console.log('Migration complete.');
     console.log('MongoDB connected...');
   } catch (err) {
     console.error('Error connecting to MongoDB:', err.message);
@@ -308,8 +313,11 @@ app.patch('/admin/update/:_id', async (req, res) => {
     res.status(500).json({ success: false, message: 'Failed to update user. Error: ' + error.message });
   }
 });
-app.get('/forgot-password', (req, res) => {
-  res.render('/login/forgotpassword'); // Ensure this matches the exact filename
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+
+app.get('/forgotpassword', (req, res) => {
+  res.render('forgotpassword'); // Ensure this matches the exact filename
 });
 
 // // Route for the index page
@@ -323,192 +331,132 @@ app.get('/forgot-password', (req, res) => {
 
 
 
-// function authenticateToken(req, res, next) {
-//   const token = req.header('Authorization');
+app.post('/forgotpassword', async (req, res) => {
+  try {
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS }
+    });
 
-//   if (!token) {
-//     return res.status(401).json({ message: 'Access denied. No token provided.' });
-//   }
+    const { email, otp, newPassword, confirmPassword } = req.body;
 
-//   try {
-//     const verified = jwt.verify(token, process.env.JWT_SECRET);
-//     req.user = verified;
-//     next();
-//   } catch (err) {
-//     res.status(400).json({ message: 'Invalid token.' });
-//   }
-// }
-// restrictTo = (...roles) => {
-//   return (req, res, next) => {
-//     // roles is an array ['admin', 'user', etc.]
-//     if (!roles.includes(req.usermodel.role)) {
-//       return res.status(403).json({
-//         status: 'fail',
-//         message: 'You do not have permission to perform this action'
-//       });
-//     }
-//     next();
-//   };
-// };
-// module.exports = authenticateToken;
-// app.get('/', authenticateToken, (req, res) => {
-//   // Pass the user object to the template
-//   res.render('index', { user: req.user });
-// });
+    const user = await usermodel.findOne({ email });
+    if (!user) return res.status(404).json({ error: 'No user found with this email' });
 
-// app.get('/admin', authenticateToken, restrictTo('admin'), async (req, res) => {
-//   try {
-//     const users = awai t usermodel.find();
-//     res.render('admin', { users });
-//   } catch (error) {
-//     console.error('Error fetching users:', error);
-//     res.status(500).send('Server Error');
-//   }
-// });
-
-
-
-// app.patch('/updateUser/:id', restrictTo('admin'), (req, res) => {
-//   // Logic to update user
-//   res.status(200).json({
-//     status: 'success',
-//     message: 'User updated successfully'
-//   });
-// });
-
-// // Assuming you have a route to delete a user
-// app.delete('/deleteUser/:id', restrictTo('admin'), (req, res) => {
-//   // Logic to delete user
-//   res.status(204).json({
-//     status: 'success',
-//     message: 'User deleted successfully'
-//   });
-// });
-
-// app.post('/reset-password', async (req, res) => {
-//   const { email,  newPassword, confirmPassword } = req.body;
-  
-//   try {
-//     // Check if passwords match
-//     if (newPassword !== confirmPassword) {
-//       return res.status(400).json({ error: 'Passwords do not match' });
-//     }
-
-//     // Find the user by email
-//     const user = await usermodel.findOne({ email });
-//     if (!user) {
-//       return res.status(404).json({ error: 'No user found with this email' });
-//     }
-
-//     // Check if OTP is provided
-//     else{
-
-//     if (otp) {
-//       // Check if OTP is valid
-//       if (user.resetToken !== otp || Date.now() > user.resetTokenExpiry) {
-//         return res.status(400).json({ error: 'Invalid or expired OTP' });
-//       }
-
-//       // Update user password and clear OTP fields
-//       user.password = bcrypt.hashSync(newPassword, 10);
-//       user.resetToken = undefined;
-//       user.resetTokenExpiry = undefined;+
-//       await user.save();
-
-//       return res.status(200).json({ message: 'Password successfully reset' });
-//     } else {
-//       // If OTP is not provided, request OTP and send email
-//       const otp = crypto.randomBytes(3).toString('hex'); // Generates a 6-digit OTP
-//       user.resetToken = otp;
-//       user.resetTokenExpiry = Date.now() + 3600000; // OTP valid for 1 hour
-//       await user.save();
-
-//       const mailOptions = {
-//         to: email,
-//         from: process.env.EMAIL_USER,
-//         subject: 'Password Reset OTP',
-//         text: `Your OTP for password reset is: ${otp}`
-//       };
+    if (!otp) {
+      const generatedOtp = crypto.randomBytes(3).toString('hex');
+      user.resetToken = generatedOtp;
+      user.resetTokenExpiry = Date.now() + 3600000;
+      await user.save();
  
-//       await transporter.sendMail(mailOptions);
-//       return res.status(200).json({ message: 'OTP sent to your email' });
-//     }}
-//   } catch (err) {
-//     console.error('Error during password reset:', err);
-//     res.status(500).json({ error: 'Server error' });
-//   }
-// });
+      const mailOptions = {
+        to: email,
+        from: process.env.EMAIL_USER,
+        subject: 'Password Reset OTP',
+        text: `Your OTP for password reset is: ${generatedOtp}`
+      };
+
+      await transporter.sendMail(mailOptions);
+     
+
+      
+      return res.status(200).json({ message: 'OTP sent to your email' });
+    }
+
+    if (user.resetToken !== otp || Date.now() > user.resetTokenExpiry) {
+      return res.status(400).json({ error: 'Invalid or expired OTP' });
+    }
+
+    if (newPassword !== confirmPassword) {
+      return res.status(400).json({ error: 'Passwords do not match' });
+    }
+
+    user.password = bcrypt.hashSync(newPassword, 10);
+    user.resetToken = undefined;
+    user.resetTokenExpiry = undefined;
+    await user.save();
+
+    return res.status(200).json({ message: 'Password successfully reset' });
+  } catch (err) {
+    console.error('Error during password reset:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+
+//module.exports = app;
+
 // Countries API route
 app.get('/countries', (req, res) => {
   const countrylist = Object.values(getCountries()).map(country => country.name);
   res.json(countrylist);
 });
 
-const transporter = nodemailer.createTransport({
-    service: 'Gmail', // or any other email service provider
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
-    }
-});
+// const transporter = nodemailer.createTransport({
+//     service: 'Gmail', // or any other email service provider
+//     auth: {
+//         user: process.env.EMAIL_USER,
+//         pass: process.env.EMAIL_PASS
+//     }
+// });
 
-app.post('/request-reset', async (req, res) => {
-  const email = req.body.email;
-  const user = await usermodel.findOne({ email });
+// app.post('/request-reset', async (req, res) => {
+//   const email = req.body.email;
+//   const user = await usermodel.findOne({ email });
 
-  if (user) {
-      // Generate OTP
-      const otp = crypto.randomBytes(3).toString('hex'); // Generates a 6-digit OTP
-      user.resetToken = otp;
-      user.resetTokenExpiry = Date.now() + 3600000; // OTP valid for 1 hour
-      await user.save();
+//   if (user) {
+//       // Generate OTP
+//       const otp = crypto.randomBytes(3).toString('hex'); // Generates a 6-digit OTP
+//       user.resetToken = otp;
+//       user.resetTokenExpiry = Date.now() + 3600000; // OTP valid for 1 hour
+//       await user.save();
 
-      // Send email with OTP
-      const mailOptions = {
-          to: email,
-          from: process.env.EMAIL_USER,
-          subject: 'Password Reset OTP',
-          text: `Your OTP for password reset is: ${otp}`
-      };
+//       // Send email with OTP
+//       const mailOptions = {
+//           to: email,
+//           from: process.env.EMAIL_USER,
+//           subject: 'Password Reset OTP',
+//           text: `Your OTP for password reset is: ${otp}`
+//       };
 
-      await transporter.sendMail(mailOptions);
-      res.send('OTP sent to your email');
-  } else {
-      res.status(404).send('No account with that email address');
-  }
-});
+//       await transporter.sendMail(mailOptions);
+//       res.send('OTP sent to your email');
+//   } else {
+//       res.status(404).send('No account with that email address');
+//   }
+// });
 
-app.post('/reset-password', async (req, res) => {
-  const { email, otp, newPassword, confirmPassword } = req.body;
-    // Find user by email
-    const user = await usermodel.findOne({ email });
+// app.post('/reset-password', async (req, res) => {
+//   const { email, otp, newPassword, confirmPassword } = req.body;
+//     // Find user by email
+//     const user = await usermodel.findOne({ email });
 
-    if (!user) {
-        return res.status(400).json({ error: 'User not found' });
-    }
+//     if (!user) {
+//         return res.status(400).json({ error: 'User not found' });
+//     }
 
-    // Check if OTP is valid
-    if (user.resetToken !== otp || Date.now() > user.resetTokenExpiry) {
-        return res.status(400).json({ error: 'Invalid or expired OTP' });
-    }
+//     // Check if OTP is valid
+//     if (user.resetToken !== otp || Date.now() > user.resetTokenExpiry) {
+//         return res.status(400).json({ error: 'Invalid or expired OTP' });
+//     }
 
-    // Check if new password and confirm password match
-    if (newPassword !== confirmPassword) {
-        return res.status(400).json({ error: 'Passwords do not match' });
-    }
+//     // Check if new password and confirm password match
+//     if (newPassword !== confirmPassword) {
+//         return res.status(400).json({ error: 'Passwords do not match' });
+//     }
 
-    // Update user password and clear OTP fields
-    user.password = bcrypt.hashSync(newPassword, 10);
-    user.resetToken = undefined;
-    user.resetTokenExpiry = undefined;
-    await user.save();
+//     // Update user password and clear OTP fields
+//     user.password = bcrypt.hashSync(newPassword, 10);
+//     user.resetToken = undefined;
+//     user.resetTokenExpiry = undefined;
+//     await user.save();
 
-    res.status(200).json({ message: 'Password successfully reset' });
-});
-// Fallback route for undefined paths
-app.use((req, res) => {
-  res.status(404).send('Page not found');
-});
+//     res.status(200).json({ message: 'Password successfully reset' });
+// });
+// // Fallback route for undefined paths
+// app.use((req, res) => {
+//   res.status(404).send('Page not found');
+// });
 
 // Starting server using port 3001
 app.listen(3001, () => {
