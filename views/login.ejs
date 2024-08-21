@@ -178,7 +178,7 @@
       <input type="password" id="password" name="password" required placeholder="Enter your password"  autocomplete="off"> <br><br>
 
       <button type="submit"  class="login-button">Login</button>
-<a href="#" id="forgotPasswordLink">Forgot Password?</a>
+<a href="/Movies-site/views/forgot password" id="forgotPasswordLink">Forgot Password?</a>
       <div id="toast" class="toast"></div>
     </form>
     <div id="errorMessages" class="error-message"></div>
@@ -186,7 +186,7 @@
   
 
   <!-- Popup HTML -->
-  <div class="popup" id="popup">
+  <!-- <div class="popup" id="popup">
     <button class="close" id="popupClose">&times;</button>
     <h1 style="color:#f66d05">Reset Password</h1>
     <form id="resetPasswordForm" action="/reset-password" method="post">
@@ -203,7 +203,7 @@
 
         <button type="submit">Reset Password</button>
     </form>
-</div>
+</div> -->
 
 <head>
     <link rel="stylesheet" href="/css/footer.css">
@@ -291,30 +291,30 @@ const submitButton = document.querySelector(".login-button");
     }
   });
 
-  document.getElementById('resetPasswordForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
+//   document.getElementById('resetPasswordForm').addEventListener('submit', async (e) => {
+//     e.preventDefault();
 
-    const email = document.getElementById('email').value;
-    const otp = document.getElementById('otp').value;
-    const newPassword = document.getElementById('newPassword').value;
-    const confirmPassword = document.getElementById('confirmPassword').value;
+//     const email = document.getElementById('email').value;
+//     const otp = document.getElementById('otp').value;
+//     const newPassword = document.getElementById('newPassword').value;
+//     const confirmPassword = document.getElementById('confirmPassword').value;
 
-    const response = await fetch('/reset-password', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ email, otp, newPassword, confirmPassword })
-    });
+//     const response = await fetch('/reset-password', {
+//         method: 'POST',
+//         headers: {
+//             'Content-Type': 'application/json'
+//         },
+//         body: JSON.stringify({ email, otp, newPassword, confirmPassword })
+//     });
 
-    const result = await response.json();
-    if (response.ok) {
-        showToast(result.message, true);
-        window.location.href = '/'; // Redirect to home page after successful reset
-    } else {
-        showToast(result.error, false);
-    }
-});
+//     const result = await response.json();
+//     if (response.ok) {
+//         showToast(result.message, true);
+//         window.location.href = '/'; // Redirect to home page after successful reset
+//     } else {
+//         showToast(result.error, false);
+//     }
+// });
 
 </script>
 
