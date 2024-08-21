@@ -190,9 +190,9 @@ app.get('/details/:id', async (req, res) => {
 });
 
 // Registration route
-app.get('/Register', (req, res) => {
+app.get('/register', (req, res) => {
   const { message, messageType } = req.query;
-  res.render('Register', { message: message || '', messageType: messageType || 'success' });
+  res.render('register', { message: message || '', messageType: messageType || 'success' });
 });
 
 
@@ -208,35 +208,35 @@ app.get("/login", async (req, res) => {
 })
 
 
-// app.post('/Register', async (req, res) => {
-//   const { firstname, lastname, email, password, country, phone, role, active } = req.body;
-//   // console.log(req.body);
+app.post('/Register', async (req, res) => {
+  const { firstname, lastname, email, password, country, phone, role, active } = req.body;
+  // console.log(req.body);
 
-//   try {
-//     const hashedPassword = await bcrypt.hash(password, 6);
-//     const userRole = role || 'user'
-//     const user = new usermodel({
-//       firstname,
-//       lastname,
-//       email,
-//       password: hashedPassword,
-//       country,
-//       phone,
-//       role: userRole,
+  try {
+    const hashedPassword = await bcrypt.hash(password, 6);
+    const userRole = role || 'user'
+    const user = new usermodel({
+      firstname,
+      lastname,
+      email,
+      password: hashedPassword,
+      country,
+      phone,
+      role: userRole,
 
-//       active: { type: Boolean, default: true }
-//     });
+      active: { type: Boolean, default: true }
+    });
 
-//     await user.save();
-//     console.log('Saving user to the database...');
+    await user.save();
+    console.log('Saving user to the database...');
 
-//     // Redirect with success message
-//     res.redirect('/Register?message=User%20registered%20successfully&messageType=success');
-//   } catch (error) {
-//     console.error('Error registering user:', error);
-//     res.redirect('/Register?message=Error%20registering%20user&messageType=error');
-//   }
-// });
+    // Redirect with success message
+    res.redirect('/Register?message=User%20registered%20successfully&messageType=success');
+  } catch (error) {
+    console.error('Error registering user:', error);
+    res.redirect('/Register?message=Error%20registering%20user&messageType=error');
+  }
+});
 
 // Login route
 app.get("/Login", async (req, res) => {
@@ -384,7 +384,7 @@ app.patch('/admin/update/:_id', async (req, res) => {
 // });
 
 app.post('/reset-password', async (req, res) => {
-  const { email, otp, newPassword, confirmPassword } = req.body;
+  const { email,  newPassword, confirmPassword } = req.body;
   
   try {
     // Check if passwords match
@@ -399,6 +399,8 @@ app.post('/reset-password', async (req, res) => {
     }
 
     // Check if OTP is provided
+    else{
+
     if (otp) {
       // Check if OTP is valid
       if (user.resetToken !== otp || Date.now() > user.resetTokenExpiry) {
@@ -408,7 +410,7 @@ app.post('/reset-password', async (req, res) => {
       // Update user password and clear OTP fields
       user.password = bcrypt.hashSync(newPassword, 10);
       user.resetToken = undefined;
-      user.resetTokenExpiry = undefined;
+      user.resetTokenExpiry = undefined;+
       await user.save();
 
       return res.status(200).json({ message: 'Password successfully reset' });
@@ -425,10 +427,10 @@ app.post('/reset-password', async (req, res) => {
         subject: 'Password Reset OTP',
         text: `Your OTP for password reset is: ${otp}`
       };
-
+ 
       await transporter.sendMail(mailOptions);
       return res.status(200).json({ message: 'OTP sent to your email' });
-    }
+    }}
   } catch (err) {
     console.error('Error during password reset:', err);
     res.status(500).json({ error: 'Server error' });
