@@ -308,11 +308,9 @@ app.patch('/admin/update/:_id', async (req, res) => {
     res.status(500).json({ success: false, message: 'Failed to update user. Error: ' + error.message });
   }
 });
-app.post("/forgotpassword",async (req, res) =>{
-res.render("forgetpassowrd");
-
-
-})
+app.get('/forgot-password', (req, res) => {
+  res.render('/login/forgotpassword'); // Ensure this matches the exact filename
+});
 
 // // Route for the index page
 // app.get('/', (req, res) => {
