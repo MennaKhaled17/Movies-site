@@ -333,55 +333,67 @@ app.get('/forgotpassword', (req, res) => {
 
 app.post('/forgotpassword', async (req, res) => {
   try {
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS }
-    });
+      const { email, otp, newPassword, confirmPassword } = req.body;
+      const user = await usermodel.findOne({ email });
 
-    const { email, otp, newPassword, confirmPassword } = req.body;
+      if (!user) {
+          return res.status(404).json({ error: 'No user found with this email' });
+      }
 
-    const user = await usermodel.findOne({ email });
-    if (!user) return res.status(404).json({ error: 'No user found with this email' });
+      if (!otp) {
+          const generatedOtp = crypto.randomBytes(3).toString('hex');
+          user.resetToken = generatedOtp;
+          user.resetTokenExpiry = Date.now() + 3600000;
+          await user.save();
 
-    if (!otp) {
-      const generatedOtp = crypto.randomBytes(3).toString('hex');
-      user.resetToken = generatedOtp;
-      user.resetTokenExpiry = Date.now() + 3600000;
+          const transporter = nodemailer.createTransport({
+              service: 'gmail',
+              auth: {
+                  user: process.env.EMAIL_USER,
+                  pass: process.env.EMAIL_PASS
+              },
+              tls: {
+                rejectUnauthorized: false // Only for testing, not recommended for production
+            }
+          });
+          console.log('EMAIL_USER:', process.env.EMAIL_USER);
+console.log('EMAIL_PASS:', process.env.EMAIL_PASS);
+
+
+          const mailOptions = {
+              to: email,
+              from: process.env.EMAIL_USER,
+              subject: 'Password Reset OTP',
+              text: `Your OTP for password reset is: ${generatedOtp}`
+          };
+
+          await transporter.sendMail(mailOptions);
+          return res.status(200).json({ message: 'OTP sent to your email' });
+      }
+
+      if (user.resetToken !== otp || Date.now() > user.resetTokenExpiry) {
+          return res.status(400).json({ error: 'Invalid or expired OTP' });
+      }
+
+      if (newPassword !== confirmPassword) {
+          return res.status(400).json({ error: 'Passwords do not match' });
+      }
+
+      user.password = bcrypt.hashSync(newPassword, 10);
+      user.resetToken = undefined;
+      user.resetTokenExpiry = undefined;
       await user.save();
- 
-      const mailOptions = {
-        to: email,
-        from: process.env.EMAIL_USER,
-        subject: 'Password Reset OTP',
-        text: `Your OTP for password reset is: ${generatedOtp}`
-      };
 
-      await transporter.sendMail(mailOptions);
-     
-
-      
-      return res.status(200).json({ message: 'OTP sent to your email' });
-    }
-
-    if (user.resetToken !== otp || Date.now() > user.resetTokenExpiry) {
-      return res.status(400).json({ error: 'Invalid or expired OTP' });
-    }
-
-    if (newPassword !== confirmPassword) {
-      return res.status(400).json({ error: 'Passwords do not match' });
-    }
-
-    user.password = bcrypt.hashSync(newPassword, 10);
-    user.resetToken = undefined;
-    user.resetTokenExpiry = undefined;
-    await user.save();
-
-    return res.status(200).json({ message: 'Password successfully reset' });
+      return res.status(200).json({ message: 'Password successfully reset' });
   } catch (err) {
-    console.error('Error during password reset:', err);
-    res.status(500).json({ error: 'Server error' });
+      console.error('Error during password reset:', err);
+      if (!res.headersSent) {  // Check if headers have already been sent
+          return res.status(500).json({ error: 'Server error' });
+      }
   }
 });
+
+
 
 
 //module.exports = app;
