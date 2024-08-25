@@ -46,10 +46,11 @@ const connectDB = async () => {
   console.log('Attempting to connect to MongoDB...');
   try {
     await mongoose.connect(uri);
-    await usermodel.updateMany(
-      { resetToken: { $exists: false } }, // Match documents without the field
-      { $set: { resetToken: '', resetTokenExpiry: new Date(0) } } // Set default values
+     await usermodel.updateMany(
+      { role: { $exists: false } }, // Match documents without the 'role' field
+      { $set: { role: 'user' } } // Set default role value
     );
+    
 
     console.log('Migration complete.');
     console.log('MongoDB connected...');
@@ -212,7 +213,6 @@ app.get("/login", async (req, res) => {
   res.render('login');
 })
 
-
 app.post('/Register', async (req, res) => {
   const { firstname, lastname, email, password, country, phone, role, active } = req.body;
   // console.log(req.body);
@@ -231,6 +231,8 @@ app.post('/Register', async (req, res) => {
 
       active: { type: Boolean, default: true }
     });
+
+
 
     await user.save();
     console.log('Saving user to the database...');
@@ -251,28 +253,18 @@ app.get("/Login", async (req, res) => {
   res.render('Login', { error });
 
 });
-const generateToken = (user) => {
-  if (!user || !user.email) {
-    throw new Error('Invalid user object');
-  }
-  return jwt.sign({
-    email: user.email,
-    role: user.role === 'admin' ? 'admin' : 'user' // Correctly set the role
-  }, process.env.ACCESS_TOKEN_SECRET, {
-    expiresIn: '1h' // Set token expiration
-  });
-};
-app.post('/login', async (req, res) => {
-  const { email, password } = req.body;
-  const user = await usermodel.findOne({ email });
 
-  if (user && user.password === password) { // Replace with proper password checking
-    const token = generateToken(user);
-    res.json({ token }); // Send token to client
-  } else {
-    res.status(401).send('Invalid credentials');
-  }
-});
+// app.post('/login', async (req, res) => {
+//   const { email, password } = req.body;
+//   const user = await usermodel.findOne({ email });
+
+//   if (user && user.password === password) { // Replace with proper password checking
+//     const token = requireAuth(user.email);
+//     res.json({ token }); // Send token to client
+//   } else {
+//     res.status(401).send('Invalid credentials');
+//   }
+//});
 
 // Function to generate token
 
@@ -283,47 +275,54 @@ app.use(express.json());
 
 
 // Route to handle GET requests to the homepage or welcome page
-const authenticateToken = (req, res, next) => {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1]; // Bearer token
+// const authenticateToken = (req, res, next) => {
+//   const authHeader = req.headers['Authorization'];
+//   const token = requireAuth(); // Bearer token
 
-  if (token == null) return res.redirect('/unauthorized'); // Redirect to unauthorized page
+//   if (token == null) return res.redirect('/unauthorized'); // Redirect to unauthorized page
 
-  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
-    if (err) return res.redirect('/unauthorized'); // Redirect on error
-    req.user = user; // Attach user info to the request
-    next();
-  });
-};
+//   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
+//     if (err) return res.redirect('/unauthorized'); // Redirect on error
+//     req.user = user; // Attach user info to the request
+//     next();
+//   });
+// };
 
 // Function to handle unauthorized access
-const handleUnauthorizedAccess = (req, res, next) => {
-  if (!req.user || req.user.role !== 'admin') {
-    return res.status(403).sendFile(__dirname + '/unauthorized.ejs'); // Render unauthorized page
+
+async function handleUnauthorizedAccess(req, res) {
+  try {
+    // Assuming `req.user` contains the current user object
+    const user = usermodel.find(); // You should have set `req.user` in your authentication middleware
+
+    if (user && user.role === 'admin') {
+      // Render the admin page
+      return res.render('admin'); // Render the admin page
+    } else {console.log(user.role);
+      // Render the unauthorized page
+      return res.render('unauthorized'); // Render the unauthorized page
+    }
+  } catch (error) {
+    // Handle any errors that occur
+    console.error('Error handling unauthorized access:', error);
+    return res.status(500).send('Internal Server Error');
   }
-  next(); // Continue to the next middleware if authorized
-};
+}
+
 
 // Example protected route using the new middleware
-app.get('/admin', authenticateToken, handleUnauthorizedAccess, (req, res) => {
-  res.json({ message: 'This is a protected route.' }); // Only reaches here if the user is authorized
-});
+// app.get('/admin', authenticateToken, handleUnauthorizedAccess, (req, res) => {
+//   res.json({ message: 'This is a protected route.' }); // Only reaches here if the user is authorized
+// });
 
-// Serve the unauthorized page
-app.get('/unauthorized', (req, res) => {
-  res.status(403).sendFile(__dirname + '/unauthorized.ejs'); // Render unauthorized page
-});
+// // Serve the unauthorized page
+// app.get('/unauthorized', (req, res) => {
+//   res.status(403).sendFile(__dirname + '/unauthorized.ejs'); // Render unauthorized page
+// });
 
 
-app.get('/admin', async (req, res) => {
-  try {
-    const users = await usermodel.find(); // Fetch all users from the database
-    res.render('admin', { users: users }); // Pass users to the template
-
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('Server Error');
-  }
+app.get('/admin', (req, res) => {
+  handleUnauthorizedAccess(req, res);
 });
 
 app.patch('/admin/deactivated/:_id', async (req, res) => {

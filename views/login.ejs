@@ -269,7 +269,7 @@ function validateForm(event) {
             if (remainingAttempts > 0) {
                 showToast(`Wrong password. You have ${remainingAttempts} attempts left.`, false);
             }
-            if (remainingAttempts <= 0) {
+            if (remainingAttempts == 0) {
                 showToast("Maximum attempts exceeded. Please try again later.", false);
                 document.querySelector('.login-button').disabled = true; // Disable the login button
             }
