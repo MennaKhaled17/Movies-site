@@ -264,7 +264,18 @@
     });
   }
 }
-
+const axios = require('axios');
+axios.get('/admin', {
+    headers: {
+        'Authorization': 'Bearer bedfxvswergr'
+    }
+})
+.then(response => {
+    console.log(response.data);
+})
+.catch(error => {
+    console.error('Error:', error);
+});
 </script>
 
 </html>

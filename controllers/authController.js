@@ -51,26 +51,36 @@ module.exports={
 //     login_get: (req, res) => {
 //         res.render('login', { title: 'Log in' ,error:'.'});
 //     },
-    login_post: async(req, res) => {
+login_post: async (req, res) => {
+    try {
         const user = await userModel.findOne({ email: req.body.email });
-        
+
         if (user && bcrypt.compareSync(req.body.password, user.password)) {
-            const token=createToken(user._id);
-            res.cookie('jwt',token,{httpOnly:true,maxAge:maxAge*1000});
-            console.log("User authenticated", token);
-            res.redirect('/');
-            res.render('welcome', { user: user });
-        }else if (!user) {	
-            //res.render('login', { title: 'Log in',error:'Email not registered'});
-            console.log("User not found");
+            const token = createToken(user._id);
+            res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 1000 });
+
+            // Optionally set a success message in the session or as a query parameter
+            // Example using query parameter:
+            res.redirect('/?message=Login successful!');
+
+        } else if (!user) {
+            // Email not found, redirect with error message
+            res.redirect('/login?error=Email not registered');
         } else {
-            console.log("Invalid credentials");
-            //res.render('login', { title: 'Log in',error:'Incorrect password'});
+            // Invalid password, redirect with error message
+            res.redirect('/login?error=Incorrect password');
         }
-    },
+    } catch (error) {
+        console.error("Error during login:", error);
+        res.redirect('/login?error=An error occurred');
+    }
+
+},
+
 //logout
     logout_get:(req,res)=>{
         res.cookie('jwt','',{maxAge:1});
         res.redirect('/')
     }
+
 }

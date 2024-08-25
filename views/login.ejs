@@ -34,7 +34,7 @@
     }
     .toast {
       visibility: hidden;
-      max-width: 300px;
+      max-width: 500px;
       margin: auto;
       background-color: #333;
       color: #fff;
@@ -175,10 +175,10 @@
       <input type="email" id="email" name="email" required placeholder="Enter your email address" autocomplete="off"> <br><br>
       
       <label for="password">Password:</label>
-      <input type="password" id="password" name="password" required placeholder="Enter your password"  autocomplete="off"> <br><br>
+      <input type="password" id="password" name="password" required placeholder="Enter your password"  autocomplete="off" maxlength="10"> <br><br>
 
-      <button type="submit"  class="login-button">Login</button>
-<a href="/forgotpassword" id="forgotPasswordLink">Forgot Password?</a>
+      <button type="submit"  class="login-button" onclick="validateForm()">Login</button>
+      <a href="/forgotpassword" id="forgotPasswordLink">Forgot Password?</a>
       <div id="toast" class="toast"></div>
     </form>
     <div id="errorMessages" class="error-message"></div>
@@ -215,7 +215,9 @@
     <p>Follow us on <a href="#">Facebook</a>, <a href="#">Twitter</a>, <a href="#">Instagram</a></p>
 </footer>
 </body>
-<script>function showToast(message, isSuccess) {
+<script>
+// Toast notification function
+function showToast(message, isSuccess) {
     const toast = document.getElementById('toast');
     toast.textContent = message;
     toast.className = 'toast toast-show ' + (isSuccess ? 'toast-success' : 'toast-error');
@@ -223,73 +225,51 @@
         toast.className = 'toast';
     }, 3000); // Toast will disappear after 3 seconds
 }
-   document.addEventListener('DOMContentLoaded', () => {
+
+document.addEventListener('DOMContentLoaded', function() {
     const urlParams = new URLSearchParams(window.location.search);
     const message = urlParams.get('message');
     const error = urlParams.get('error');
 
     if (message) {
-      Toastify({
-        text: decodeURIComponent(message),
-        duration: 3000,
-        gravity: 'top',
-        position: 'right',
-        backgroundColor: 'linear-gradient(to right, #00b09b, #96c93d)'
-      }).showToast();
+        showToast(decodeURIComponent(message), true);
     }
 
     if (error) {
-      Toastify({
-        text: decodeURIComponent(error),
-        duration: 3000,
-        gravity: 'top',
-        position: 'right',
-        backgroundColor: 'linear-gradient(to right, #FF5F6D, #FFC371)'
-      }).showToast();
+        showToast(decodeURIComponent(error), false);
     }
-  });
-    // document.getElementById('forgotPasswordLink').addEventListener('click', function(e) {
-    //   e.preventDefault();
-    //   document.getElementById('popup').classList.add('active');
-    //   document.getElementById('popupOverlay').style.display = 'block';
-    // });
+});
+let loginAttempts = 0;
+const maxAttempts = 3;
 
-    // document.getElementById('popupClose').addEventListener('click', function() {
-    //   document.getElementById('popup').classList.remove('active');
-    //   document.getElementById('popupOverlay').style.display = 'none';
-    // });
+function validateForm(event) {
+    event.preventDefault(); // Prevent form submission
 
-    // document.getElementById('popupOverlay').addEventListener('click', function() {
-    //   document.getElementById('popup').classList.remove('active');
-    //   document.getElementById('popupOverlay').style.display = 'none';
-    // });
-const submitButton = document.querySelector(".login-button");
+    // Dummy password check for demonstration
+    const enteredPassword = document.getElementById('password').value;
+    const correctPassword = 'your_correct_password'; // Replace with the actual password or logic to check it
 
+    if (enteredPassword !== correctPassword) {
+        loginAttempts++;
+        const remainingAttempts = maxAttempts - loginAttempts;
 
-  function showToast(message, isSuccess) {
-    const toast = document.getElementById('toast');
-    toast.textContent = message;
-    toast.className = 'toast toast-show ' + (isSuccess ? 'toast-success' : 'toast-error');
-    setTimeout(() => {
-      toast.className = 'toast';
-    }, 3000); // Toast will disappear after 3 seconds
-  }
+        if (remainingAttempts > 0) {
+            showToast(`Wrong password. You have ${remainingAttempts} attempts left.`, false);
+        }if (remainingAttempts <= 0){
+            showToast("Maximum attempts exceeded. Please try again later.", false);
+            document.querySelector('.login-button').disabled = true; // Disable the login button
+        }
 
-  document.addEventListener('DOMContentLoaded', () => {
-    const urlParams = new URLSearchParams(window.location.search);
-
-    // Handle success messages
-    const successMessage = urlParams.get('success');
-    if (successMessage) {
-      showToast(decodeURIComponent(successMessage), true);
+        return false;
     }
 
-    // Handle error messages
-    const errorMessage = urlParams.get('error');
-    if (errorMessage) {
-      showToast(decodeURIComponent(errorMessage), false);
-    }
-  });
+    // If the password is correct, submit the form
+    document.getElementById('loginForm').submit();
+}
+
+
+
+
 
 //   document.getElementById('resetPasswordForm').addEventListener('submit', async (e) => {
 //     e.preventDefault();

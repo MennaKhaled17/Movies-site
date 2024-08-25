@@ -252,9 +252,57 @@ app.get("/Login", async (req, res) => {
 app.use(express.urlencoded({ extended: true })); // For parsing application/x-www-form-urlencoded
 app.use(express.json());
 
-
+app.get('/unauthorized',(req,res)=>{
+  res.render('unauthorized');
+})
 
 // Route to handle GET requests to the homepage or welcome page
+const getUserByEmail = async (email) => {
+  return await usermodel.findOne({ email });
+};
+
+// Function to generate token
+// Function to generate token
+const generateToken = (user) => {
+  if (!user || !user.email) {
+      throw new Error('Invalid user object');
+  }
+  return jwt.sign({
+      email: user.email,
+      role: user.role === 'admin' ? 'admin' : 'user' // Correctly set the role
+  }, process.env.ACCESS_TOKEN_SECRET, {
+      expiresIn: '1h' // Set token expiration
+  });
+};
+
+const handleUnauthorizedAccess = (req, res, next) => {
+  if (!req.user || req.user.role !== 'admin') {
+    return res.status(403).sendFile(__dirname + '/unauthorized.ejs');
+  }
+  next();
+};
+
+// Example protected route using the new middleware
+
+// Middleware to check for authorization
+// Middleware to check for authorization
+const authenticateToken = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1]; // Bearer token
+
+  if (token == null) return res.redirect('/unauthorized'); // Redirect to unauthorized page
+
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
+    if (err) return res.redirect('/unauthorized'); // Redirect on error
+    req.user = user; // Attach user info to the request
+    next();
+  });
+};
+
+app.get('/admin', authenticateToken, handleUnauthorizedAccess, (req, res) => {
+  res.json({ message: 'This is a protected route.' });
+});
+
 
 
 app.get('/admin', async (req, res) => {
@@ -267,6 +315,7 @@ app.get('/admin', async (req, res) => {
     res.status(500).send('Server Error');
   }
 });
+
 app.patch('/admin/deactivated/:_id', async (req, res) => {
   try {
     const idd = req.params._id;
