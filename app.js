@@ -242,50 +242,47 @@ app.post('/Register', async (req, res) => {
     res.redirect('/Register?message=Error%20registering%20user&messageType=error');
   }
 });
-
+app.get('/unauthorized',(req,res)=>{
+  res.render('unauthorized');
+})
 // Login route
 app.get("/Login", async (req, res) => {
   const { error } = req.query;
   res.render('Login', { error });
 
 });
+const generateToken = (user) => {
+  if (!user || !user.email) {
+    throw new Error('Invalid user object');
+  }
+  return jwt.sign({
+    email: user.email,
+    role: user.role === 'admin' ? 'admin' : 'user' // Correctly set the role
+  }, process.env.ACCESS_TOKEN_SECRET, {
+    expiresIn: '1h' // Set token expiration
+  });
+};
+app.post('/login', async (req, res) => {
+  const { email, password } = req.body;
+  const user = await usermodel.findOne({ email });
+
+  if (user && user.password === password) { // Replace with proper password checking
+    const token = generateToken(user);
+    res.json({ token }); // Send token to client
+  } else {
+    res.status(401).send('Invalid credentials');
+  }
+});
+
+// Function to generate token
+
+
 app.use(express.urlencoded({ extended: true })); // For parsing application/x-www-form-urlencoded
 app.use(express.json());
 
-app.get('/unauthorized',(req,res)=>{
-  res.render('unauthorized');
-})
+
 
 // Route to handle GET requests to the homepage or welcome page
-const getUserByEmail = async (email) => {
-  return await usermodel.findOne({ email });
-};
-
-// Function to generate token
-// Function to generate token
-const generateToken = (user) => {
-  if (!user || !user.email) {
-      throw new Error('Invalid user object');
-  }
-  return jwt.sign({
-      email: user.email,
-      role: user.role === 'admin' ? 'admin' : 'user' // Correctly set the role
-  }, process.env.ACCESS_TOKEN_SECRET, {
-      expiresIn: '1h' // Set token expiration
-  });
-};
-
-const handleUnauthorizedAccess = (req, res, next) => {
-  if (!req.user || req.user.role !== 'admin') {
-    return res.status(403).sendFile(__dirname + '/unauthorized.ejs');
-  }
-  next();
-};
-
-// Example protected route using the new middleware
-
-// Middleware to check for authorization
-// Middleware to check for authorization
 const authenticateToken = (req, res, next) => {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1]; // Bearer token
@@ -299,10 +296,23 @@ const authenticateToken = (req, res, next) => {
   });
 };
 
+// Function to handle unauthorized access
+const handleUnauthorizedAccess = (req, res, next) => {
+  if (!req.user || req.user.role !== 'admin') {
+    return res.status(403).sendFile(__dirname + '/unauthorized.ejs'); // Render unauthorized page
+  }
+  next(); // Continue to the next middleware if authorized
+};
+
+// Example protected route using the new middleware
 app.get('/admin', authenticateToken, handleUnauthorizedAccess, (req, res) => {
-  res.json({ message: 'This is a protected route.' });
+  res.json({ message: 'This is a protected route.' }); // Only reaches here if the user is authorized
 });
 
+// Serve the unauthorized page
+app.get('/unauthorized', (req, res) => {
+  res.status(403).sendFile(__dirname + '/unauthorized.ejs'); // Render unauthorized page
+});
 
 
 app.get('/admin', async (req, res) => {

@@ -242,30 +242,45 @@ document.addEventListener('DOMContentLoaded', function() {
 let loginAttempts = 0;
 const maxAttempts = 3;
 
+
 function validateForm(event) {
-    event.preventDefault(); // Prevent form submission
+    // Prevent form submission
 
-    // Dummy password check for demonstration
     const enteredPassword = document.getElementById('password').value;
-    const correctPassword = 'your_correct_password'; // Replace with the actual password or logic to check it
+    const email = document.getElementById('email').value; // Assuming you have an email field
 
-    if (enteredPassword !== correctPassword) {
-        loginAttempts++;
-        const remainingAttempts = maxAttempts - loginAttempts;
+    // Send the password and email to the server for validation
+    fetch('/login', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email, password: enteredPassword })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.message === 'Password is correct') {
+            // If the password is correct, submit the form
+            document.getElementById('loginForm').submit();
+        } else {
+            loginAttempts++;
+            const remainingAttempts = maxAttempts - loginAttempts;
 
-        if (remainingAttempts > 0) {
-            showToast(`Wrong password. You have ${remainingAttempts} attempts left.`, false);
-        }if (remainingAttempts <= 0){
-            showToast("Maximum attempts exceeded. Please try again later.", false);
-            document.querySelector('.login-button').disabled = true; // Disable the login button
+            if (remainingAttempts > 0) {
+                showToast(`Wrong password. You have ${remainingAttempts} attempts left.`, false);
+            }
+            if (remainingAttempts <= 0) {
+                showToast("Maximum attempts exceeded. Please try again later.", false);
+                document.querySelector('.login-button').disabled = true; // Disable the login button
+            }
         }
-
-        return false;
-    }
-
-    // If the password is correct, submit the form
-    document.getElementById('loginForm').submit();
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        // showToast("An error occurred. Please try again.", false);
+    });
 }
+
 
 
 
