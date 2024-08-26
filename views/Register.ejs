@@ -117,7 +117,7 @@
       const phone = form.querySelector('input[name="phone"]').value.trim();
 
       const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      const phonePattern = /^[0-9]{12}$/;
+      const phonePattern = /^[0-9]+$/;
 
       let isValid = true;
 
@@ -137,7 +137,7 @@
       }
 
       if (!phonePattern.test(phone)) {
-        errorDiv.innerHTML += '<p>Please enter a valid phone number (12 digits).</p>';
+        errorDiv.innerHTML += '<p>Please enter a valid phone number.</p>';
         isValid = false;
       }
 

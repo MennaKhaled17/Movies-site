@@ -85,9 +85,6 @@ app.use('/',authRoutes);
 module.exports = connectDB();
 
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
 
 
 // Routing
@@ -110,11 +107,24 @@ app.get('/', async (req, res) => {
     // Slice the array to get the movies for the current page
     const paginatedMovies = movies.slice((page - 1) * limit, page * limit);
 
-    res.render('index', { movies: paginatedMovies, totalMovies, page, totalPages, query: null,});
-    res.render('welcome', { user: res.locals.user });
+    res.render('index', {
+      movies: paginatedMovies,
+      totalMovies,
+      page,
+      totalPages,
+      query: null,
+      user: res.locals.user // Include user data here
+    });
   } catch (error) {
     console.error('Error fetching popular movies:', error);
-    res.render('index', { movies: [], totalMovies: 0, page: 1, totalPages: 0, query: null, });
+    res.render('index', {
+      movies: [],
+      totalMovies: 0,
+      page: 1,
+      totalPages: 0,
+      query: null,
+      user: res.locals.user // Include user data here
+    });
   }
 });
 // Route to search movies
@@ -215,7 +225,6 @@ app.get("/login", async (req, res) => {
 
 app.post('/Register', async (req, res) => {
   const { firstname, lastname, email, password, country, phone, role, active } = req.body;
-  // console.log(req.body);
 
   try {
     const hashedPassword = await bcrypt.hash(password, 6);
@@ -238,7 +247,7 @@ app.post('/Register', async (req, res) => {
     console.log('Saving user to the database...');
 
     // Redirect with success message
-    res.redirect('/Register?message=User%20registered%20successfully&messageType=success');
+    res.redirect('/');
   } catch (error) {
     console.error('Error registering user:', error);
     res.redirect('/Register?message=Error%20registering%20user&messageType=error');
@@ -254,53 +263,20 @@ app.get("/Login", async (req, res) => {
 
 });
 
-// app.post('/login', async (req, res) => {
-//   const { email, password } = req.body;
-//   const user = await usermodel.findOne({ email });
-
-//   if (user && user.password === password) { // Replace with proper password checking
-//     const token = requireAuth(user.email);
-//     res.json({ token }); // Send token to client
-//   } else {
-//     res.status(401).send('Invalid credentials');
-//   }
-//});
-
-// Function to generate token
-
-
-app.use(express.urlencoded({ extended: true })); // For parsing application/x-www-form-urlencoded
-app.use(express.json());
-
-
-
-// Route to handle GET requests to the homepage or welcome page
-// const authenticateToken = (req, res, next) => {
-//   const authHeader = req.headers['Authorization'];
-//   const token = requireAuth(); // Bearer token
-
-//   if (token == null) return res.redirect('/unauthorized'); // Redirect to unauthorized page
-
-//   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
-//     if (err) return res.redirect('/unauthorized'); // Redirect on error
-//     req.user = user; // Attach user info to the request
-//     next();
-//   });
-// };
-
-// Function to handle unauthorized access
 
 async function handleUnauthorizedAccess(req, res) {
   try {
-    // Assuming `req.user` contains the current user object
-    const user = usermodel.find(); // You should have set `req.user` in your authentication middleware
+    // Assuming `req.user` contains the current user object from your authentication middleware
+    const user = res.locals.user; 
 
     if (user && user.role === 'admin') {
       // Render the admin page
-      return res.render('admin'); // Render the admin page
-    } else {console.log(user.role);
+
+      return res.render('admin', ); // Ensure 'admin' view is correctly configured in your view engine
+    } else {
+      console.log('User role:', user ? user.role : 'No user found');
       // Render the unauthorized page
-      return res.render('unauthorized'); // Render the unauthorized page
+      return res.render('unauthorized'); // Ensure 'unauthorized' view is correctly configured in your view engine
     }
   } catch (error) {
     // Handle any errors that occur
@@ -308,7 +284,6 @@ async function handleUnauthorizedAccess(req, res) {
     return res.status(500).send('Internal Server Error');
   }
 }
-
 
 // Example protected route using the new middleware
 // app.get('/admin', authenticateToken, handleUnauthorizedAccess, (req, res) => {
@@ -321,9 +296,7 @@ async function handleUnauthorizedAccess(req, res) {
 // });
 
 
-app.get('/admin', (req, res) => {
-  handleUnauthorizedAccess(req, res);
-});
+
 
 app.patch('/admin/deactivated/:_id', async (req, res) => {
   try {
@@ -467,9 +440,6 @@ app.get('/countries', (req, res) => {
 app.post('/forgotpassword', async (req, res) => {
   const { email, otp, newPassword, confirmPassword } = req.body;
 
-  // Set NODE_TLS_REJECT_UNAUTHORIZED to '0' if needed for self-signed certificates
-  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-
   try {
     const user = await usermodel.findOne({ email });
 
@@ -481,7 +451,7 @@ app.post('/forgotpassword', async (req, res) => {
     if (!otp) {
       // Generate OTP
       const generatedOtp = crypto.randomBytes(3).toString('hex');
-      user.resetToken = generatedOtp;
+      user.resetToken = crypto.createHash('sha256').update(generatedOtp).digest('hex'); // Hash OTP
       user.resetTokenExpiry = Date.now() + 86400000; // 1 day validity (24 hours)
       await user.save();
 
@@ -493,7 +463,7 @@ app.post('/forgotpassword', async (req, res) => {
           pass: process.env.EMAIL_PASS
         },
         tls: {
-          rejectUnauthorized: false // Bypass self-signed certificate issues
+          rejectUnauthorized: false // Not recommended for production, ensure certificate is valid instead
         }
       });
 
@@ -516,7 +486,8 @@ app.post('/forgotpassword', async (req, res) => {
     }
 
     // Verify OTP and password
-    if (user.resetToken !== otp || Date.now() > user.resetTokenExpiry) {
+    const hashedOtp = crypto.createHash('sha256').update(otp).digest('hex');
+    if (user.resetToken !== hashedOtp || Date.now() > user.resetTokenExpiry) {
       console.log('Invalid or expired OTP for email:', email);
       return res.render('forgotpassword', { alert: 'Invalid or expired OTP.' });
     }
