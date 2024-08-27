@@ -8,7 +8,18 @@
   <link rel="icon" href="/imgs/Untitled_design-removebg-preview.png">
   <title>Movies</title>
 </head>
-
+<style>
+  .change-button{
+    background-color: #ff8c00;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    width: 180px;
+  }
+</style>
 
 
 <body>
@@ -24,10 +35,12 @@
       </form>
       <div class="buttonss">
         <% if(user){ %>
+          <button class="change-button" onclick="location.href='/changepassword';">Change Password</button>
           <button class="login-button" onclick="location.href='/logout';">logout</button>
           <% }else{ %>
             <button class="login-button" onclick="location.href='/Register';">Register</button>
             <button class="login-button" onclick="location.href='/Login';">Login</button>
+            
             <% } %>
             <% if(user){ %>
               <button class="admin-buttonn" onclick="location.href='/admin';">Admin Panel</button>

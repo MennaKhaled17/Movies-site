@@ -5,186 +5,151 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Admin Panel</title>
   <style>
-    /* General styling for the admin panel */
-    .admin-panel {
-        background-color: #f3f3f3;
-        padding: 20px;
-        font-family: Arial, sans-serif;
-    }
+   /* Reset some basic styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
-    /* Admin Panel Header */
-    .admin-panel-header {
-        background-color: #ff8c00; /* Main orange color */
-        color: white;
-        padding: 15px;
-        border-radius: 5px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        margin-bottom: 20px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
+/* Ensure the body takes up the full height */
+body, html {
+  height: 100%;
+  font-family: Arial, sans-serif;
+}
 
-    .admin-panel-header h1 {
-        margin: 0;
-        font-size: 2em;
-    }
+/* Admin Panel Container */
+.admin-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: #f4f4f4;
+  padding: 20px;
+}
 
-    .admin-panel-header button {
-        background-color: #ff8c00; /* Main orange color */
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 16px;
-        transition: background-color 0.3s;
-    }
+/* Admin Panel Header */
+.admin-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  background-color: #ff5722; /* Orange color */
+  color: white;
+  border-radius: 8px;
+}
 
-    .admin-panel-header button:hover {
-        background-color: #f60; /* Darker orange for hover */
-    }
+/* Admin Navigation Links */
+.admin-nav {
+  margin: 10px 0;
+  display: flex;
+  gap: 10px;
+}
 
-    /* Admin Panel Navigation */
-    .admin-nav {
-        margin-bottom: 20px;
-    }
+.admin-nav a {
+  text-decoration: none;
+  padding: 10px 15px;
+  color: white;
+  background-color: #ff0000; /* Light orange */
+  border-radius: 4px;
+}
 
-    .admin-nav a {
-        background-color: #ff8c00; /* Main orange color */
-        color: white;
-        padding: 10px 20px;
-        text-decoration: none;
-        border-radius: 5px;
-        margin-right: 10px;
-        font-size: 16px;
-        transition: background-color 0.3s;
-    }
+.admin-nav a:hover {
+  background-color: #ff5722; /* Darker orange */
+}
 
-    .admin-nav a:hover {
-        background-color: #f60; /* Darker orange for hover */
-    }
+/* Search Form */
+form {
+  margin-bottom: 20px;
+  position: relative;
+}
 
-    /* Admin Panel Table */
-    .admin-panel table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-bottom: 20px;
-    }
-
-    .admin-panel th, .admin-panel td {
-        padding: 15px;
-        border: 1px solid #ff8c00; /* Orange border color */
-        text-align: left;
-    }
-
-    .admin-panel th {
-        background-color: #ff8c00; /* Header background color */
-        color: white;
-        border-bottom: 2px solid #ff8c00; /* Bottom border for header cells */
-    }
-
-    .admin-panel tr:nth-child(even) {
-        background-color: #f8f8f8;
-    }
-
-    .admin-panel tr:hover {
-        background-color: #e0e0e0;
-    }
-
-    /* Admin Panel Buttons */
-    .admin-panel button {
-        background-color: #ff8c00; /* Matches the navbar color */
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 16px;
-        transition: background-color 0.3s;
-    }
-
-    .admin-panel button:hover {
-        background-color: #f60; /* Darker orange for hover */
-    }
-
-    /* Admin Panel Forms */
-    .admin-panel form {
-        margin-top: 20px;
-    }
-
-    .admin-panel form input[type="text"],
-    .admin-panel form input[type="email"],
-    .admin-panel form input[type="password"],
-    .admin-panel form input[type="tel"],
-    .admin-panel form select {
-        width: 100%;
-        padding: 10px;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-        font-size: 14px;
-        margin-bottom: 15px;
-        box-sizing: border-box;
-    }
-
-    .admin-panel form input:focus,
-    .admin-panel form select:focus {
-        border-color: #ff8c00;
-        box-shadow: 0 0 5px rgba(255, 140, 0, 0.5);
-        outline: none;
-    }
-
-    /* Admin Panel Alerts */
-    .admin-panel .alert-box {
-        padding: 10px;
-        margin: 10px 0;
-        border-radius: 5px;
-        color: #fff;
-        font-size: 16px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-    }
-
-    .admin-panel .alert-success {
-        background-color: #4CAF50;
-    }
-
-    .admin-panel .alert-error {
-        background-color: #f44336;
-    }
-
-    .admin-panel .alert-box button {
-        background: none;
-        border: none;
-        color: white;
-        font-size: 16px;
-        cursor: pointer;
-    }
-
-    .admin-panel .alert-box button:hover {
-        color: #ddd;
-    }
-    #search-button{
-      position: relative;
-    left: 173px;
-    bottom: 55px;
-    }
-    #search-input {
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    width: 220px; /* Adjust as necessary for container width */
-    font-size: 16px;
-    font-family: 'Arial', sans-serif; /* Match font with the dropdown */
-    
-  }
-  #search-input:focus {
-    border-color: #aaa;
-    outline: none;
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-  }
+#search-input {
+  padding: 10px;
   
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+#search-button {
+  padding: 10px 20px;
+  background-color:#ff0000;
+  border: none;
+  border-radius: 4px;
+  color: white;
+  cursor: pointer;
+}
+
+#search-button:hover {
+  background-color: #ff5722;
+}
+
+/* Autocomplete List */
+#autocomplete-list {
+  position: absolute;
+  z-index: 1000;
+  background-color: white;
+  border: 1px solid #ccc;
+  max-height: 150px;
+  overflow-y: auto;
+  width: 250px;
+  border-radius: 4px;
+  margin-top: 2px;
+}
+
+#autocomplete-list li {
+  padding: 10px;
+  cursor: pointer;
+}
+
+#autocomplete-list li:hover {
+  background-color: #fff8f8;
+  border:20px;
+}
+
+/* Admin Content */
+.admin-content {
+  flex-grow: 1;
+  overflow-y: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+thead {
+  background-color: #ff9800;
+  color: white;
+}
+
+th, td {
+  padding: 10px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+th {
+  background-color: #ff5722;
+}
+
+td {
+  background-color: #fff;
+}
+
+button {
+  padding: 8px 12px;
+  background-color:#ff0000;
+  border: none;
+  border-radius: 4px;
+  color: white;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #ff5722;
+}
+
 
   </style>
 </head>
@@ -198,10 +163,11 @@
       <a href="/admin">Users</a>
       <a href="/">Home</a>  
     </div>
-    <form action="/search" method="GET">
-      <input type="search" name="q" placeholder="Search" id="search-input" autocomplete="off" />
+    <form action="/admin" method="GET">
+      <input type="search" name="email" placeholder="Search by Email" id="search-input" autocomplete="off" />
       <ul id="autocomplete-list"></ul>
       <button id="search-button">Go</button>
+    </form>
     <div class="admin-content">
       <table>
         <thead>
@@ -215,133 +181,136 @@
           </tr>
         </thead>
         <tbody>
-          <% users.forEach(userr => { %>
+          <% if (users.length > 0) { %>
+            <% users.forEach(userr => { %>
+              <tr>
+                <td><%= userr._id %></td> 
+                <td><%= userr.firstname %></td>
+                <td><%= userr.lastname %></td>
+                <td><%= userr.email %></td>
+                <td><%= userr.role %></td>
+                <td>
+                  <button onclick="return edit('<%= userr._id %>')">Edit</button>
+                  <button onclick="return deactivateUser('<%= userr._id %>', this.parentNode.parentNode)">Delete</button>
+                </td>
+              </tr>
+            <% }) %>
+          <% } else { %>
             <tr>
-              <td><%= userr._id %></td> 
-              <td><%= userr.firstname %></td>
-              <td><%= userr.lastname %></td>
-              <td><%= userr.email %></td>
-              <td><%= userr.role %></td>
-              <td>
-                <button onclick="return  edit('<%=userr._id%>')">Edit</button>
-                <button onclick="return deactivateUser('<%= userr._id %>',this.parentNode.parentNode)" >Delete</button>
-              </td>
+              <td colspan="6">No users found for the searched email.</td>
             </tr>
-          <% }) %>
+          <% } %>
         </tbody>
       </table>
     </div>
   </div>
 </body>
 <script>
-  function edit(userId){
-    if (confirm("Are you sure you want to Upadate this user?")) {
+  // Function to edit user
+  function edit(userId) {
+    if (confirm("Are you sure you want to update this user?")) {
       const updatedUser = {
         firstname: document.getElementById(`firstname-${userId}`),
         lastname: document.getElementById(`lastname-${userId}`),
         country: document.getElementById(`country-${userId}`),
         phone: document.getElementById(`phone-${userId}`),
         email: document.getElementById(`email-${userId}`),
-        password: document.getElementById(`password-${userId}`),
+        password: document.getElementById(`password-${userId}`)
       };
-  fetch(`/admin/update/${userId}`, {
-      method: 'PATCH', // Use PATCH instead of DELETE for updates
-      headers: {
+
+      fetch(`/admin/update/${userId}`, {
+        method: 'PATCH',
+        headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(updatedUser)
       })
-
-    
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-      
-        alert('User Upadted successfully.');
-      } else {
-        alert('Failed to Upadte user.');
-      }
-    })
-    .catch(error => {
-      console.error('Error:', error);
-      alert('An error occurred.');
-    });
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          alert('User updated successfully.');
+        } else {
+          alert('Failed to update user.');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred.');
+      });
+    }
   }
-}
- 
+
+  // Function to deactivate user
   function deactivateUser(userId, row) {
-  if (confirm("Are you sure you want to deactivate this user?")) {
-    fetch(`/admin/deactivated/${userId}`, {
-      method: 'PATCH', // Use PATCH instead of DELETE for updates
-    })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        row.remove(); // Remove the row from the UI
-        alert('User deactivated successfully.');
-      } else {
-        alert('Failed to deactivate user.');
-      }
-    })
-    .catch(error => {
-      console.error('Error:', error);
-      alert('An error occurred.');
-    });
+    if (confirm("Are you sure you want to deactivate this user?")) {
+      fetch(`/admin/deactivated/${userId}`, {
+        method: 'PATCH'
+      })
+      .then(response => {
+        if (response.ok) {
+          alert('User has been deactivated.');
+          row.style.display = 'none';
+        } else {
+          alert('Failed to deactivate user.');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred.');
+      });
+    }
   }
-}
-// const axios = require('axios');
-// axios.get('/admin', {
-//     headers: {
-//         'Authorization': 'Bearer bedfxvswergr'
-//     }
-// })
-// .then(response => {
-//     console.log(response.data);
-// })
-// .catch(error => {
-//     console.error('Error:', error);
-// });
 
-
+  // Autocomplete feature
+  // Selecting the search input and autocomplete list from the DOM
+// Selecting the search input and autocomplete list from the DOM
 document.addEventListener('DOMContentLoaded', () => {
-  const usermodel = require('./models/Schema');
-                  const searchInput = document.getElementById('search-input');
-                  const autocompleteList = document.getElementById('autocomplete-list');
+      const searchInput = document.getElementById('search-input');
+      const autocompleteList = document.getElementById('autocomplete-list');
+      const form = document.getElementById('search-form');
 
-                  searchInput.addEventListener('input', async () => {
-                    const query = searchInput.value;
-                    if (query.length < 3) {
-                      autocompleteList.innerHTML = '';
-                      return;
-                    }
+      searchInput.addEventListener('input', async () => {
+        const query = searchInput.value;
+        if (query.length < 3) {
+          autocompleteList.innerHTML = '';
+          return;
+        }
 
-                    try {
-                      
-                      const response = await usermodel.find({email});
-                     
+        try {
+          const response = await fetch(`/autocompletee?email=${encodeURIComponent(query)}`);
+          const emails = await response.json();
+          autocompleteList.innerHTML = '';
 
-                      autocompleteList.innerHTML = '';
-                      email.forEach(email => {
-                        const li = document.createElement('li');
-                        li.textContent = usermodel.email;
-                        li.addEventListener('click', () => {
-                          searchInput.value = usermodel.email;
-                          autocompleteList.innerHTML = '';
-                          document.querySelector('form').submit();
-                        });
-                        autocompleteList.appendChild(li);
-                      });
-                    } catch (error) {
-                      console.error('Error fetching autocomplete suggestions:', error);
-                    }
-                  });
-
-                  document.addEventListener('click', (e) => {
-                    if (!autocompleteList.contains(e.target) && e.target !== searchInput) {
-                      autocompleteList.innerHTML = '';
-                    }
-                  });
+          emails.forEach(email => {
+            const li = document.createElement('li');
+            li.textContent = email;
+            li.addEventListener('click', () => {
+              searchInput.value = email;
+              autocompleteList.innerHTML = '';
+            
+              fetch(`/admin?email=${encodeURIComponent(email)}`)
+                .then(response => response.text())
+                .then(html => {
+                  document.getElementById('admin-content').innerHTML = html;
+                })
+                .catch(error => {
+                  console.error('Error fetching search results:', error);
                 });
-</script>
+            });
+            autocompleteList.appendChild(li);
+          });
+        } catch (error) {
+          console.error('Error fetching autocomplete suggestions:', error);
+        }
+      });
 
+      document.addEventListener('click', (e) => {
+        if (!autocompleteList.contains(e.target) && e.target !== searchInput) {
+          autocompleteList.innerHTML = '';
+        }
+      });
+    });
+
+
+</script>
 </html>

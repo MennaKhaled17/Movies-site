@@ -345,6 +345,39 @@ app.patch('/admin/update/:_id', async (req, res) => {
   }
 });
 
+app.get('/admin', async (req, res) => {
+  const searchQuery = req.query.email || '';
+  try {
+    const users = await usermodel.find({ email: { $regex: new RegExp(`^${searchQuery}$`, 'i') } });
+    res.render('admin', { users });
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+app.get('/changepassword',async (req, res)=>{
+  res.render('changepassword');
+})
+// Autocomplete route
+app.get('/autocompletee', async (req, res) => {
+  const searchQuery = req.query.email || '';
+
+  if (!searchQuery) {
+    return res.json([]);
+  }
+
+  try {
+    const users = await usermodel.find({
+      email: { $regex: new RegExp(searchQuery, 'i') }
+    }).limit(5);
+
+    const emails = users.map(user => user.email);
+    res.json(emails);
+  } catch (error) {
+    console.error('Error fetching autocomplete suggestions:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
 
 
 app.get('/autocompletee', async (req, res) => {
@@ -360,7 +393,7 @@ app.get('/autocompletee', async (req, res) => {
     console.error('Error during autocomplete:', error);
     res.json([]);
   }
-});
+ });
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
