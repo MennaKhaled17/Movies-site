@@ -194,7 +194,7 @@ app.get('/details/:id', async (req, res) => {
   try {
     const response = await axios.get(`${BASE_URL}/movie/${id}`, {
       params: {
-        api_key: API_KEY,
+        api_key: API_KEY, 
       },
     });
     const movie = response.data;
@@ -342,6 +342,23 @@ app.patch('/admin/update/:_id', async (req, res) => {
   } catch (error) {
     console.error("Update failed:", error.message);
     res.status(500).json({ success: false, message: 'Failed to update user. Error: ' + error.message });
+  }
+});
+
+
+
+app.get('/autocompletee', async (req, res) => {
+  const query = req.query.q;
+  if (!query) {
+    return res.json([]);
+  }
+
+  try {
+    const response = await usermodel.find({email});
+     
+  } catch (error) {
+    console.error('Error during autocomplete:', error);
+    res.json([]);
   }
 });
 app.set('view engine', 'ejs');
