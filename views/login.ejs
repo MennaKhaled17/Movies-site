@@ -177,7 +177,7 @@
       <label for="password">Password:</label>
       <input type="password" id="password" name="password" required placeholder="Enter your password" autocomplete="off"> <br><br>
 
-      <button type="submit"  class="login-button" onsubmit=" return validateForm(event)">Login</button>
+      <button type="submit"  class="login-button">Login</button>
       <a href="/forgotpassword" id="forgotPasswordLink">Forgot Password?</a>
       <div id="toast" class="toast"></div>
     </form>
@@ -239,55 +239,49 @@ document.addEventListener('DOMContentLoaded', function() {
         showToast(decodeURIComponent(error), false);
     }
 });
-let loginAttempts = 0;
+
+let loginAttempts = 0; // Declare outside the function
 const maxAttempts = 3;
 
-
 function validateForm(event) {
-   
+    event.preventDefault(); // Prevent default form submission
 
     const enteredPassword = document.getElementById('password').value;
-    const email = document.getElementById('email').value; // Assuming you have an email field
+    const correctPassword = "password123"; // Replace with the correct password (for demo purposes)
 
-    if (loginAttempts >= maxAttempts&&enteredPassword!=password) {
+    console.log("Current login attempts:", loginAttempts);
+
+    if (loginAttempts >= maxAttempts) {
         showToast("Maximum attempts exceeded. Please try again later.", false);
-        document.querySelector('.login-button').disabled = true; // Disable the login button
-        return; // Stop further execution
+        document.querySelector('.login-button').disabled = true;
+        return false; // Stop further execution
     }
 
-    // Send the password and email to the server for validation
-    fetch('/login', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ email, password: enteredPassword })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (password===enteredPassword) {
-            // If the password is correct, submit the form
-            document.getElementById('loginForm').submit();
-        } else {
-            loginAttempts++;
-            const remainingAttempts = maxAttempts - loginAttempts;
+    if (enteredPassword === correctPassword) {
+        showToast("Login successful!", true);
+        // Perform login action here, like redirecting to a new page
+        document.getElementById('loginForm').submit();
+    } else {
+        loginAttempts++;
+        const remainingAttempts = maxAttempts - loginAttempts;
 
-            if (remainingAttempts > 0) {
-                showToast(`Wrong password. You have ${remainingAttempts} attempts left.`, false);
-            } else if (remainingAttempts === 0) {
-                showToast("Maximum attempts exceeded. Please try again later.", false);
-                document.querySelector('.login-button').disabled = true; // Disable the login button
-            }
+        if (remainingAttempts > 0) {
+            showToast(`Wrong password. You have ${remainingAttempts} attempts left.`, false);
+        } else {
+            showToast("Maximum attempts exceeded. Please try again later.", false);
+            document.querySelector('.login-button').disabled = true;
         }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        showToast("An error occurred. Please try again.", false);
-    });
+    }
 }
 
-
-
+function showToast(message, isSuccess) {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.className = 'toast toast-show ' + (isSuccess ? 'toast-success' : 'toast-error');
+    setTimeout(() => {
+        toast.className = 'toast';
+    }, 3000); // Toast will disappear after 3 seconds
+}
 
 
 

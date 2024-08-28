@@ -355,29 +355,45 @@ app.get('/admin', async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
-app.get('/changepassword',async (req, res)=>{
-  res.render('changepassword');
-})
-// Autocomplete route
-app.get('/autocompletee', async (req, res) => {
-  const searchQuery = req.query.email || '';
+app.get('/changepassword', (req, res) => {
+  res.render('changepassword'); // Render the change-password form
+});
 
-  if (!searchQuery) {
-    return res.json([]);
+app.post('/changepassword', async (req, res) => {
+  const { CurrentPassword, newPassword, confirmPassword } = req.body;
+  const userId = usermodel.email; // Make sure you have user authentication in place
+
+  if (newPassword !== confirmPassword) {
+    return res.redirect('/changepassword?error=New%20passwords%20do%20not%20match.');
   }
 
   try {
-    const users = await usermodel.find({
-      email: { $regex: new RegExp(searchQuery, 'i') }
-    }).limit(5);
+    // Find the user
+    const user = await usermodel.findOne(userId);
+    if (!user) {
+      return res.redirect('/changepassword?error=User%20not%20found.');
+    }
 
-    const emails = users.map(user => user.email);
-    res.json(emails);
+    // Check if the old password is correct
+    const isMatch = await bcrypt.compare(CurrentPassword, user.password);
+    if (!isMatch) {
+      return res.redirect('/changepassword?error=Old%20password%20is%20incorrect.');
+    }
+
+    // Hash the new password and update the user
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+    await user.save();
+
+    res.redirect('/changepassword?message=Password%20updated%20successfully.');
   } catch (error) {
-    console.error('Error fetching autocomplete suggestions:', error);
-    res.status(500).send('Internal Server Error');
+    console.error('Error:', error);
+    res.redirect('/changepassword?error=An%20error%20occurred%20while%20changing%20the%20password.');
   }
 });
+
+module.exports = app;
+
 
 
 app.get('/autocompletee', async (req, res) => {

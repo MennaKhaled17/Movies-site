@@ -139,7 +139,6 @@ module.exports = {
 
   reset_pass: async (req, res) => {
     const { email, newPassword } = req.body;
-    console.log(email);
     try {
       const user = await userModel.findOne({ email });
 
