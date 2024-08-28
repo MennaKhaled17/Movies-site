@@ -578,7 +578,9 @@ app.post('/forgotpassword', async (req, res) => {
 });
 
 module.exports = app;
-
+app.get('/account', (res,req)=>{
+  res.render('/account');
+})
 // Starting server using port 3001
 app.listen(3001, () => {
   console.log('Server is running on http://localhost:3001');
