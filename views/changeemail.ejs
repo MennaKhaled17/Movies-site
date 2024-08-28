@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Change Email</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<style>
+    /* General Styles for the Container */
+/* General Styles for the Container */
+/* General Styles for the Container */
+.container {
+  max-width: 500px; /* Adjust width as needed */
+  margin: 40px auto;
+  padding: 30px;
+  background-color: #fff;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+}
+
+h1 {
+  color: #ff6f00; /* Example color, adjust to match your theme */
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 24px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 16px;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 14px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-size: 16px;
+  box-sizing: border-box;
+  transition: border-color 0.3s;
+}
+
+.form-group input:focus {
+  border-color: #ff6f00; /* Focus color to match theme */
+  outline: none;
+}
+
+button {
+  width: 100%;
+  padding: 14px;
+  background-color: #ff6f00; /* Button color to match theme */
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: #e65c00; /* Slightly darker shade for hover */
+}
+
+button:active {
+  background-color: #cc5200; /* Even darker shade for active */
+}
+
+.error-message, .success-message {
+  font-size: 14px;
+  text-align: center;
+  margin-top: 15px;
+}
+
+.error-message {
+  color: #d9534f; /* Red for errors */
+}
+
+.success-message {
+  color: #5bc0de; /* Light blue for success */
+}
+.toast {
+      display: none;
+      padding: 10px;
+      border-radius: 4px;
+      margin-top: 10px;
+    }
+
+    .toast-show {
+      display: block;
+    }
+
+    .toast-success {
+      background-color: #4CAF50; /* Green */
+      color: white;
+    }
+
+    .toast-error {
+      background-color: #f44336; /* Red */
+      color: white;
+    }
+
+
+</style>
+<body>
+  <div class="container">
+    <h1>Change Your Email</h1>
+    <form action="/changeemail" method="POST">
+      <div class="form-group">
+        <label for="oldEmail">Current Email</label>
+        <input type="email" id="oldEmail" name="oldEmail" placeholder="Current Email" required>
+      </div>
+      <div class="form-group">
+        <label for="newEmail">New Email</label>
+        <input type="email" id="newEmail" name="newEmail" placeholder="New Email" required>
+      </div>
+      <button type="submit">Update Email</button>
+      <div id="toast" class="toast"></div>
+    </form>
+  </div>
+  <script>
+      function showToast(message, isSuccess) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = 'toast toast-show ' + (isSuccess ? 'toast-success' : 'toast-error');
+      setTimeout(() => {
+        toast.className = 'toast';
+      }, 3000); // Toast will disappear after 3 seconds
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const message = urlParams.get('message');
+      const error = urlParams.get('error');
+
+      if (message) {
+        showToast(decodeURIComponent(message), true);
+      }
+
+      if (error) {
+        showToast(decodeURIComponent(error), false);
+      }
+    });
+
+    function validateemail(){
+    const { oldEmail, newEmail } = req.body;
+
+try {
+  // Find the user by old email
+  const user =  usermodel.findOne({ email: oldEmail });
+
+  if (!user) {
+   showToast( 'Current email not found' ,false);
+  }
+
+  // Update the user's email
+  user.email = newEmail;
+   user.save();
+
+ showToast( 'Email updated successfully' ,true);
+} catch (error) {
+  console.error(error);
+  showToast( 'Server error' ,false);
+}
+    }
+  </script>
+</body>
+</html>

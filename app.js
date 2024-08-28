@@ -578,9 +578,38 @@ app.post('/forgotpassword', async (req, res) => {
 });
 
 module.exports = app;
-app.get('/account', (res,req)=>{
-  res.render('/account');
-})
+app.get('/account', (req, res) => {
+  return res.render('account'); // 'account' is the name of your EJS template without the leading slash
+});
+
+app.get('/changeemail', (req, res) => {
+  res.render('changeemail');
+});
+
+// Handle the form submission
+app.post('/changeemail', async (req, res) => {
+  const { oldEmail, newEmail } = req.body;
+
+  try {
+    // Find the user by old email
+    const user = await usermodel.findOne({ email: oldEmail });
+
+    if (!user) {
+      return res.status(400).json({ message: 'Current email not found' });
+    }
+
+    // Update the user's email
+    user.email = newEmail;
+    await user.save();
+
+    res.json({ message: 'Email updated successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+module.exports = app;
 // Starting server using port 3001
 app.listen(3001, () => {
   console.log('Server is running on http://localhost:3001');

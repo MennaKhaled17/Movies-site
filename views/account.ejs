@@ -4,21 +4,36 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>User Account</title>
-  <!-- <link rel="stylesheet" href="/styles.css"> -->
+  <link rel="stylesheet" href="/styles.css">
 </head>
 <style>
-    .account-container {
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 20px;
-  background-color: #f7f7f7;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+ body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f4f4f4;
+  margin: 0;
+  padding: 0;
 }
 
-.profile-section {
+.account-container {
+  display: flex;
+  height: 100vh; /* Ensure the container takes the full height of the viewport */
+  max-width: 100vw; /* Allow the container to use full width */
+}
+
+.sidebar {
+  width: 250px; /* Adjust width as needed */
+  background-color: #ff8c00;
+  color: #fff;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); /* Add shadow for visual separation */
+}
+
+.sidebar-header {
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
 }
 
 .profile-image {
@@ -26,80 +41,137 @@
   width: 100px;
   height: 100px;
   object-fit: cover;
+  margin-bottom: 15px;
+  border: 3px solid #e67e22;
 }
 
-.account-panel {
+.sidebar-menu {
+  list-style: none;
+  padding: 0;
+  width: 100%;
+}
+
+.sidebar-menu li {
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+.sidebar-menu li a {
+  color: #fff;
+  text-decoration: none;
+  font-size: 16px;
+  padding: 15px;
+  display: block;
+  text-align: center;
+  border-radius: 5px;
+  background-color: #e67e22;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.sidebar-menu li a:hover {
+  background-color: #d35400;
+  transform: translateY(-2px);
+}
+
+.main-content {
+  flex: 1;
+  padding: 20px;
+  background-color: #fff;
+  overflow-y: auto; /* Allow scrolling if content overflows */
+}
+
+.content-section {
+  display: none;
+}
+
+.content-section.active {
+  display: block;
+}
+
+h3 {
+  color: #ff8c00;
   margin-bottom: 20px;
 }
 
-.account-panel h3 {
-  margin-bottom: 10px;
-}
-
-.account-panel form {
+form {
   display: flex;
   flex-direction: column;
 }
 
-.account-panel input {
-  margin-bottom: 10px;
-  padding: 8px;
+form input {
+  margin-bottom: 15px;
+  padding: 12px;
+  border: 2px solid #ccc;
   border-radius: 5px;
-  border: 1px solid #ccc;
+  font-size: 16px;
 }
 
-.account-panel button {
-  padding: 10px;
-  background-color: #007bff;
-  color: white;
+form button {
+  padding: 12px;
+  background-color: #ff8c00;
+  color: #fff;
   border: none;
   border-radius: 5px;
+  font-size: 18px;
   cursor: pointer;
+  transition: background-color 0.3s;
 }
 
-.logout-section {
-  text-align: center;
+form button:hover {
+  background-color: #e67e22;
 }
 
 .logout-button {
-  padding: 10px;
-  background-color: #ff4d4d;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
+  background-color: #d35400;
+}
+
+.logout-button:hover {
+  background-color: #c0392b;
 }
 
 </style>
 <body>
   <div class="account-container">
-    <h1>Account Settings</h1>
-    <div class="profile-section">
-      <img src="<%= user.profileImage %>" alt="Profile Picture" class="profile-image">
-      <h2><%= user.name %></h2>
+    <div class="sidebar">
+      
+      <ul class="sidebar-menu">
+        <li><a href="/account" data-target="profileSection">Profile</a></li>
+        <li><a href="/account" data-target="emailSection">Change Email</a></li>
+        <li><a href="/changepassword" data-target="passwordSection">Change Password</a></li>
+        <li><a href="/" data-target="logoutSection">Logout</a></li>
+      </ul>
     </div>
 
-    <div class="account-panel">
-      <h3>Change Email</h3>
-      <form action="/account/change-email" method="POST">
-        <input type="email" name="newEmail" placeholder="New Email" required>
-        <button type="submit">Change Email</button>
-      </form>
-
-      <h3>Change Password</h3>
-      <form action="/account/change-password" method="POST">
-        <input type="password" name="currentPassword" placeholder="Current Password" required>
-        <input type="password" name="newPassword" placeholder="New Password" required>
-        <input type="password" name="confirmPassword" placeholder="Confirm Password" required>
-        <button type="submit">Change Password</button>
-      </form>
-    </div>
-
-    <div class="logout-section">
-      <form action="/account/logout" method="POST">
-        <button type="submit" class="logout-button">Logout</button>
-      </form>
+    <div class="main-content">
+      <div id="profileSection" class="content-section active">
+        <h3>Your Profile</h3>
+        
+      </div>
+      <div id="emailSection" class="content-section">
+        <h3>Change Email</h3>
+        <form action="/changeemail" method="POST">
+          <input type="email" name="newEmail" placeholder="New Email" required>
+          <button type="submit">Change Email</button>
+        </form>
+      </div>
+      <div id="passwordSection" class="content-section">
+        <h3>Change Password</h3>
+        <form action="/changepassword" method="POST">
+          <input type="password" name="currentPassword" placeholder="Current Password" required>
+          <input type="password" name="newPassword" placeholder="New Password" required>
+          <input type="password" name="confirmPassword" placeholder="Confirm Password" required>
+          <button type="submit">Change Password</button>
+        </form>
+      </div>
+      <div id="logoutSection" class="content-section">
+        <h3>Logout</h3>
+        <form action="/logout" method="POST">
+          <button type="submit" class="logout-button">Logout</button>
+        </form>
+      </div>
     </div>
   </div>
+
+  <script src="/script.js"></script>
 </body>
 </html>

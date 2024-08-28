@@ -34,7 +34,8 @@ const userSchema = new mongoose.Schema({
     resetToken: { type: String }, // Field to store the OTP hash
     
     resetTokenExpiry: { type: Date }, // Field to store OTP expiry time
-   
+    profileImage:{ type: String },
+
     });
   const User = mongoose.model('User', userSchema); //hsmy al usersachema user dah asm al model
 
