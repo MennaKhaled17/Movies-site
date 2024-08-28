@@ -457,6 +457,7 @@ body {
   }
   
 
+  
   /* //login page */
   /* Basic reset */
 
@@ -707,7 +708,7 @@ label[for="country"] {
   .toast-error {
     background-color: #f44336; /* Red background for error */
   }
-  .admin-button {
+  .admin-buttonn {
     background-color: #ff8800; /* Orange background */
     color: white; /* White text color */
     padding: 10px 20px; /* Padding for the button */
@@ -716,6 +717,7 @@ label[for="country"] {
     font-size: 16px; /* Font size */
     cursor: pointer; /* Pointer cursor on hover */
     transition: background-color 0.3s ease; /* Smooth transition on hover */
+    display: inline-flexbox;
   }
   
   .admin-button:hover {

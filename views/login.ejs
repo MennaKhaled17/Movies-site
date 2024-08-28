@@ -170,14 +170,14 @@
   
   <div class="container">
     <h1 style="color:#ff8c00">Login Form</h1>
-    <form action="/Login" id="loginForm" method="post" onsubmit="validateForm(event)">
+    <form action="/Login" id="loginForm" method="post" onsubmit=" return validateForm(event)">
       <label for="email">Email: </label>
       <input type="email" id="email" name="email" required placeholder="Enter your email address" autocomplete="off"> <br><br>
       
       <label for="password">Password:</label>
       <input type="password" id="password" name="password" required placeholder="Enter your password" autocomplete="off"> <br><br>
 
-      <button type="submit"  class="login-button" onclick="validateForm()">Login</button>
+      <button type="submit"  class="login-button" onsubmit=" return validateForm(event)">Login</button>
       <a href="/forgotpassword" id="forgotPasswordLink">Forgot Password?</a>
       <div id="toast" class="toast"></div>
     </form>
@@ -244,10 +244,16 @@ const maxAttempts = 3;
 
 
 function validateForm(event) {
-    // Prevent form submission
+   
 
     const enteredPassword = document.getElementById('password').value;
     const email = document.getElementById('email').value; // Assuming you have an email field
+
+    if (loginAttempts >= maxAttempts&&enteredPassword!=password) {
+        showToast("Maximum attempts exceeded. Please try again later.", false);
+        document.querySelector('.login-button').disabled = true; // Disable the login button
+        return; // Stop further execution
+    }
 
     // Send the password and email to the server for validation
     fetch('/login', {
@@ -259,7 +265,7 @@ function validateForm(event) {
     })
     .then(response => response.json())
     .then(data => {
-        if (data.message === 'Password is correct') {
+        if (password===enteredPassword) {
             // If the password is correct, submit the form
             document.getElementById('loginForm').submit();
         } else {
@@ -268,8 +274,7 @@ function validateForm(event) {
 
             if (remainingAttempts > 0) {
                 showToast(`Wrong password. You have ${remainingAttempts} attempts left.`, false);
-            }
-            if (remainingAttempts == 0) {
+            } else if (remainingAttempts === 0) {
                 showToast("Maximum attempts exceeded. Please try again later.", false);
                 document.querySelector('.login-button').disabled = true; // Disable the login button
             }
@@ -277,7 +282,7 @@ function validateForm(event) {
     })
     .catch(error => {
         console.error('Error:', error);
-        // showToast("An error occurred. Please try again.", false);
+        showToast("An error occurred. Please try again.", false);
     });
 }
 
@@ -313,8 +318,7 @@ function validateForm(event) {
 
 </script>
 
-</body>
-</html>
+
 
 
 
@@ -339,4 +343,6 @@ footer a:hover {
     text-decoration: underline;
 }
 </style>
+
+</body>
 </html>

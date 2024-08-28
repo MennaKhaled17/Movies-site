@@ -29,6 +29,12 @@
             <button class="login-button" onclick="location.href='/Register';">Register</button>
             <button class="login-button" onclick="location.href='/Login';">Login</button>
             <% } %>
+            <% if(user){ %>
+              <button class="admin-buttonn" onclick="location.href='/admin';">Admin Panel</button>
+              <% }else{ %>
+                
+                <% } %>
+              
       </div>
 
     </div>
@@ -89,7 +95,8 @@
         <% } %>
 
           <% if (user && user.role==='admin' ) { %>
-            <button class="admin-button" onclick="location.href='/admin';">Admin Panel</button>
+            <button class="admin-buttonn" onclick="location.href='/admin';" >Admin Panel</button>
+
             <% } %>
 
               <script>

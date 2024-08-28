@@ -28,7 +28,7 @@ module.exports = {
         // Example using query parameter:
         res.redirect('/?message=Login successful!');
 
-      } else if (!user) {
+      } else if (!user ) {
         // Email not found, redirect with error message
         res.redirect('/login?error=Email not registered');
       } else {
@@ -36,8 +36,7 @@ module.exports = {
         res.redirect('/login?error=Incorrect password');
       }
     } catch (error) {
-      console.error("Error during login:", error);
-      res.redirect('/login?error=An error occurred');
+     console.log(error);
     }
 
   },
@@ -57,15 +56,14 @@ module.exports = {
       if (user && user.role === 'admin') {
         // Retrieve all users directly within this function
         const users = await userModel.find().exec(); // Retrieve all users from the database
-
-        // Render the admin page with the users data
+           // Render the admin page with the users data
         return res.render('admin', { users }); // Ensure 'admin' view is correctly configured in your view engine
       } else {
         console.log('User role:', user ? user.role : 'No user found');
         // Render the unauthorized page
         return res.render('unauthorized'); // Ensure 'unauthorized' view is correctly configured in your view engine
       }
-    } catch (error) {
+    } catch (error) {x
       // Handle any errors that occur
       console.error('Error handling unauthorized access:', error);
       return res.status(500).send('Internal Server Error');
