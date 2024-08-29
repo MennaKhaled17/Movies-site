@@ -12,39 +12,64 @@ const secret = process.env.JWT_SECRET;
 const createToken = (id) => {
   return jwt.sign({ id }, secret, { expiresIn: maxAge });
 }
+const MAX_LOGIN_ATTEMPTS = 3;
+const LOCK_TIME = 15 * 60 * 1000; // Lock for 15 minutes
 
-//sign up
 module.exports = {
   login_post: async (req, res) => {
     try {
-      const user = await userModel.findOne({ email: req.body.email });
+      const { email, password } = req.body;
+      const user = await userModel.findOne({ email });
 
-      if (user && bcrypt.compareSync(req.body.password, user.password)) {
+      if (!user) {
+        // Email not found, redirect with error message
+        return res.redirect('/login?error=Email not registered');
+      }
+
+      // Check if user is locked out
+      if (user.lockUntil && user.lockUntil > Date.now()) {
+        return res.redirect('/login?error=Account locked. Try again later.');
+      }
+
+      // Check password
+      const isPasswordCorrect = bcrypt.compareSync(password, user.password);
+
+      if (isPasswordCorrect) {
+        // Reset login attempts and lockUntil fields on successful login
+        user.loginAttempts = 0;
+        user.lockUntil = undefined;
+        await user.save();
+
         const token = createToken(user._id);
         res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 1000 });
-
-
-        // Optionally set a success message in the session or as a query parameter
-        // Example using query parameter:
-        res.redirect('/?message=Login successful!');
-
-      } else if (!user ) {
-        // Email not found, redirect with error message
-        res.redirect('/login?error=Email not registered');
+        return res.redirect('/?message=Login successful!');
       } else {
-        // Invalid password, redirect with error message
-        res.redirect('/login?error=Incorrect password');
+        // Increment login attempts
+        user.loginAttempts = (user.loginAttempts || 0) + 1;
+
+        // Lock the account if max attempts are reached
+        if (user.loginAttempts >= MAX_LOGIN_ATTEMPTS) {
+          user.lockUntil = Date.now() + LOCK_TIME;
+        }
+
+        await user.save();
+
+        const remainingAttempts = MAX_LOGIN_ATTEMPTS - user.loginAttempts;
+        const errorMessage = remainingAttempts > 0
+          ? `Incorrect password. You have ${remainingAttempts} attempts left.`
+          : 'Maximum attempts exceeded. Please try again later.';
+
+        return res.redirect(`/login?error=${encodeURIComponent(errorMessage)}`);
       }
     } catch (error) {
-     console.log(error);
+      console.error('Error during login:', error);
+      res.redirect('/login?error=Server error, please try again.');
     }
-
   },
 
-  //logout
   logout_get: (req, res) => {
     res.cookie('jwt', '', { maxAge: 1 });
-    res.redirect('/')
+    res.redirect('/');
   },
 
   // admin get
@@ -56,14 +81,15 @@ module.exports = {
       if (user && user.role === 'admin') {
         // Retrieve all users directly within this function
         const users = await userModel.find().exec(); // Retrieve all users from the database
-           // Render the admin page with the users data
+        // Render the admin page with the users data
         return res.render('admin', { users }); // Ensure 'admin' view is correctly configured in your view engine
       } else {
         console.log('User role:', user ? user.role : 'No user found');
         // Render the unauthorized page
         return res.render('unauthorized'); // Ensure 'unauthorized' view is correctly configured in your view engine
       }
-    } catch (error) {x
+    } catch (error) {
+      x
       // Handle any errors that occur
       console.error('Error handling unauthorized access:', error);
       return res.status(500).send('Internal Server Error');

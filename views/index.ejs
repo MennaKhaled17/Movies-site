@@ -42,11 +42,11 @@
             <button class="login-button" onclick="location.href='/Login';">Login</button>
             
             <% } %>
-            <% if(user){ %>
+            <% if (user && user.role === "admin") { %>
               <button class="admin-buttonn" onclick="location.href='/admin';">Admin Panel</button>
-              <% }else{ %>
-                
-                <% } %>
+            <% } else { %>
+              <!-- You can add content here for non-admin users if needed -->
+            <% } %>
               
       </div>
 

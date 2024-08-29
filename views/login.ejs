@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,20 +8,7 @@
   <link rel="stylesheet" href="/css/main.css">
   <link rel="icon" href="/imgs/Untitled_design-removebg-preview.png">
   <style>
-   .container {
-    background: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    max-width: 500px;  /* Maximum width of the form box */
-    width: 100%;
-    padding: 40px;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-    text-align: center; /* Center-align text inside the container */
-    position: relative;
-    left:450px;
-    top:90px;
-   }
-   .container {
+    .container {
       background: #ffffff;
       border-radius: 8px;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -32,6 +20,7 @@
       left: 450px;
       top: 90px;
     }
+
     .toast {
       visibility: hidden;
       max-width: 500px;
@@ -48,17 +37,21 @@
       font-size: 17px;
       box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.2);
     }
+
     .toast-show {
       visibility: visible;
       opacity: 1;
       transition: opacity 0.5s ease-in-out;
     }
+
     .toast-success {
-      background-color: #4CAF50; /* Green */
+      background-color: #4CAF50;
     }
+
     .toast-error {
-      background-color: #F44336; /* Red */
+      background-color: #F44336;
     }
+
     footer {
       background-color: #333;
       color: white;
@@ -69,274 +62,75 @@
       top: 650px;
       width: 100%;
     }
+
     footer a {
       color: #d3d3d3;
       text-decoration: none;
     }
+
     footer a:hover {
       text-decoration: underline;
     }
-     /* Styles for the popup */
-     .popup {
-      display: none; /* Hidden by default */
-      position: fixed;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      background-color: #fff;
-      border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-      padding: 20px;
-      z-index: 1000; /* Ensure it's on top */
-      position: relative;
-      width: 36% ;
-    }
-
-    .popup.active {
-      display: block;
-    }
-
-    .popup-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 200%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
-      z-index: 999;
-    }
-
-    .popup button.close {
-      background: none;
-      border: none;
-      font-size: 20px;
-      cursor: pointer;
-      color: #888;
-    }
-
-    .popup button.close:hover {
-      color: #333;
-    }
-
-    .popup form {
-      position: relative;
-      left: 180px;
-    }
-
-    .popup form label {
-      font-weight: bold;
-      margin-bottom: 8px;
-    }
-
-    .popup form input {
-      margin-bottom: 20px;
-      padding: 10px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-    }
-
-    .popup form button {
-      padding: 10px;
-      border: none;
-      border-radius: 4px;
-      background-color: #f66d05;
-      color: #fff;
-      font-size: 16px;
-      cursor: pointer;
-      position: relative;
-      width:50%;
-      right:27px;
-    }
-
-    .popup form button:hover {
-      background-color: #f66d05;
-    }
-    #forgotPasswordLink{
-      position: relative;
-      right:190px;
-      top:15px;
-      color:#f66d05
-    }
   </style>
 </head>
-  
-  </style>
-</head>
+
 <body>
-    
-  <%- include('partials/navbar.ejs') %> 
- 
 
-  
+  <%- include('partials/navbar.ejs') %>
+
   <div class="container">
     <h1 style="color:#ff8c00">Login Form</h1>
-    <form action="/Login" id="loginForm" method="post" onsubmit=" return validateForm(event)">
+    <form action="/Login" id="loginForm" method="post">
       <label for="email">Email: </label>
-      <input type="email" id="email" name="email" required placeholder="Enter your email address" autocomplete="off"> <br><br>
-      
-      <label for="password">Password:</label>
-      <input type="password" id="password" name="password" required placeholder="Enter your password" autocomplete="off"> <br><br>
+      <input type="email" id="email" name="email" required placeholder="Enter your email address" autocomplete="off">
+      <br><br>
 
-      <button type="submit"  class="login-button">Login</button>
+      <label for="password">Password:</label>
+      <input type="password" id="password" name="password" required placeholder="Enter your password" autocomplete="off"> 
+      <br><br>
+
+      <button type="submit" class="login-button">Login</button>
       <a href="/forgotpassword" id="forgotPasswordLink">Forgot Password?</a>
       <div id="toast" class="toast"></div>
     </form>
-    <div id="errorMessages" class="error-message"></div>
   </div>
-  
 
-  <!-- Popup HTML -->
-  <!-- <div class="popup" id="popup">
-    <button class="close" id="popupClose">&times;</button>
-    <h1 style="color:#f66d05">Reset Password</h1>
-    <form id="resetPasswordForm" action="/reset-password" method="post">
-        <label for="email">Enter your email address:</label>
-        <input type="email" id="email" name="email" required autocomplete="off">
-
-      
-
-        <label for="newPassword">New Password:</label>
-        <input type="password" id="newPassword" name="newPassword" required autocomplete="off">
-
-        <label for="confirmPassword">Confirm New Password:</label>
-        <input type="password" id="confirmPassword" name="confirmPassword" required autocomplete="off">
-
-        <button type="submit">Reset Password</button>
-    </form>
-</div> -->
-
-<head>
+  <head>
     <link rel="stylesheet" href="/css/footer.css">
-</head>
+  </head>
 
-<footer>
+  <footer>
     <p>&copy; 2024 Movie Gallery. All rights reserved.</p>
     <p>Contact us: <a href="mailto:info@moviegallery.com">info@moviegallery.com</a> | Phone: (123) 456-7890</p>
     <p>Follow us on <a href="#">Facebook</a>, <a href="#">Twitter</a>, <a href="#">Instagram</a></p>
-</footer>
-</body>
-<script>
-// Toast notification function
-function showToast(message, isSuccess) {
-    const toast = document.getElementById('toast');
-    toast.textContent = message;
-    toast.className = 'toast toast-show ' + (isSuccess ? 'toast-success' : 'toast-error');
-    setTimeout(() => {
+  </footer>
+
+  <script>
+    // Toast notification function
+    function showToast(message, isSuccess) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = 'toast toast-show ' + (isSuccess ? 'toast-success' : 'toast-error');
+      setTimeout(() => {
         toast.className = 'toast';
-    }, 3000); // Toast will disappear after 3 seconds
-}
+      }, 3000); // Toast will disappear after 3 seconds
+    }
 
-document.addEventListener('DOMContentLoaded', function() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const message = urlParams.get('message');
-    const error = urlParams.get('error');
+    document.addEventListener('DOMContentLoaded', function () {
+      const urlParams = new URLSearchParams(window.location.search);
+      const message = urlParams.get('message');
+      const error = urlParams.get('error');
 
-    if (message) {
+      if (message) {
         showToast(decodeURIComponent(message), true);
-    }
+      }
 
-    if (error) {
+      if (error) {
         showToast(decodeURIComponent(error), false);
-    }
-});
-
-let loginAttempts = 0; // Declare outside the function
-const maxAttempts = 3;
-
-function validateForm(event) {
-    event.preventDefault(); // Prevent default form submission
-
-    const enteredPassword = document.getElementById('password').value;
-    const correctPassword = "password123"; // Replace with the correct password (for demo purposes)
-
-    console.log("Current login attempts:", loginAttempts);
-
-    if (loginAttempts >= maxAttempts) {
-        showToast("Maximum attempts exceeded. Please try again later.", false);
-        document.querySelector('.login-button').disabled = true;
-        return false; // Stop further execution
-    }
-
-    if (enteredPassword === correctPassword) {
-        showToast("Login successful!", true);
-        // Perform login action here, like redirecting to a new page
-        document.getElementById('loginForm').submit();
-    } else {
-        loginAttempts++;
-        const remainingAttempts = maxAttempts - loginAttempts;
-
-        if (remainingAttempts > 0) {
-            showToast(`Wrong password. You have ${remainingAttempts} attempts left.`, false);
-        } else {
-            showToast("Maximum attempts exceeded. Please try again later.", false);
-            document.querySelector('.login-button').disabled = true;
-        }
-    }
-}
-
-function showToast(message, isSuccess) {
-    const toast = document.getElementById('toast');
-    toast.textContent = message;
-    toast.className = 'toast toast-show ' + (isSuccess ? 'toast-success' : 'toast-error');
-    setTimeout(() => {
-        toast.className = 'toast';
-    }, 3000); // Toast will disappear after 3 seconds
-}
-
-
-
-//   document.getElementById('resetPasswordForm').addEventListener('submit', async (e) => {
-//     e.preventDefault();
-
-//     const email = document.getElementById('email').value;
-//     const otp = document.getElementById('otp').value;
-//     const newPassword = document.getElementById('newPassword').value;
-//     const confirmPassword = document.getElementById('confirmPassword').value;
-
-//     const response = await fetch('/reset-password', {
-//         method: 'POST',
-//         headers: {
-//             'Content-Type': 'application/json'
-//         },
-//         body: JSON.stringify({ email, otp, newPassword, confirmPassword })
-//     });
-
-//     const result = await response.json();
-//     if (response.ok) {
-//         showToast(result.message, true);
-//         window.location.href = '/'; // Redirect to home page after successful reset
-//     } else {
-//         showToast(result.error, false);
-//     }
-// });
-
-</script>
-
-
-
-
-
-<style>
-    footer {
-    background-color: #333;
-    color: white;
-    text-align: center;
-    padding: 20px 0;
-    margin-top: 20px;
-    position: absolute;
-    top: 650px;
-    width: 100%;
-}
-
-footer a {
-    color: #d3d3d3;
-    text-decoration: none;
-}
-
-footer a:hover {
-    text-decoration: underline;
-}
-</style>
+      }
+    });
+  </script>
 
 </body>
+
 </html>

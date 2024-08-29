@@ -32,7 +32,8 @@ const userSchema = new mongoose.Schema({
 
     },
     resetToken: { type: String }, // Field to store the OTP hash
-    
+    loginAttempts: { type: Number, default: 0 },
+    lockUntil: { type: Date },
     resetTokenExpiry: { type: Date }, // Field to store OTP expiry time
     profileImage:{ type: String },
 
