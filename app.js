@@ -15,9 +15,12 @@ const bcrypt = require("bcrypt");
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const authRoutes=require('./routes/authroutes');
+const adminRoutes=require('./routes/adminRoutes.js');
+// const adminRoutes=require('./routes/adminRoutes');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 const { google } = require('googleapis');
+const adminController = require('./controllers/adminController.js');
 
 // API Data
 const API_KEY = '2306111c328b44f1be3d16ba83e418a6';
@@ -62,25 +65,8 @@ const connectDB = async () => {
 
 app.get('*', checkUser);
 app.post('*', checkUser);
+app.use('/admin', adminRoutes);
 app.use('/',authRoutes);
-
-// Authentication Middleware
-// function authenticateToken(req, res, next) {
-//   const token = req.query.token || req.headers['authorization'];
-
-//   if (!token) {
-//     return res.redirect('/login?error=Access%20denied.%20Please%20login%20first.');
-//   }
-
-//   jwt.verify(token, 'mena1234', (err, user) => {
-//     if (err) {
-//       console.error('Token verification failed:', err);
-//       return res.redirect('/login?error=Invalid%20token.%20Please%20login%20again.');
-//     }
-//     req.user = user; // Attach the decoded user to the request
-//     next(); // Proceed to the next middleware or route handler
-//   });
-// }
 
 module.exports = connectDB();
 
@@ -297,64 +283,6 @@ async function handleUnauthorizedAccess(req, res) {
 
 
 
-
-app.patch('/admin/deactivated/:_id', async (req, res) => {
-  try {
-    const idd = req.params._id;
-    if (!mongoose.Types.ObjectId.isValid(idd)) {
-      return res.status(400).json({ success: false, message: 'Invalid User ID' });
-    }
-
-    await usermodel.findByIdAndUpdate(idd, { active: false });
-    res.json({ success: true, message: 'User deactivated successfully.' });
-  } catch (error) {
-    console.error(error);
-    res.json({ success: false, message: 'Failed to deactivate user.' });
-  }
-});
-
-app.patch('/admin/update/:_id', async (req, res) => {
-  const { _id } = req.params;
-  console.log("Received _id:", _id);  // Log the received _id
-
-  const { firstname, lastname, country, phone, email, password } = req.body;
-
-  try {
-    const objectId = new mongoose.Types.ObjectId(_id);
-    console.log("Querying with ObjectId:", objectId); // Log the ObjectId being queried
-
-    // Fetch user by ObjectId
-    const user = await usermodel.findById(objectId);
-    if (!user) {
-      console.log("User not found with ID:", _id);
-      return res.status(404).json({ success: false, message: 'User not found.' });
-    }
-
-    user.firstname = firstname || user.firstname;
-    user.lastname = lastname || user.lastname;
-    user.country = country || user.country;
-    user.phone = phone || user.phone;
-    user.email = email || user.email;
-    user.password = password || user.password;
-
-    const updatedUser = await user.save();  // Save the updated user
-    res.json({ success: true, message: 'User updated successfully.', updatedUser });
-  } catch (error) {
-    console.error("Update failed:", error.message);
-    res.status(500).json({ success: false, message: 'Failed to update user. Error: ' + error.message });
-  }
-});
-
-app.get('/admin', async (req, res) => {
-  const searchQuery = req.query.email || '';
-  try {
-    const users = await usermodel.find({ email: { $regex: new RegExp(`^${searchQuery}$`, 'i') } });
-    res.render('admin', { users });
-  } catch (error) {
-    console.error('Error fetching users:', error);
-    res.status(500).send('Internal Server Error');
-  }
-});
 app.get('/changepassword', (req, res) => {
   res.render('changepassword'); // Render the change-password form
 });
